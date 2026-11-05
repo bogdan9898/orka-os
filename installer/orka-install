@@ -104,7 +104,6 @@ disk_contents() {
   local IFS=,; echo "${what[*]}" | sed 's/,/, /g'
 }
 
-disk_has_windows() { disk_contents "$1" | grep -q Windows; }
 
 list_disks() {
   local boot name size model
@@ -195,7 +194,6 @@ confirm() {
     if [[ "$contents" != empty ]]; then
       warning=("WARNING: $ORKA_DISK is not empty [$contents]." "Everything on it will be permanently deleted:" "")
       mapfile -t -O 3 warning < <(disk_partitions "$ORKA_DISK")
-      disk_has_windows "$ORKA_DISK" && warning+=("" "This disk contains WINDOWS.")
     fi
   else
     what="create 2 partitions in the free space of $ORKA_DISK (nothing else is touched)"
