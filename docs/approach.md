@@ -20,43 +20,56 @@
 
 **Why the script wins here:** most of Omarchy's complexity (582 commands, `$OMARCHY_PATH`, the package repo, migrations, the custom shell) arrived with v4 and exists to support many users and many machines. A personal, single-machine setup needs none of it. Omarchy **v3.8.4** (July 2026), the last release built from standard tools, is the ideal reference to borrow from.
 
-## Proposed repo layout
+## Repo layout
 
 ```text
 orka-os/
-├── install.sh          # entry point; idempotent, safe to re-run
-├── packages.txt        # curated package list for this hardware
-├── packages-aur.txt    # AUR packages (via yay/paru)
-├── config/             # dotfiles → ~/.config (hypr, ghostty, nvim…)
-├── themes/             # color schemes and wallpapers
-├── branding/           # logo, plymouth theme, login screen, fastfetch art
-├── shell/              # Quickshell desktop (bar, notifications, launcher, OSD, lock, greeter)
-├── bin/                # orka-* helper commands
-├── iso/                # archiso profile + offline repo build
+├── packages.txt        # official repo packages for this hardware
+├── packages-aur.txt    # AUR packages (prebuilt into the ISO)
+├── installer/          # orka-install (runs in the live ISO) + target/ (files for the installed system)
+├── config/hypr/        # Hyprland defaults → /usr/share/orka/hypr
+├── config/user/        # user dotfiles → ~/.config (seeded once by orka-setup-user)
+├── bin/                # orka-* helper commands → /usr/local/bin
+├── iso/                # build.sh, archiso profile overlay, test/ (QEMU VM + install test)
+├── themes/             # (later) color schemes and wallpapers
+├── branding/           # (later) logo, Plymouth theme, fastfetch art
+├── shell/              # (later) Quickshell desktop
 └── docs/
 ```
 
 ## Install flow
 
-1. Boot the **OrkaOS ISO** (USB stick). No network needed: every package is in the ISO's local repo.
-2. The installer (`install.sh`, started automatically) asks for username, password and hostname, then:
-   1. partitions the free space next to Windows (see [dual boot](hardware-and-dual-boot.md)): a new ESP plus a Btrfs root with Snapper
-   2. installs packages from `packages.txt` and `packages-aur.txt` out of the local repo
-   3. installs Limine with entries for `linux-zen`, `linux` and Windows
-   4. links or copies dotfiles from `config/` and the Quickshell desktop from `shell/`
-   5. enables services: iwd, Bluetooth, PipeWire, Docker, Snapper
-   6. applies branding: Plymouth boot splash, fastfetch logo, wallpapers
-   7. switches pacman to the normal Arch mirrors for later updates
-3. Reboot into OrkaOS, log in on the TTY and run `uwsm start hyprland` (until the Quickshell greeter exists).
+1. Boot the **OrkaOS ISO** (USB stick). No network needed: every package is in the ISO's local repo. Details: [ISO and installer](iso.md).
+2. `orka-install` starts automatically on the first console and asks for the disk, the mode (whole disk / free space), hostname, username and password, then partitions (2 GiB ESP + Btrfs with Snapper), installs all packages from the local repo, sets up Limine (`linux-zen`, `linux`, Windows), services, the firewall and the Hyprland dotfiles, and points pacman at the normal Arch mirrors for later updates.
+3. Reboot, log in on **tty1**: Hyprland starts. See [desktop](desktop.md).
 
 ## Roadmap
 
-1. **Foundation:** repo skeleton, package list, offline ISO (archiso) and installer, Hyprland started from the TTY, basic theme.
-2. **Test in a VM:** QEMU/KVM with VirGL in the `archlinux` WSL distro, including a fully offline install.
+Status on 2026-11-05 (end of day 1).
+
+1. **Foundation**
+   - [x] Package list (official + AUR), debloated from Omarchy v3.8.4 ([packages](packages.md))
+   - [x] Offline ISO build (`iso/build.sh`) and installer (`orka-install`), UEFI only
+   - [x] Multiple disks: contents shown in the disk menu, red warning before erasing any non-empty disk, Windows boot entry added at every boot (`orka-windows-entry`)
+   - [x] Hyprland 0.57 config in Lua, key bindings ported from Omarchy, `orka-*` helpers, Hyprland starts on tty1
+   - [ ] Shell and terminal setup: starship prompt, aliases (`eza`, `zoxide`, `fzf`), Ghostty and tmux configs
+   - [ ] Neovim config
+   - [ ] Basic theme (colors are a placeholder, see `config/hypr/orka/theme.lua`); Qt/GTK theming (Kvantum, Adwaita-dark, icon theme)
+2. **Test in a VM**
+   - [x] QEMU/KVM in the `archlinux` WSL distro; automated offline install test incl. Windows next to it / on a 2nd disk (`iso/test/install-test.sh`)
+   - [x] Hyprland starts and basic bindings work in the VM
+   - [ ] Click through the interactive installer once (only the first screen and the warning box were checked visually)
 3. **Branding:** Orka logo, Plymouth theme, boot menu, fastfetch, wallpapers.
    - [ ] **TODO: create the logo with an actual orca** (not just a fin). Needs variants for the boot splash, boot menu, fastfetch (ASCII/image), icon and wallpaper.
    - [ ] **TODO: rebrand fastfetch:** replace the Arch logo and text with the Orka logo and name.
    - [ ] **TODO: replace every occurrence of the OS name** so the system shows **OrkaOS** instead of "Arch Linux": `/etc/os-release` (`NAME`, `PRETTY_NAME`, `ID=orka` with `ID_LIKE=arch` so Arch tools still recognize it, `LOGO`), Limine boot entries, ISO label and boot menu, Plymouth, the TTY login banner (`/etc/issue`), fastfetch.
    - [ ] **TODO: choose Orka's fonts** (UI, monospace for terminal/editor, icon font). For now the current set is fine: `noto-fonts`, `noto-fonts-emoji`, `ttf-jetbrains-mono-nerd`, `woff2-font-awesome`.
-4. **Install on the host** (dual boot).
+   - [ ] Icon theme (Yaru was dropped: its AUR build needs gnome-shell)
+4. **Install on the host** (separate disk, Windows disks disconnected; checklist in [dual boot](hardware-and-dual-boot.md)). Then check what the VM can't: FreeSync/`highrr`, screenshots/recording, media keys, Wi-Fi/Bluetooth, KDE Connect.
 5. **Quickshell desktop**, one component at a time: bar → notifications → polkit agent → launcher → OSD → lock screen → login greeter.
+
+### Known small issues
+
+- `pacman` warns "database file for 'core' does not exist" until the first time the installed system is online (`orka-firstboot` runs `pacman -Sy` when there is network).
+- The luarocks pacman hook prints `/usr/bin/lua5.1: No such file or directory` during install (harmless; add `lua51` if Neovim plugins need LuaRocks builds).
+- The current ISO in `~/orka-build/out` predates the last three commits (key list fix, erase warning); rebuild with `sudo ./iso/build.sh iso`.

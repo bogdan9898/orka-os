@@ -2,7 +2,7 @@
 
 A personal, Arch-based Linux setup with its own name and branding, inspired by [Omarchy](https://github.com/omacom/omarchy). Built for one machine only (see [hardware](docs/hardware-and-dual-boot.md)), dual-booted alongside Windows 11. Not intended for public release.
 
-> Status: **building the ISO**. Build and test environment ready.
+> Status (2026-11-05): **offline installer ISO works** (tested in QEMU, incl. Windows on another disk); **Hyprland desktop config** in place (no bar/launcher yet). Next: shell/terminal setup, Neovim, theme, then install on the real machine. See the [roadmap](docs/approach.md#roadmap).
 
 ## Naming
 
@@ -21,7 +21,7 @@ Why "Orka" rather than "Orca": `orca` is already an Arch package (the GNOME scre
 - Keep the spirit and structure of Omarchy (Hyprland, opinionated defaults, themes, keybindings, menus), but **debloat** it and give it **custom names and branding**.
 - Tailored to a single machine: drop everything for hardware it doesn't have.
 - Dual boot with the existing Windows 11 install.
-- Later: a **custom OrkaOS ISO** so a reinstall is branded from the first boot.
+- A **custom OrkaOS ISO** that installs fully offline (done, see [ISO and installer](docs/iso.md)).
 - Eventually: a custom desktop shell (bar, widgets, launcher, notifications, lock screen) written in **Quickshell**.
 
 ## Decisions so far
