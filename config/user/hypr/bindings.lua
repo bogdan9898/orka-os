@@ -1,0 +1,2 @@
+-- Your extra key bindings, e.g.:
+-- hl.bind("SUPER + SHIFT + M", hl.dsp.exec_cmd("uwsm app -- spotify"), { description = "Music" })

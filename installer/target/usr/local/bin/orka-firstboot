@@ -1,0 +1,18 @@
+#!/bin/bash
+# OrkaOS first-boot setup: steps that need the running system (not a chroot).
+# Runs once from orka-firstboot.service, then disables itself.
+set -u
+
+# Firewall: block incoming connections except KDE Connect.
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 1714:1764/tcp comment 'KDE Connect'
+ufw allow 1714:1764/udp comment 'KDE Connect'
+ufw --force enable
+systemctl enable --now ufw.service
+
+# Package lists: the install was offline, so the sync databases are missing
+# (pacman warns about it). Fetch them if there is network; harmless if not.
+pacman -Sy --noconfirm || true
+
+systemctl disable orka-firstboot.service

@@ -1,0 +1,11 @@
+[Unit]
+Description=OrkaOS: add Limine boot entries for Windows disks
+After=local-fs.target
+RequiresMountsFor=/boot
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/orka-windows-entry
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,2 @@
+-- Your programs to start with Hyprland, e.g.:
+-- hl.on("hyprland.start", function() hl.exec_cmd("uwsm app -- firefox") end)

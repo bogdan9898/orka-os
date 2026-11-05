@@ -1,0 +1,10 @@
+#!/bin/bash
+# Set the desktop background: ~/.config/orka/background (any image) if it
+# exists, otherwise a plain dark color. Placeholder until OrkaOS wallpapers exist.
+bg="$HOME/.config/orka/background"
+pkill -x swaybg
+if [[ -e "$bg" ]]; then
+  exec swaybg -i "$bg" -m fill
+else
+  exec swaybg -c '#1a1b26'
+fi

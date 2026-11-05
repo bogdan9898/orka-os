@@ -1,0 +1,156 @@
+# OrkaOS: official Arch repo packages (core/extra), one per line.
+# Baked into the ISO's offline repo and installed by install.sh.
+# Draft based on Omarchy v3.8.4 install/omarchy-*.packages, debloated for
+# this machine (see docs/packages.md for what was dropped and why).
+# Only list what we want on purpose; packages that other entries pull in
+# anyway are left out (pacman installs them as dependencies).
+
+# --- Base system --------------------------------------------------------
+base
+base-devel
+linux-zen
+linux                     # fallback kernel
+amd-ucode
+linux-firmware-amd
+linux-firmware-amdgpu     # RX 6800 XT + Ryzen iGPU
+linux-firmware-mediatek   # MT7922 Wi-Fi 6E + Bluetooth
+linux-firmware-realtek    # Realtek 2.5GbE
+kernel-modules-hook       # keeps running kernel's modules usable after an update
+sudo                      # (also pulled by base-devel; listed because we configure it)
+man-db
+bash-completion
+inetutils
+whois
+git
+
+# --- Disk, boot, snapshots ------------------------------------------------
+btrfs-progs
+dosfstools
+exfatprogs
+snapper
+snap-pac                  # Btrfs snapshots before/after every pacman transaction
+limine
+zram-generator
+plymouth
+
+# --- Graphics (AMD) ------------------------------------------------------
+mesa
+vulkan-radeon
+
+# --- Networking & Bluetooth -----------------------------------------------
+iwd                       # Wi-Fi (Omarchy v3 uses iwd, no NetworkManager)
+impala                    # Wi-Fi TUI
+wireless-regdb
+bluez
+bluez-utils
+bluetui                   # Bluetooth TUI
+nss-mdns                  # .local hostnames (pulls in avahi)
+ufw
+
+# --- Audio ---------------------------------------------------------------
+pipewire
+pipewire-alsa
+pipewire-jack
+pipewire-pulse
+wireplumber
+gst-plugin-pipewire
+alsa-utils
+pamixer
+playerctl
+wiremix                   # audio mixer TUI
+
+# --- Hyprland desktop ------------------------------------------------------
+# Bar, notifications, launcher, OSD, lock screen and login screen will be our
+# own Quickshell implementations (shell/). Until then: log in on the TTY and
+# start Hyprland with `uwsm start hyprland`.
+hyprland
+hypridle
+hyprpicker
+hyprsunset
+uwsm
+quickshell                # Orka desktop shell toolkit
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+xdg-terminal-exec
+swaybg
+polkit                    # admin auth; the agent (password dialog) is our Quickshell code
+kwallet                   # Secret Service (stores app passwords), replaces gnome-keyring
+kwallet-pam               # unlocks the wallet at login (PAM)
+kvantum                   # Qt 6 theming (Dolphin, KDE Connect)
+gnome-themes-extra
+
+# --- Screenshots & clipboard -----------------------------------------------
+grim
+slurp
+satty
+wl-clipboard
+
+# --- Fonts ----------------------------------------------------------------
+# Placeholder set; Orka's own fonts are a roadmap TODO (docs/approach.md).
+noto-fonts
+noto-fonts-emoji
+ttf-jetbrains-mono-nerd
+woff2-font-awesome
+
+# --- Terminal & CLI tools ---------------------------------------------------
+ghostty                   # terminal
+tmux
+neovim
+luarocks                  # for Neovim plugins
+tree-sitter-cli
+starship
+fzf
+fd
+ripgrep
+bat
+eza
+zoxide
+dust
+btop
+fastfetch
+jq
+gum
+tldr
+termdown                  # countdown timer / stopwatch in the terminal
+plocate
+unzip
+inxi
+expac
+socat
+xmlstarlet
+lazygit
+imagemagick
+yazi                      # terminal file manager
+poppler                   # PDF previews in Yazi
+7zip                      # archives (Yazi previews, extraction)
+
+# --- Desktop apps ----------------------------------------------------------
+dolphin                   # file manager (pulls kio-extras: phones/MTP, SMB, SFTP)
+ffmpegthumbs              # Dolphin: video thumbnails
+kdegraphics-thumbnailers  # Dolphin: PDF and image thumbnails
+gparted                   # partition editor (replaces gnome-disk-utility)
+ntfsprogs                 # GParted: NTFS support (the Windows partitions)
+filelight                 # disk usage map (also in Dolphin's menu)
+gnome-calculator
+libqalculate
+imv                       # image viewer
+mpv                       # video player
+ffmpeg
+evince                    # PDF viewer
+webp-pixbuf-loader
+firefox                   # browser
+xdg-user-dirs             # standard folders (Pictures, Videos...) for screenshots/recordings
+libreoffice-fresh         # office suite (Writer, Calc, Impress, Draw...)
+pavucontrol               # audio settings GUI
+kdeconnect                # phone integration (needs ufw ports 1714-1764 open)
+tesseract-data-eng        # OCR: copy text from screenshots (pulls tesseract)
+gpu-screen-recorder       # screen recording
+
+# --- Development -----------------------------------------------------------
+# gcc (C and C++ / g++) comes with base-devel; git is in Base system.
+python
+rust
+docker
+docker-buildx
+docker-compose
+lazydocker                # Docker TUI

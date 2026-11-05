@@ -1,0 +1,2 @@
+-- Your look-and-feel overrides, e.g.:
+-- hl.config({ general = { gaps_out = 0 }, decoration = { rounding = 8 } })

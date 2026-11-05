@@ -1,0 +1,71 @@
+# ISO and installer
+
+The OrkaOS ISO is an archiso live system with the full package set baked in as a local repo, so installing needs **no network**.
+
+## Layout
+
+| Path | What |
+|---|---|
+| `iso/build.sh` | Builds the ISO (stages: `aur`, `repo`, `iso`, `clean`) |
+| `iso/live-packages.txt` | Extra packages for the live environment only (`gum`) |
+| `iso/profile/` | Overlay on archiso's `releng` profile |
+| `installer/orka-install` | The installer (runs in the live ISO) |
+| `installer/target/` | Files copied onto the installed system (network, zram, mirrors, first-boot setup) |
+| `iso/test/vm.sh` | Starts the QEMU test VM |
+| `iso/test/install-test.sh` | End-to-end test: offline install + boot report |
+
+## Build
+
+In the `archlinux` WSL distro (needs `archiso`, `base-devel`, `git`):
+
+```sh
+cd /mnt/c/Users/bogdan/dev/orka-os
+sudo ./iso/build.sh            # all stages
+sudo ./iso/build.sh iso        # only re-assemble the ISO (installer changes)
+```
+
+| Stage | Does |
+|---|---|
+| `aur` | Clones the AUR packages from `packages-aur.txt`, installs their build dependencies, builds them with `makepkg` (as the normal user) |
+| `repo` | Downloads every package from `packages.txt` plus all dependencies (resolved against an empty pacman db, as on a fresh install) and creates the `orka` repo with the AUR packages. Package signatures are kept |
+| `iso` | Copies archiso's `releng` profile, applies `iso/profile/`, renames it to OrkaOS (UEFI only), adds the repo and the installer, runs `mkarchiso` |
+
+Output: `~/orka-build/out/orkaos-YYYY.MM.DD-x86_64.iso` (about 3.2 GB). Build files live in `~/orka-build` (see [TEMP-FILES.md](../TEMP-FILES.md)).
+
+The package snapshot is whatever the Arch mirrors serve at build time. Rebuild the `repo` stage to refresh it; after installing, `pacman -Syu` updates from the normal mirrors.
+
+## Installer
+
+Boots straight into `orka-install` on the first console. It asks for the disk, the mode, hostname, username and password, then:
+
+1. **Partitions**: a 2 GiB ESP (FAT32) + Btrfs root, either in the largest free space (`free`, keeps Windows) or on the whole disk (`wipe`).
+2. **Btrfs subvolumes** `@`, `@home`, `@log`, `@pkg`, `zstd` compression.
+3. **Boot config before packages**: `/etc/default/limine`, a base `/boot/limine.conf`, the initramfs hooks. `limine-mkinitcpio-hook` then installs kernels into the ESP and writes the boot entries itself.
+4. **Packages** with `pacstrap` from the local repo.
+5. **System setup**: locale, timezone, user (groups `wheel`, `docker`), services, Snapper config for `/`, KWallet PAM unlock, then `snap-pac` (pre/post snapshots for every pacman transaction).
+6. **Desktop**: Hyprland defaults to `/usr/share/orka/hypr`, `orka-*` commands to `/usr/local/bin`, the user's dotfiles via `orka-setup-user` (see [desktop](desktop.md)).
+7. **Limine**: UEFI entry, fallback loader, and a Windows entry for every other disk with Windows Boot Manager. `orka-windows-entry.service` repeats the scan at every boot, so Windows disks that were disconnected during the install get their entry later.
+
+**Several disks:** the disk menu shows each disk's size, model and contents (`[empty]`, `[Windows, 4 partitions]`, ...). Only the chosen disk is touched; erasing a disk that contains Windows is flagged in the confirmation.
+
+Unattended mode (used by the test): `ORKA_UNATTENDED=1 ORKA_DISK=/dev/vda ORKA_MODE=wipe ORKA_HOSTNAME=… ORKA_USER=… ORKA_PASSWORD=… orka-install`. See the header of `installer/orka-install`.
+
+### Offline details
+
+- archiso's keyring service waits for an NTP time sync, which never happens offline; the build removes `systemd-time-wait-sync` from the live system.
+- The live system's keyring checks the official packages' signatures; the AUR packages are our own unsigned builds (`SigLevel = Optional TrustAll` for the `orka` repo only).
+- The installed system gets a fixed mirrorlist (`geo` + `fastly` mirrors) for later updates.
+
+## Test
+
+```sh
+iso/test/install-test.sh                 # newest ISO, whole-disk install
+iso/test/install-test.sh --mode free     # next to a fake Windows install on the same disk
+iso/test/install-test.sh --windows-disk during   # 2nd disk with fake Windows attached while installing
+iso/test/install-test.sh --windows-disk later    # ...attached only afterwards (boot service adds the entry)
+iso/test/install-test.sh --gui           # watch it in a window
+```
+
+The VM runs with `restrict=on` networking: no internet, but SSH to the live ISO works (port 2222, key from a cloud-init seed). With `ORKA_TEST=1` the installer adds a serial console and `orka-selftest.service`, which prints a boot report the test script reads from the serial log.
+
+`iso/test/vm.sh --gui` boots the installed disk in a window for manual testing.

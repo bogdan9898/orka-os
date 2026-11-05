@@ -1,0 +1,25 @@
+-- Launcher, screenshots, system actions.
+local apps = require("orka.apps")
+local function bind(keys, cmd, description)
+    hl.bind(keys, hl.dsp.exec_cmd(cmd), { description = description })
+end
+
+-- Stand-in launcher until the Quickshell launcher exists: Hyprland's run dialog.
+bind("SUPER + SPACE",          "hyprland-run",                       "Run a program")
+bind("SUPER + K",              apps.tui("orka-keybindings", "keybindings"), "Show key bindings")
+
+-- Screenshots, recording, color picker, OCR
+bind("PRINT",                  "orka-screenshot region",             "Screenshot (region, edit)")
+bind("SHIFT + PRINT",          "orka-screenshot screen",             "Screenshot (screen, edit)")
+bind("ALT + PRINT",            "orka-screenrecord",                  "Start/stop screen recording")
+bind("SUPER + PRINT",          "pkill hyprpicker || hyprpicker -a",  "Color picker")
+bind("SUPER + CTRL + PRINT",   "orka-screenshot text",               "Copy text from screen region (OCR)")
+
+-- Night light, zoom
+bind("SUPER + CTRL + N",       "orka-nightlight",                    "Toggle night light")
+bind("SUPER + CTRL + Z",       "hyprctl eval 'hl.config({ cursor = { zoom_factor = 2 } })'", "Zoom in")
+bind("SUPER + CTRL + ALT + Z", "hyprctl eval 'hl.config({ cursor = { zoom_factor = 1 } })'", "Reset zoom")
+
+-- Leave the session. Deliberately awkward to press: there's no lock screen
+-- or confirmation dialog yet (both are planned Quickshell components).
+hl.bind("SUPER + CTRL + ALT + ESCAPE", hl.dsp.exec_cmd("uwsm stop"), { description = "Log out" })

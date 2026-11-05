@@ -1,0 +1,3 @@
+# Extra packages for the live (installer) environment, on top of archiso's
+# releng list. These are NOT installed on the target system.
+gum                       # installer UI (menus, prompts, spinners)

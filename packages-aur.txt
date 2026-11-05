@@ -1,0 +1,10 @@
+# OrkaOS: AUR packages, one per line.
+# Prebuilt during the ISO build (makepkg) and added to the offline repo,
+# so nothing is compiled at install time.
+
+yay                       # AUR helper
+limine-snapper-sync       # Btrfs snapshots as Limine boot entries
+limine-mkinitcpio-hook    # installs kernels into Limine automatically
+# yaru-icon-theme: dropped for now (its AUR build needs gnome-shell); icon theme is part of the theme TODO
+claude-code               # Claude Code CLI
+sublime-text-4            # Sublime Text 4 (stable build)

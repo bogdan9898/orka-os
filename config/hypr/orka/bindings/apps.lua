@@ -1,0 +1,25 @@
+-- Application launchers. The default apps are defined in orka/apps.lua.
+local apps = require("orka.apps")
+local function bind(keys, cmd, description)
+    hl.bind(keys, hl.dsp.exec_cmd(cmd), { description = description })
+end
+
+bind("SUPER + RETURN",               apps.run(apps.terminal),       "Terminal")
+bind("SUPER + ALT + RETURN",         apps.run(apps.terminal .. " -e bash -c 'tmux attach || tmux new -s Work'"), "Terminal with tmux")
+bind("SUPER + SHIFT + RETURN",       apps.run(apps.browser),        "Browser")
+bind("SUPER + SHIFT + B",            apps.run(apps.browser),        "Browser")
+bind("SUPER + SHIFT + ALT + B",      apps.run(apps.private),        "Browser (private)")
+bind("SUPER + SHIFT + F",            apps.run(apps.files),          "File manager")
+bind("SUPER + SHIFT + N",            apps.run(apps.terminal .. " -e nvim"), "Neovim")
+bind("SUPER + SHIFT + S",            apps.run(apps.editor),         "Sublime Text")
+bind("SUPER + SHIFT + O",            apps.run("libreoffice"),       "LibreOffice")
+bind("SUPER + SHIFT + Y",            apps.tui("yazi"),              "Yazi (files)")
+bind("SUPER + SHIFT + D",            apps.tui("lazydocker"),        "Docker (lazydocker)")
+bind("SUPER + SHIFT + G",            apps.tui("lazygit"),           "Git (lazygit)")
+
+-- System TUIs (floating)
+bind("SUPER + CTRL + T",             apps.tui("btop"),              "Activity (btop)")
+bind("SUPER + CTRL + A",             apps.tui("wiremix"),           "Audio (wiremix)")
+bind("SUPER + CTRL + B",             apps.tui("bluetui"),           "Bluetooth (bluetui)")
+bind("SUPER + CTRL + W",             apps.tui("impala"),            "Wi-Fi (impala)")
+bind("XF86Calculator",               apps.run(apps.calculator),     "Calculator")

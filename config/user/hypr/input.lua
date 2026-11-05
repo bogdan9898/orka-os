@@ -1,0 +1,2 @@
+-- Your keyboard/mouse settings, e.g.:
+-- hl.config({ input = { kb_layout = "us,ro", kb_options = "grp:alts_toggle", sensitivity = -0.2 } })

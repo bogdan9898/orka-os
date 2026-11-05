@@ -1,0 +1,13 @@
+[Unit]
+Description=OrkaOS first-boot setup
+Wants=network-online.target
+After=network-online.target
+ConditionPathExists=/usr/local/bin/orka-firstboot
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/orka-firstboot
+RemainAfterExit=no
+
+[Install]
+WantedBy=multi-user.target

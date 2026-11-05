@@ -1,0 +1,18 @@
+# ISO build output (large; tracked in TEMP-FILES.md, never committed)
+iso/work/
+iso/out/
+iso/repo/
+iso/aur-build/
+*.iso
+*.qcow2
+*.img
+*.pkg.tar.zst
+*.pkg.tar.zst.sig
+
+# Editors / OS
+*.swp
+*~
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
