@@ -24,7 +24,7 @@ Collected from Windows on 2026-11-05.
 ## Dual-boot plan
 
 - OrkaOS gets a **separate, dedicated disk** (decided 2026-11-05). The installer's `wipe` mode uses the whole disk: 2 GB ESP + Btrfs.
-- During the install, **both Windows disks are disconnected**, to be safe. The installer still handles other disks: the disk menu shows what's on each disk (e.g. `[Windows, 4 partitions]`), only the chosen disk is touched, and erasing a disk that contains Windows shows an extra warning.
+- During the install, **both Windows disks are disconnected**, to be safe. The installer still handles other disks: the disk menu shows what's on each disk (e.g. `[Windows, 4 partitions]`), only the chosen disk is touched, and erasing a disk that is not empty shows a clear warning listing everything that will be deleted.
 - **Windows boot entry:** `orka-windows-entry.service` runs at every boot and adds a Limine entry for any Windows Boot Manager it finds on another disk's EFI partition. After reconnecting the Windows disks, the entry appears automatically (it's written during that boot, so it shows in the menu from the next boot on).
 - **Boot order:** the firmware decides which disk's boot loader starts. After reconnecting the Windows disks, check in the BIOS that **"Limine"** (on the OrkaOS disk) is first; Windows is then started from the Limine menu.
 - Bootloader: Limine, managed by `limine-mkinitcpio-hook` (see [ISO and installer](iso.md)).

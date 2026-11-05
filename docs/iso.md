@@ -46,7 +46,7 @@ Boots straight into `orka-install` on the first console. It asks for the disk, t
 6. **Desktop**: Hyprland defaults to `/usr/share/orka/hypr`, `orka-*` commands to `/usr/local/bin`, the user's dotfiles via `orka-setup-user` (see [desktop](desktop.md)).
 7. **Limine**: UEFI entry, fallback loader, and a Windows entry for every other disk with Windows Boot Manager. `orka-windows-entry.service` repeats the scan at every boot, so Windows disks that were disconnected during the install get their entry later.
 
-**Several disks:** the disk menu shows each disk's size, model and contents (`[empty]`, `[Windows, 4 partitions]`, ...). Only the chosen disk is touched; erasing a disk that contains Windows is flagged in the confirmation.
+**Several disks:** the disk menu shows each disk's size, model and contents (`[empty]`, `[Windows, 4 partitions]`, ...). Only the chosen disk is touched. Erasing a disk that is not empty shows a red warning with every partition that will be deleted (plus a note if it contains Windows), and still needs the disk name typed to confirm; unattended mode refuses unless `ORKA_ERASE_NONEMPTY=1`.
 
 Unattended mode (used by the test): `ORKA_UNATTENDED=1 ORKA_DISK=/dev/vda ORKA_MODE=wipe ORKA_HOSTNAME=… ORKA_USER=… ORKA_PASSWORD=… orka-install`. See the header of `installer/orka-install`.
 

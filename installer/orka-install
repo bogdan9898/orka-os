@@ -11,6 +11,7 @@
 # Optional:
 #   ORKA_TIMEZONE (Europe/Bucharest), ORKA_LOCALE (en_US.UTF-8), ORKA_KEYMAP (us)
 #   ORKA_TEST=1     test build: kernel log + self-test report on the serial port
+#   ORKA_ERASE_NONEMPTY=1  allow "wipe" on a disk that has partitions (unattended only)
 
 set -euo pipefail
 
@@ -180,11 +181,22 @@ plan_partitions() {
   ROOT_GIB=$root_gib
 }
 
+# Partitions of a disk, for the erase warning: "  vda1  100M  vfat  EFI".
+disk_partitions() {
+  lsblk -lnpo NAME,SIZE,FSTYPE,LABEL,PARTLABEL,TYPE "$1" |
+    awk '$NF=="part" { $NF=""; sub("^/dev/", "", $1); printf "  %s\n", $0 }'
+}
+
 confirm() {
-  local what
+  local what contents warning=()
+  contents="$(disk_contents "$ORKA_DISK")"
   if [[ "$ORKA_MODE" == wipe ]]; then
-    what="ERASE ALL DATA on $ORKA_DISK"
-    disk_has_windows "$ORKA_DISK" && what="$what (THIS DISK CONTAINS WINDOWS)"
+    what="ERASE the whole disk $ORKA_DISK"
+    if [[ "$contents" != empty ]]; then
+      warning=("WARNING: $ORKA_DISK is not empty [$contents]." "Everything on it will be permanently deleted:" "")
+      mapfile -t -O 3 warning < <(disk_partitions "$ORKA_DISK")
+      disk_has_windows "$ORKA_DISK" && warning+=("" "This disk contains WINDOWS.")
+    fi
   else
     what="create 2 partitions in the free space of $ORKA_DISK (nothing else is touched)"
   fi
@@ -192,12 +204,16 @@ confirm() {
   if interactive; then
     echo
     gum style --border rounded --padding "0 2" --border-foreground 4 \
-      "Disk:      $ORKA_DISK ($(lsblk -dno SIZE,MODEL "$ORKA_DISK" | xargs))" \
+      "Disk:      $ORKA_DISK ($(lsblk -dno SIZE,MODEL "$ORKA_DISK" | xargs)) [$contents]" \
       "Action:    $what" \
       "Partitions: 2 GiB boot (FAT32) + ${ROOT_GIB} GiB system (Btrfs)" \
       "Hostname:  $ORKA_HOSTNAME" \
       "User:      $ORKA_USER" \
       "Timezone:  $ORKA_TIMEZONE, $ORKA_LOCALE, keyboard $ORKA_KEYMAP"
+    if ((${#warning[@]})); then
+      echo
+      gum style --border thick --padding "0 2" --border-foreground 1 --foreground 1 --bold "${warning[@]}"
+    fi
     echo
     if [[ "$ORKA_MODE" == wipe ]]; then
       local typed
@@ -207,7 +223,10 @@ confirm() {
       gum confirm "Install OrkaOS now?" || exit 1
     fi
   else
-    info "unattended: $what"
+    info "unattended: $what [$contents]"
+    if ((${#warning[@]})) && [[ "${ORKA_ERASE_NONEMPTY:-0}" != 1 ]]; then
+      die "$ORKA_DISK is not empty [$contents]; set ORKA_ERASE_NONEMPTY=1 to erase it anyway"
+    fi
   fi
 }
 
