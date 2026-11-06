@@ -1,14 +1,16 @@
 //@ pragma UseQApplication
 // OrkaOS desktop shell (Quickshell). Installed to /usr/share/orka/shell and
 // started by Hyprland (orka/autostart.lua) with `qs -p /usr/share/orka/shell`.
-// Saving a file reloads the shell. So far: the bar (one per monitor) and
-// notifications (Notifications.qml, popups on the focused monitor).
+// Saving a file reloads the shell. So far: the bar (one per monitor),
+// notifications (Notifications.qml, popups on the focused monitor) and the
+// polkit agent (admin password dialog).
 //
 // UseQApplication: system tray menus are Qt widget menus and need it.
 import QtQuick
 import Quickshell
 import qs.bar
 import qs.notifications
+import qs.polkit
 
 ShellRoot {
     Variants {
@@ -17,4 +19,5 @@ ShellRoot {
     }
 
     Popups {}
+    PolkitDialog {}
 }

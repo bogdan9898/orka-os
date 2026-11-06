@@ -66,7 +66,7 @@ Status on 2026-11-05 (end of day 1).
    - [ ] **TODO: choose Orka's fonts** (UI, monospace for terminal/editor, icon font). For now the current set is fine: `noto-fonts`, `noto-fonts-emoji`, `ttf-jetbrains-mono-nerd`, `woff2-font-awesome`.
    - [ ] Icon theme (Yaru was dropped: its AUR build needs gnome-shell)
 4. **Install on the host** (separate disk, Windows disks disconnected; checklist in [dual boot](hardware-and-dual-boot.md)). Then check what the VM can't: FreeSync/`highrr`, screenshots/recording, media keys, Wi-Fi/Bluetooth, KDE Connect.
-5. **Quickshell desktop**, one component at a time: bar and notifications (done: [quickshell](quickshell.md#the-bar)) → polkit agent → launcher → OSD → lock screen → login greeter.
+5. **Quickshell desktop**, one component at a time: bar, notifications, polkit agent (done: [quickshell](quickshell.md#the-bar)) → launcher → OSD → lock screen → login greeter.
 
 ### Known small issues
 

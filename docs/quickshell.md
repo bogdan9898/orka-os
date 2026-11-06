@@ -37,9 +37,9 @@ Omarchy's `shell/` uses all of these: 67 files import `Quickshell`, 21 `Quickshe
 No stock desktop tools: Waybar, Mako, SwayOSD, Hyprlock, Walker and SDDM are **not** installed. Every piece is our own Quickshell code, built over time. Until a piece exists, the TTY covers it (log in on the console, start Hyprland with `uwsm start hyprland`).
 
 1. `quickshell` (Arch `extra`, 0.3.2) is in the base package list. Our shell lives in this repo under `shell/`, is installed to `/usr/share/orka/shell/` and started from Hyprland (`qs -p /usr/share/orka/shell`, in `orka/autostart.lua`).
-2. Build components one at a time: **bar (done) → notifications (done) → polkit agent → launcher → OSD → lock screen**. The lock screen comes late because a broken lock screen is a security problem; until then, there is no screen lock.
+2. Build components one at a time: **bar (done) → notifications (done) → polkit agent (done) → launcher → OSD → lock screen**. The lock screen comes late because a broken lock screen is a security problem; until then, there is no screen lock.
 3. Last: a login greeter via greetd (`Quickshell.Services.Greetd`) to replace the TTY login.
-4. The polkit agent (admin password dialog) is ours too, built on `Quickshell.Services.Polkit` (included in Arch's 0.3.2). `polkit-gnome` is not installed. Until our agent exists, GUI apps that need admin rights (mounting disks in Nautilus, GNOME Disks) can't ask for a password; in the terminal, `pkexec` and `sudo` still work.
+4. The polkit agent (admin password dialog) is ours too, built on `Quickshell.Services.Polkit` (included in Arch's 0.3.2); `polkit-gnome` is not installed. Done, see [polkit agent](#polkit-agent).
 
 ## The bar
 
@@ -60,7 +60,7 @@ Layout taken from Omarchy v3.8.4's Waybar; the code is our own (Omarchy v4's Qui
 
 Not in it (on purpose): battery (desktop), Omarchy's weather, update, dictation and idle indicators (no such features yet), tooltips (later).
 
-Files (`shell/`): `shell.qml` (one bar per monitor, the notification popups), `Notifications.qml` (the notification daemon), `notifications/` (popups), `Theme.qml` (colors, font, glyphs; placeholder until the Orka theme), `Apps.qml` (start programs via uwsm, like `orka/apps.lua`), `bar/*.qml` (one file per widget). Network state comes from `orka-netstatus`, because Quickshell's Networking module only supports NetworkManager and OrkaOS uses iwd + systemd-networkd.
+Files (`shell/`): `shell.qml` (one bar per monitor, the notification popups), `Notifications.qml` (the notification daemon), `notifications/` (popups), `polkit/` (the admin password dialog), `Theme.qml` (colors, font, glyphs; placeholder until the Orka theme), `Apps.qml` (start programs via uwsm, like `orka/apps.lua`), `bar/*.qml` (one file per widget). Network state comes from `orka-netstatus`, because Quickshell's Networking module only supports NetworkManager and OrkaOS uses iwd + systemd-networkd.
 
 **Tested** 2026-11-06 in the VM (installed from the ISO, Hyprland on tty1): the bar starts with Hyprland, windows tile below it, workspaces follow `SUPER + 1..5`, the clock shows, the network icon shows wired with internet and offline without, volume shows muted (the VM has no sound device), Bluetooth is hidden (no adapter). Shell log: no QML errors. Not yet tried: the tray (needs a tray app such as KDE Connect), clicks, volume scrolling, the recording dot, multiple monitors, real Wi-Fi.
 
@@ -89,6 +89,17 @@ The shell is the notification daemon (`NotificationServer` in `Notifications.qml
 **Tested** 2026-11-06 in the VM with `notify-send`: popups stack newest first, critical (red) stays, action buttons, bold/italic body, app timeout (`-t 3000`) and the 5 s default, images and theme icons (a missing icon is left out), restore, do not disturb (bell in the bar, notification kept), `SUPER + ,` and `SUPER + SHIFT + ,`. Not yet tried: mouse clicks on popups (default action, right-click dismiss, hover pause), `SUPER + ALT + ,`, real apps (Firefox, KDE Connect).
 
 `orka-notifications` calls the shell over IPC (`qs -p /usr/share/orka/shell ipc call notifications <function>`). Try it with `notify-send "Hello" "World"` (`libnotify`, now in the package list). Not yet: a notification center (history panel), sounds, inline replies.
+
+## Polkit agent
+
+When an app needs admin rights, polkit asks the session's agent for the password; ours is `polkit/PolkitDialog.qml` (`PolkitAgent` from `Quickshell.Services.Polkit`, D-Bus path `/org/orka/PolkitAgent`). Without an agent such requests simply fail: GParted wouldn't start from the desktop, Dolphin couldn't mount internal disks. `sudo` and `pkexec` in a terminal never needed it.
+
+- A dialog in the middle of the focused monitor, the rest of the screen dimmed. It takes all keyboard input until answered.
+- Shows what polkit says the app wants to do (e.g. "Authentication is needed to run `/usr/bin/true` as the super user") and the action ID (`org.freedesktop.policykit.exec`).
+- **Enter** or *Authenticate*: check the password. **Escape** or *Cancel*: refuse (the app gets "Request dismissed").
+- Wrong password: red border and "Wrong password, try again", the field is cleared, polkit asks again. Messages from PAM (e.g. account locked) are shown under the field.
+
+**Tested** 2026-11-06 in the VM with `pkexec true` from Ghostty: dialog shown, wrong password rejected and asked again, right password accepted, Escape cancels; the log says `orka: polkit agent registered`. Not yet tried: a real GUI app (GParted, Dolphin), several monitors, a request arriving while another is open (polkit queues them).
 
 ## References
 

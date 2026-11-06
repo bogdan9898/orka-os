@@ -21,6 +21,7 @@ Singleton {
         cpu:         String.fromCodePoint(0xF035B),
         recording:   String.fromCodePoint(0xF0EC2),
         dnd:         String.fromCodePoint(0xF009B),   // bell with a slash
+        lock:        String.fromCodePoint(0xF033E),
         btOn:        String.fromCodePoint(0xF293),
         btOff:       String.fromCodePoint(0xF00B2),
         btConnected: String.fromCodePoint(0xF00B1),
