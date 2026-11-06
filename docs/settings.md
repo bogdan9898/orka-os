@@ -37,7 +37,7 @@ Both pages have an "Open … folder" button.
 
 ## Themes
 
-Built in (all work offline, also in Ghostty and Neovim): **Orka** (the placeholder colors, the default), **Tokyo Night**, **Catppuccin Mocha**, **Catppuccin Latte** (light).
+Built in (all work offline, also in Ghostty and Neovim): **Orka** ("Deep water": navy, ocean blue, sea-glass teal; the default), **Orka Light**, **Tokyo Night**, **Catppuccin Mocha**, **Catppuccin Latte** (light).
 
 A theme reaches:
 
@@ -48,10 +48,12 @@ A theme reaches:
 | Ghostty | `config-file = ?"~/.config/orka/current/ghostty.conf"` in your Ghostty config: a built-in Ghostty theme by name, or the theme's own `ghostty.conf` | At once (SIGUSR2) |
 | tmux | Uses the terminal's colors (named colors only) | With Ghostty |
 | Neovim | `plugins/orka.lua` reads `"neovim"` from `current/theme.json` | At start, and in a running Neovim when it gets focus |
-| GTK / Firefox (portal) | `gsettings set org.gnome.desktop.interface color-scheme prefer-dark/light` | At once (apps that follow it) |
+| GTK / Firefox (portal) | `gsettings` `color-scheme` (prefer-dark/light), `gtk-theme` (adw-gtk3 / adw-gtk3-dark), `icon-theme`; colors in `current/gtk.css`, imported by `~/.config/gtk-{3,4}.0/gtk.css` | Light/dark and GTK 3 theme at once; the colors when an app starts |
+| Qt / KDE apps (Dolphin, Filelight, KDE Connect) | `QT_QPA_PLATFORMTHEME=qt6ct`: Breeze style, palette `current/qt6ct-colors.conf` and icon theme set in `~/.config/qt6ct/qt6ct.conf`; KDE colors in `~/.config/kdeglobals` (only those keys are changed, the rest of both files is yours) | When an app starts |
+| Icons | Papirus-Dark, or Papirus-Light for light themes (`"icons"` in `theme.json` to choose another), for GTK, Qt and KDE apps | As above |
 | Wallpaper | The theme's `wallpaper` image, or its background color, when the wallpaper is "Theme default" | At once |
 
-Not themed yet: Qt apps (Dolphin, KDE Connect: Kvantum is installed but not configured), the icon theme, btop. Part of the theme roadmap item.
+The GTK, Qt and icon settings are also applied at each login (`orka-settings apply apps`), because `gsettings` needs the session's D-Bus. Not themed yet: btop, the mouse cursor.
 
 ## How Hyprland gets the values
 
@@ -60,5 +62,7 @@ Not themed yet: Qt apps (Dolphin, KDE Connect: Kvantum is installed but not conf
 The login screen doesn't use these settings (it runs before you log in, as another user).
 
 ## Tested
+
+2026-11-07 (theming) in the VM from a fresh install: the session and the shell get `QT_QPA_PLATFORMTHEME=qt6ct`; Dolphin (Breeze style, Papirus icons, Deep water colors, soft unfocused selection), gnome-calculator (libadwaita) and the launcher's app icons in Orka, then `orka-settings set .theme '"orka-light"'` switches the bar, Ghostty, Hyprland borders, GTK and, for newly started apps, Qt. Without `[UiSettings] ColorScheme=*` in kdeglobals, Dolphin ignored the qt6ct palette (Breeze Light with unreadable labels).
 
 2026-11-06 in the VM, from a fresh install, by clicking (QEMU's QMP `input-send-event`, now enabled in `iso/test/vm.sh`): all eight pages show real data (26 display modes of the virtual monitor, the sound devices, 100 keyboard layouts, system information); choosing Tokyo Night recolors the shell, the Hyprland borders and Ghostty at once; a wallpaper from `~/Pictures/Wallpapers` is applied; 1024×768 is applied and, without pressing Keep, goes back to 1280×800 after 15 s; the night light turns on; searching "roman" and Enter adds the Romanian layout (`hyprctl getoption input:kb_layout` → `us,ro`). Not yet tried: the Idle & lock choices by click (same mechanism; the VM's screen had just changed size), Sound device switching (the VM has one device each way), the scale choices, several monitors, Neovim following a theme change, a theme of your own.

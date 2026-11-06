@@ -12,11 +12,11 @@ Singleton {
     property var theme: ({})
     readonly property var colors: theme.colors || {}
 
-    readonly property color background: colors.background || "#1a1a1a"
-    readonly property color foreground: colors.foreground || "#e0e0e0"
-    readonly property color accent: colors.accent || "#1793d1"
-    readonly property color urgent: colors.urgent || "#e05252"
-    readonly property color inactive: colors.inactive || "#595959"
+    readonly property color background: colors.background || "#0d1620"
+    readonly property color foreground: colors.foreground || "#dce6ef"
+    readonly property color accent: colors.accent || "#3fa7d6"
+    readonly property color urgent: colors.urgent || "#ef6461"
+    readonly property color inactive: colors.inactive || "#2e3d4d"
     readonly property bool light: theme.mode === "light"
 
     FileView {

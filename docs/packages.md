@@ -19,7 +19,9 @@ The lists live in [`packages.txt`](../packages.txt) (official repos) and [`packa
 | `gparted` + `ntfsprogs` | Partition editor, replaces `gnome-disk-utility`. `ntfsprogs` lets it handle the Windows NTFS partitions |
 | `filelight` | Disk usage map; Dolphin links to it |
 | `termdown` | Countdown timer and stopwatch in the terminal (a Quickshell timer widget may come later) |
-| `kvantum` | Qt 6 theming, replaces `kvantum-qt5` |
+| `qt6ct` + `breeze` | Qt theming: the Breeze style with colors generated from the OrkaOS theme. Replaces `kvantum-qt5` (and Kvantum, tried first) |
+| `adw-gtk-theme` | GTK 3 apps in the libadwaita look, colored by the OrkaOS theme. Replaces `gnome-themes-extra` |
+| `papirus-icon-theme` | Icon theme (Omarchy uses `yaru-icon-theme`, whose AUR build needs gnome-shell) |
 
 ### Dropped: hardware this machine doesn't have
 

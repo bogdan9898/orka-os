@@ -78,8 +78,11 @@ swaybg
 polkit                    # admin auth; the agent (password dialog) is our Quickshell code
 kwallet                   # Secret Service (stores app passwords), replaces gnome-keyring
 kwallet-pam               # unlocks the wallet at login (PAM)
-kvantum                   # Qt 6 theming (Dolphin, KDE Connect)
-gnome-themes-extra
+# Theming: orka-settings generates GTK and Qt colors from the OrkaOS theme.
+adw-gtk-theme             # GTK 3 apps in the libadwaita look (themes adw-gtk3, adw-gtk3-dark)
+qt6ct                     # Qt apps: style, colors and icons outside KDE Plasma
+breeze                    # Qt widget style, native for the KDE apps (Dolphin...)
+papirus-icon-theme        # icons (Papirus-Dark / Papirus-Light, follows the theme)
 
 # --- Screenshots & clipboard -----------------------------------------------
 grim

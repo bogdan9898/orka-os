@@ -10,4 +10,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd(apps.run("hypridle"))
     hl.exec_cmd(apps.run("orka-wallpaper"))
     hl.exec_cmd("orka-settings apply nightlight")   -- night light, if it was on
+    -- GTK/Qt theme and icons: gsettings needs the session's D-Bus, which the
+    -- installer doesn't have, so set them again at each login.
+    hl.exec_cmd("orka-settings apply apps")
 end)

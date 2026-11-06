@@ -555,6 +555,7 @@ echo "git: pull.rebase=$(as_user git config pull.rebase) defaultBranch=$(as_user
 echo "login: greetd=$(systemctl is-enabled greetd 2>&1) active=$(systemctl is-active greetd 2>&1) greeter=$(pgrep -u greeter -x qs >/dev/null && echo running || echo missing) cage=$(pgrep -x cage >/dev/null && echo running || echo missing)"
 echo "shell service: $(systemctl --global is-enabled orka-shell.service 2>&1)"
 echo "settings: theme=$(jq -r .id "/home/$u/.config/orka/current/theme.json" 2>&1) current=[$(ls "/home/$u/.config/orka/current" | tr '\n' ' ')] themes=$(ls /usr/share/orka/themes | grep -vc README) dirs=$(test -d "/home/$u/Pictures/Wallpapers" && test -d "/home/$u/.config/orka/themes" && echo ok) desktop=$(test -f /usr/share/applications/org.orka.Settings.desktop && echo ok)"
+echo "theming: qt6ct=$(as_user grep -E '^(style|icon_theme)=' "/home/$u/.config/qt6ct/qt6ct.conf" | tr '\n' ' ')kdeglobals=$(grep -c '^\[Colors:' "/home/$u/.config/kdeglobals") gtk=$(grep -c 'orka/current/gtk.css' "/home/$u/.config/gtk-3.0/gtk.css" "/home/$u/.config/gtk-4.0/gtk.css" | tr '\n' ' ')icons=$(test -f /usr/share/icons/Papirus-Dark/index.theme && echo ok) styles=$(ls /usr/lib/qt6/plugins/styles/ | tr '\n' ' ')"
 echo "lock: pam=$(test -f /etc/pam.d/orka-lock && echo ok || echo missing) kwallet-greetd=$(grep -c pam_kwallet5 /etc/pam.d/greetd) settings=$(as_user cat "/home/$u/.config/orka/settings.json" | tr -d ' \n')"
 echo "ORKA-SELFTEST-END"
 EOF

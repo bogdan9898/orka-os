@@ -1,0 +1,13 @@
+{
+  "name": "Orka Light",
+  "mode": "light",
+  "colors": {
+    "background": "#eef3f7",
+    "foreground": "#1b2a38",
+    "accent": "#1f7fb0",
+    "accent2": "#2a9d8f",
+    "urgent": "#d64545",
+    "inactive": "#b8c5d1"
+  },
+  "neovim": "tokyonight-day"
+}

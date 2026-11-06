@@ -15,8 +15,9 @@ One directory per theme. Installed to `/usr/share/orka/themes/`; your own go in 
   },
   "ghostty": "TokyoNight Night",  // a built-in Ghostty theme (`ghostty +list-themes`), "" = Ghostty's default
   "neovim": "tokyonight-night",   // a Neovim colorscheme (tokyonight-*, catppuccin-* work offline)
-  "wallpaper": "wallpaper.jpg"    // optional: an image in this directory, the theme's default wallpaper
+  "wallpaper": "wallpaper.jpg",   // optional: an image in this directory, the theme's default wallpaper
+  "icons": "Papirus-Dark"         // optional: icon theme; default Papirus-Dark, or Papirus-Light for "mode": "light"
 }
 ```
 
-Optional files next to it: `ghostty.conf` (used instead of the `ghostty` name, for custom colors). tmux follows the terminal's colors and needs nothing.
+Optional files next to it: `ghostty.conf` (used instead of the `ghostty` name, for custom colors). tmux follows the terminal's colors and needs nothing. GTK and Qt apps get colors generated from `colors` (see [docs/settings.md](../docs/settings.md#themes)).

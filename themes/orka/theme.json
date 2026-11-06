@@ -2,13 +2,12 @@
   "name": "Orka",
   "mode": "dark",
   "colors": {
-    "background": "#1a1a1a",
-    "foreground": "#e0e0e0",
-    "accent": "#1793d1",
-    "accent2": "#33ccff",
-    "urgent": "#e05252",
-    "inactive": "#595959"
+    "background": "#0d1620",
+    "foreground": "#dce6ef",
+    "accent": "#3fa7d6",
+    "accent2": "#7fd1c7",
+    "urgent": "#ef6461",
+    "inactive": "#2e3d4d"
   },
-  "ghostty": "",
   "neovim": "tokyonight-night"
 }

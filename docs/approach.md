@@ -45,7 +45,7 @@ orka-os/
 
 ## Roadmap
 
-Status on 2026-11-06 (end of day 2). **Next up**, in the order offered to the user: the real Orka theme (colors, Qt/Kvantum, icon theme), branding, then installing on the real machine.
+Status on 2026-11-06 (end of day 2). **Next up**, in the order offered to the user: the real Orka theme (in progress on day 3), branding, then installing on the real machine.
 
 1. **Foundation**
    - [x] Package list (official + AUR), debloated from Omarchy v3.8.4 ([packages](packages.md))
@@ -54,7 +54,9 @@ Status on 2026-11-06 (end of day 2). **Next up**, in the order offered to the us
    - [x] Hyprland 0.57 config in Lua, key bindings ported from Omarchy (with sections, `orka/keys.lua`), `orka-*` helpers
    - [x] Shell and terminal setup: starship prompt, aliases (`eza`, `zoxide`, `fzf`), Ghostty and tmux configs ([shell](shell.md))
    - [x] Neovim config: LazyVim, plugins bundled into the ISO ([neovim](neovim.md))
-   - [ ] Basic theme: theme switching works (4 themes, Settings → Theme, [settings](settings.md)); still to do: real Orka colors, Qt theming (Kvantum), icon theme
+   - [x] Themes: switching (5 themes, Settings → Theme, [settings](settings.md)); Orka "Deep water" + Orka Light; GTK and Qt apps colored from the theme (adw-gtk3, qt6ct + Breeze), Papirus icons
+   - [ ] **TODO: btop follows the theme** (a btop theme generated from the current theme's colors by `orka-settings`)
+   - [ ] **TODO: mouse cursor theme** (one that fits Orka, same in GTK, Qt, Hyprland and the login screen; `XCURSOR_THEME`/`HYPRCURSOR_THEME` + gsettings `cursor-theme`)
 2. **Test in a VM**
    - [x] QEMU/KVM in the `archlinux` WSL distro; automated offline install test incl. Windows next to it / on a 2nd disk (`iso/test/install-test.sh`)
    - [x] Hyprland starts and basic bindings work in the VM

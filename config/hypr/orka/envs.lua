@@ -5,7 +5,9 @@ hl.env("HYPRCURSOR_SIZE", "24")
 -- Prefer Wayland everywhere, with X11 as fallback.
 hl.env("GDK_BACKEND", "wayland,x11,*")
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
-hl.env("QT_STYLE_OVERRIDE", "kvantum")
+-- Qt apps take their style, colors and icons from qt6ct, which orka-settings
+-- sets up from the current theme.
+hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
 hl.env("MOZ_ENABLE_WAYLAND", "1")
 hl.env("ELECTRON_OZONE_PLATFORM_HINT", "wayland")
 hl.env("OZONE_PLATFORM", "wayland")

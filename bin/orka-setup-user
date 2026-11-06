@@ -30,6 +30,9 @@ install_file "$user_cfg/ghostty/config" "$HOME/.config/ghostty/config"
 install_file "$user_cfg/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
 install_file "$user_cfg/git/config" "$HOME/.config/git/config"
 install_file "$user_cfg/xdg-terminals.list" "$HOME/.config/xdg-terminals.list"
+# GTK apps: the theme colors (~/.config/orka/current/gtk.css).
+install_file "$user_cfg/gtk/gtk.css" "$HOME/.config/gtk-3.0/gtk.css"
+install_file "$user_cfg/gtk/gtk.css" "$HOME/.config/gtk-4.0/gtk.css"
 # OrkaOS settings (the settings app, SUPER + ALT + SPACE), the folders for
 # your own themes and wallpapers, and the files generated from the settings.
 install_file "$user_cfg/orka/settings.json" "$HOME/.config/orka/settings.json"
