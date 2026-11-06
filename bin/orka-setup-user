@@ -30,6 +30,11 @@ install_file "$user_cfg/ghostty/config" "$HOME/.config/ghostty/config"
 install_file "$user_cfg/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
 install_file "$user_cfg/git/config" "$HOME/.config/git/config"
 
+# Neovim (LazyVim). The plugins themselves are unpacked by the installer.
+while IFS= read -r -d '' f; do
+  install_file "$f" "$HOME/.config/nvim/${f#"$user_cfg/nvim/"}"
+done < <(find "$user_cfg/nvim" -type f -print0)
+
 # Start Hyprland after logging in on the first console (tty1).
 profile="$HOME/.bash_profile"
 touch "$profile"

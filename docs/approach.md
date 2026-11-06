@@ -53,7 +53,7 @@ Status on 2026-11-05 (end of day 1).
    - [x] Multiple disks: contents shown in the disk menu, red warning before erasing any non-empty disk, Windows boot entry added at every boot (`orka-windows-entry`)
    - [x] Hyprland 0.57 config in Lua, key bindings ported from Omarchy, `orka-*` helpers, Hyprland starts on tty1
    - [x] Shell and terminal setup: starship prompt, aliases (`eza`, `zoxide`, `fzf`), Ghostty and tmux configs ([shell](shell.md))
-   - [ ] Neovim config
+   - [x] Neovim config: LazyVim, plugins bundled into the ISO ([neovim](neovim.md))
    - [ ] Basic theme (colors are a placeholder, see `config/hypr/orka/theme.lua`); Qt/GTK theming (Kvantum, Adwaita-dark, icon theme)
 2. **Test in a VM**
    - [x] QEMU/KVM in the `archlinux` WSL distro; automated offline install test incl. Windows next to it / on a 2nd disk (`iso/test/install-test.sh`)

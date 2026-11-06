@@ -1,0 +1,2 @@
+-- Autocommands, loaded on startup. LazyVim's defaults:
+-- https://www.lazyvim.org/configuration/general#auto-commands

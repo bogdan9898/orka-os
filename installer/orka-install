@@ -443,7 +443,27 @@ install_desktop() {
   install -m755 "$SRC"/bin/orka-* "$TARGET/usr/local/bin/"
   arch-chroot "$TARGET" runuser -u "$ORKA_USER" -- env HOME="/home/$ORKA_USER" \
     /usr/local/bin/orka-setup-user >>"$LOG" 2>&1 || die "orka-setup-user failed (log: $LOG)"
+  install_nvim_bundle
   info "Hyprland starts after logging in on tty1"
+}
+
+# Neovim plugins, parsers and language servers, prepared by `build.sh nvim`,
+# so LazyVim needs no downloads on the first start.
+install_nvim_bundle() {
+  local bundle="$ORKA/nvim-data.tar.zst" share="/home/$ORKA_USER/.local/share" from
+  if [[ ! -f "$bundle" ]]; then
+    info "No Neovim bundle on this ISO: plugins download on the first start"
+    return 0
+  fi
+  install -d "$TARGET$share"
+  rm -rf "$TARGET$share/nvim"
+  tar -C "$TARGET$share" --zstd -xf "$bundle"
+  # Mason wrapper scripts contain the build machine's path; point them here.
+  from="$(cat "$TARGET$share/nvim/.orka-build-path")"
+  rm "$TARGET$share/nvim/.orka-build-path"
+  grep -rIlFZ "$from" "$TARGET$share/nvim" | xargs -0r sed -i "s#$from#$share/nvim#g"
+  arch-chroot "$TARGET" chown -R "$ORKA_USER:" "/home/$ORKA_USER/.local"
+  info "Neovim: LazyVim plugins installed"
 }
 
 # ---------------------------------------------------------------------------
@@ -509,6 +529,14 @@ echo "bashrc: $(as_user bash -ic 'echo "ls=${BASH_ALIASES[ls]%% *} cd=$(type -t 
   | grep -v -e 'cannot set terminal process group' -e 'no job control' | tr '\n' ' ')"
 echo "tmux: $(as_user tmux -L selftest -f "/home/$u/.config/tmux/tmux.conf" new-session -d \; show -gv prefix \; kill-server | tr '\n' ' ')"
 echo "ghostty config: $(as_user ghostty +validate-config | tr '\n' ' ')"
+echo 'local x = 1' >/tmp/orka-selftest.lua; chmod 644 /tmp/orka-selftest.lua
+echo "nvim: $(cd /tmp && as_user nvim --headless /tmp/orka-selftest.lua -c 'lua vim.defer_fn(function()
+  local m = {} for _, p in ipairs(require("lazy").plugins()) do if not p._.installed then m[#m + 1] = p.name end end
+  local lsp = vim.tbl_map(function(c) return c.name end, vim.lsp.get_clients())
+  io.stdout:write(("plugins=%d missing=[%s] theme=%s lsp=[%s] treesitter=%s"):format(require("lazy").stats().count,
+    table.concat(m, ","), vim.g.colors_name or "none", table.concat(lsp, ","), tostring(pcall(vim.treesitter.get_parser, 0, "lua"))))
+  vim.cmd("qall!") end, 10000)' | tr '\n' ' ')"
+echo "nvim build paths left: $(grep -rIlF /orka-build/nvim-home "/home/$u/.local/share/nvim" | wc -l)"
 echo "git: pull.rebase=$(as_user git config pull.rebase) defaultBranch=$(as_user git config init.defaultBranch)"
 echo "ORKA-SELFTEST-END"
 EOF

@@ -7,7 +7,9 @@
 #   aur    build the AUR packages from packages-aur.txt with makepkg
 #   repo   download every official package (with all dependencies) and
 #          create the offline repo "orka" together with the AUR packages
-#   iso    assemble the archiso profile (releng + iso/profile overlay) and
+#   nvim   download the Neovim (LazyVim) plugins, parsers and language
+#          servers and pack them, so Neovim works offline on the first start
+#   iso   assemble the archiso profile (releng + iso/profile overlay) and
 #          run mkarchiso
 #   clean  delete the build directory's work/ dir (keeps caches and output)
 #
@@ -183,12 +185,45 @@ stage_repo() {
 }
 
 # ---------------------------------------------------------------------------
+# Stage: nvim
+# ---------------------------------------------------------------------------
+
+# LazyVim downloads its plugins, treesitter parsers and language servers on
+# the first start. Do that here instead, with the versions pinned in
+# config/user/nvim/lazy-lock.json, and pack the result for the installer.
+stage_nvim() {
+  log "Bundling Neovim plugins (LazyVim)"
+  local t
+  for t in nvim tree-sitter; do
+    command -v "$t" >/dev/null || pacman -S --noconfirm --needed --asdeps neovim tree-sitter-cli >/dev/null
+  done
+  local home="$B/nvim-home" lock="$SRC/config/user/nvim/lazy-lock.json"
+  rm -rf "$home"
+  install -d -o "$BUILD_USER" -g "$BUILD_USER" "$home" "$home/.config"
+  as_user cp -r --no-preserve=mode "$SRC/config/user/nvim" "$home/.config/nvim"
+  (cd "$home" && as_user env -i HOME="$home" PATH=/usr/bin TERM=dumb \
+     nvim --headless "+Lazy! restore" "+luafile $SRC/iso/nvim-bundle.lua") >"$B/nvim-bundle.log" 2>&1 ||
+    { tail -20 "$B/nvim-bundle.log"; die "Neovim bundle failed, see $B/nvim-bundle.log"; }
+  cmp -s "$lock" "$home/.config/nvim/lazy-lock.json" ||
+    die "lazy-lock.json changed during the bundle (a plugin was added or removed?): update it from $home/.config/nvim/lazy-lock.json"
+  info "$(grep -E '^(parsers|mason):' "$B/nvim-bundle.log" | tr '\n' ' ')"
+
+  # Mason writes absolute paths into some wrapper scripts; the installer
+  # rewrites this path to the user's home.
+  local data="$home/.local/share/nvim"
+  printf '%s\n' "$data" >"$data/.orka-build-path"
+  tar -C "$home/.local/share" --zstd -cf "$B/nvim-data.tar.zst" nvim
+  info "bundle: $(du -h "$B/nvim-data.tar.zst" | cut -f1)"
+}
+
+# ---------------------------------------------------------------------------
 # Stage: iso
 # ---------------------------------------------------------------------------
 
 stage_iso() {
   log "Assembling the archiso profile"
   [[ -f "$REPO/$REPO_NAME.db.tar.zst" ]] || die "run the repo stage first"
+  [[ -f "$B/nvim-data.tar.zst" ]] || die "run the nvim stage first"
 
   rm -rf "$PROFILE"
   cp -a "$RELENG" "$PROFILE"
@@ -221,6 +256,7 @@ stage_iso() {
   # Offline repo and OrkaOS sources (installer, package lists, configs).
   install -d "$PROFILE/airootfs/opt/orka"
   cp -al "$REPO" "$PROFILE/airootfs/opt/orka/repo"
+  cp "$B/nvim-data.tar.zst" "$PROFILE/airootfs/opt/orka/"
   install -d "$PROFILE/airootfs/opt/orka/src"
   cp -r --no-preserve=mode,ownership "$SRC/installer" "$SRC/config" "$SRC/bin" \
     "$SRC/packages.txt" "$SRC/packages-aur.txt" "$PROFILE/airootfs/opt/orka/src/"
@@ -240,10 +276,10 @@ stage_clean() { log "Removing $WORK"; rm -rf "$WORK"; }
 # ---------------------------------------------------------------------------
 
 preflight
-stages=("$@"); ((${#stages[@]})) || stages=(aur repo iso)
+stages=("$@"); ((${#stages[@]})) || stages=(aur repo nvim iso)
 for s in "${stages[@]}"; do
   case "$s" in
-    aur|repo|iso|clean) "stage_$s" ;;
+    aur|repo|nvim|iso|clean) "stage_$s" ;;
     *) die "unknown stage: $s" ;;
   esac
 done

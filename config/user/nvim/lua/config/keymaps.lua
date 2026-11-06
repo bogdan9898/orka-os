@@ -1,0 +1,4 @@
+-- Key mappings, loaded on startup. LazyVim's defaults:
+-- https://www.lazyvim.org/keymaps
+-- Add yours here, e.g.
+--   vim.keymap.set("n", "<leader>w", "<cmd>w<cr>", { desc = "Save" })

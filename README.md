@@ -2,7 +2,7 @@
 
 A personal, Arch-based Linux setup with its own name and branding, inspired by [Omarchy](https://github.com/omacom/omarchy). Built for one machine only (see [hardware](docs/hardware-and-dual-boot.md)), dual-booted alongside Windows 11. Not intended for public release.
 
-> Status (2026-11-05): **offline installer ISO works** (tested in QEMU, incl. Windows on another disk); **Hyprland desktop config** in place (no bar/launcher yet). Next: shell/terminal setup, Neovim, theme, then install on the real machine. See the [roadmap](docs/approach.md#roadmap).
+> Status (2026-11-06): **offline installer ISO works** (tested in QEMU, incl. Windows on another disk); **Hyprland desktop config** in place (no bar/launcher yet); **shell, terminal, git and Neovim (LazyVim, offline)** set up. Next: first Quickshell component (bar), theme, then install on the real machine. See the [roadmap](docs/approach.md#roadmap).
 
 ## Naming
 
@@ -53,6 +53,7 @@ Why "Orka" rather than "Orca": `orca` is already an Arch package (the GNOME scre
 - [ISO and installer](docs/iso.md): building the offline ISO, what the installer does, testing in QEMU
 - [Desktop](docs/desktop.md): Hyprland (Lua) config layout and key bindings
 - [Shell and terminal](docs/shell.md): bash, starship, Ghostty, tmux and git configs, aliases and key bindings
+- [Neovim](docs/neovim.md): LazyVim, bundled offline into the ISO
 - [Quickshell](docs/quickshell.md): building our own bar, widgets, lock screen and more
 - [Hardware & dual boot](docs/hardware-and-dual-boot.md): target machine specs and the dual-boot checklist
 

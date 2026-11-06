@@ -1,0 +1,4 @@
+-- Options, loaded before the plugins. LazyVim's defaults:
+-- https://www.lazyvim.org/configuration/general
+-- Add yours here, e.g.
+--   vim.opt.relativenumber = false
