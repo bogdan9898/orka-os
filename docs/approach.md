@@ -45,7 +45,7 @@ orka-os/
 
 ## Roadmap
 
-Status on 2026-11-06 (end of day 2). **Next up**, in the order offered to the user: the real Orka theme (in progress on day 3), branding, then installing on the real machine.
+Status on 2026-11-07 (end of day 3): the theme is done (Orka Deep water + Orka Light, GTK/Qt/icons) and the installed system's boot menu is themed. **Next up**, as offered to the user (not picked yet): the rest of branding (logo, OS name, fastfetch, desktop wallpapers), btop and mouse cursor theming, then installing on the real machine.
 
 1. **Foundation**
    - [x] Package list (official + AUR), debloated from Omarchy v3.8.4 ([packages](packages.md))
@@ -75,6 +75,7 @@ Status on 2026-11-06 (end of day 2). **Next up**, in the order offered to the us
 
 - `pacman` warns "database file for 'core' does not exist" until the first time the installed system is online (`orka-firstboot` runs `pacman -Sy` when there is network).
 - The luarocks pacman hook prints `/usr/bin/lua5.1: No such file or directory` during install (harmless; add `lua51` if Neovim plugins need LuaRocks builds).
-- The ISO in `~/orka-build/out` (`orkaos-2026.11.06`) is built from commit `fe4381b` (all of day 2). Rebuild with `sudo ./iso/build.sh iso` after changes (`nvim iso` if the Neovim config changed, `repo iso` if packages changed).
+- The ISO in `~/orka-build/out` (`orkaos-2026.11.07`) is built from commit `383d746` (all of day 3 except docs and `iso/test/boot-menu-shots.sh`). Rebuild with `sudo ./iso/build.sh iso` after changes (`nvim iso` if the Neovim config changed, `repo iso` if packages changed).
+- gnome-calculator looked slightly see-through while focused in the VM screenshots (day 3): check whether a Hyprland opacity rule applies to it, or whether it's libadwaita/VM rendering.
 - Faint rounded window shadow visible at the bottom edge behind the dimmed overlays (settings, cheat sheet) right after a theme change: Hyprland redraw, cosmetic.
-- Not testable in the VM, check on the real machine: FreeSync/`highrr`, several monitors (bar per monitor, popups on the focused one), suspend (lock before sleep), screen off after idle, real Wi-Fi/Bluetooth icons, the system tray with KDE Connect, sound device switching, notification clicks from real apps.
+- Not testable in the VM, check on the real machine: FreeSync/`highrr`, several monitors (bar per monitor, popups on the focused one), suspend (lock before sleep), screen off after idle, real Wi-Fi/Bluetooth icons, the system tray with KDE Connect, sound device switching, notification clicks from real apps, the monitor's resolution (the boot menu wallpaper is 2560x1440: regenerate with `branding/limine/make-wallpaper.sh WxH` if it differs) and the boot menu's font size at that resolution.
