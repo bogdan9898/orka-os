@@ -37,7 +37,7 @@ Omarchy's `shell/` uses all of these: 67 files import `Quickshell`, 21 `Quickshe
 No stock desktop tools: Waybar, Mako, SwayOSD, Hyprlock, Walker and SDDM are **not** installed. Every piece is our own Quickshell code, built over time. Until a piece exists, the TTY covers it (log in on the console, start Hyprland with `uwsm start hyprland`).
 
 1. `quickshell` (Arch `extra`, 0.3.2) is in the base package list. Our shell lives in this repo under `shell/`, is installed to `/usr/share/orka/shell/` and started from Hyprland (`qs -p /usr/share/orka/shell`, in `orka/autostart.lua`).
-2. Build components one at a time: **bar (done) → notifications (done) → polkit agent (done) → launcher → OSD → lock screen**. The lock screen comes late because a broken lock screen is a security problem; until then, there is no screen lock.
+2. Build components one at a time: **bar (done) → notifications (done) → polkit agent (done) → launcher (done) → OSD → lock screen**. The lock screen comes late because a broken lock screen is a security problem; until then, there is no screen lock.
 3. Last: a login greeter via greetd (`Quickshell.Services.Greetd`) to replace the TTY login.
 4. The polkit agent (admin password dialog) is ours too, built on `Quickshell.Services.Polkit` (included in Arch's 0.3.2); `polkit-gnome` is not installed. Done, see [polkit agent](#polkit-agent).
 
@@ -47,7 +47,7 @@ Layout taken from Omarchy v3.8.4's Waybar; the code is our own (Omarchy v4's Qui
 
 | Where | What | Click | Right click / scroll |
 |---|---|---|---|
-| Left | Fish icon (placeholder for the Orka logo) | Run a program (`hyprland-run`, stand-in launcher) | Terminal |
+| Left | Fish icon (placeholder for the Orka logo) | App launcher | Terminal |
 | Left | Workspaces 1–5, plus others in use; active = filled square, empty = dimmed | Go to workspace | Scroll: previous / next |
 | Center | Clock `Friday 14:05` | Toggle the date (`06 November W45 2026`) | |
 | Center | Red dot while recording the screen | Stop recording | |
@@ -60,7 +60,7 @@ Layout taken from Omarchy v3.8.4's Waybar; the code is our own (Omarchy v4's Qui
 
 Not in it (on purpose): battery (desktop), Omarchy's weather, update, dictation and idle indicators (no such features yet), tooltips (later).
 
-Files (`shell/`): `shell.qml` (one bar per monitor, the notification popups), `Notifications.qml` (the notification daemon), `notifications/` (popups), `polkit/` (the admin password dialog), `Theme.qml` (colors, font, glyphs; placeholder until the Orka theme), `Apps.qml` (start programs via uwsm, like `orka/apps.lua`), `bar/*.qml` (one file per widget). Network state comes from `orka-netstatus`, because Quickshell's Networking module only supports NetworkManager and OrkaOS uses iwd + systemd-networkd.
+Files (`shell/`): `shell.qml` (one bar per monitor, the notification popups), `Notifications.qml` (the notification daemon), `notifications/` (popups), `polkit/` (the admin password dialog), `LauncherState.qml` + `launcher/` (the app launcher), `Theme.qml` (colors, font, glyphs; placeholder until the Orka theme), `Apps.qml` (start programs via uwsm, like `orka/apps.lua`), `bar/*.qml` (one file per widget). Network state comes from `orka-netstatus`, because Quickshell's Networking module only supports NetworkManager and OrkaOS uses iwd + systemd-networkd.
 
 **Tested** 2026-11-06 in the VM (installed from the ISO, Hyprland on tty1): the bar starts with Hyprland, windows tile below it, workspaces follow `SUPER + 1..5`, the clock shows, the network icon shows wired with internet and offline without, volume shows muted (the VM has no sound device), Bluetooth is hidden (no adapter). Shell log: no QML errors. Not yet tried: the tray (needs a tray app such as KDE Connect), clicks, volume scrolling, the recording dot, multiple monitors, real Wi-Fi.
 
@@ -100,6 +100,25 @@ When an app needs admin rights, polkit asks the session's agent for the password
 - Wrong password: red border and "Wrong password, try again", the field is cleared, polkit asks again. Messages from PAM (e.g. account locked) are shown under the field.
 
 **Tested** 2026-11-06 in the VM with `pkexec true` from Ghostty: dialog shown, wrong password rejected and asked again, right password accepted, Escape cancels; the log says `orka: polkit agent registered`. Not yet tried: a real GUI app (GParted, Dolphin), several monitors, a request arriving while another is open (polkit queues them).
+
+## Launcher
+
+`SUPER + SPACE` (or the fish button in the bar) opens `launcher/Launcher.qml`: a search box at the top of the focused monitor, listing the installed apps (`DesktopEntries`, hidden entries left out) with icon, name and description; apps that run in a terminal are marked "terminal". Replaces Omarchy's Walker and our `hyprland-run` stand-in.
+
+| Keys | Action |
+|---|---|
+| type | Search |
+| `↑` `↓`, `TAB` / `SHIFT + TAB`, `CTRL + J/K`, `CTRL + N/P` | Move the selection |
+| `ENTER` / click | Start the app; with no matching app, run the text as a command (`sh -c`) |
+| `ESCAPE` / click outside | Close |
+
+- **Search order:** name starts with the text → a word in the name starts with it → the name contains it → its letters appear in order (`ffx` → Firefox) → generic name, keywords, description or ID contain it. Ties: more used first, then A–Z.
+- **Most used first:** each start counts (up to 20 points, so a good name match still wins); with an empty search the most used apps are at the top. Counts live in `~/.local/state/orka/launcher.json`.
+- **Starting:** `uwsm app -- <id>.desktop`, so apps get their own systemd scope like the key bindings. Terminal apps (btop, Neovim, yazi) open in Ghostty through `xdg-terminal-exec`, configured by the seeded `~/.config/xdg-terminals.list`.
+- The mouse selects a row only once it has really moved: when the list opens under a resting pointer, Wayland reports that as motion too, and Enter would otherwise start whatever happens to be under the pointer.
+- IPC target `launcher`: `qs -p /usr/share/orka/shell ipc call launcher toggle|open|close`.
+
+**Tested** 2026-11-06 in the VM: app list with icons, search (`bto` → btop), letters in order (`ffx` → Firefox), Enter starts btop in Ghostty (terminal app), Escape closes, the count is saved, a typed command (`notify-send Launched`) runs. The resting-pointer case was a bug found in the test and fixed. Not yet tried: selecting with a moving mouse (QEMU's tablet can't be moved from the monitor), desktop actions (e.g. Firefox's "New private window"), several monitors.
 
 ## References
 

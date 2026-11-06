@@ -27,8 +27,7 @@ PanelWindow {
 
         BarIcon {
             text: Theme.icons.logo
-            // Stand-ins until the Orka menu and launcher exist.
-            onClicked: Apps.run(["hyprland-run"])
+            onClicked: LauncherState.open = !LauncherState.open
             onRightClicked: Apps.run([Apps.terminal])
         }
         Workspaces {

@@ -1,0 +1,3 @@
+# Terminal for apps marked Terminal=true (btop, Neovim, yazi... started from
+# the launcher), used by xdg-terminal-exec. One desktop entry per line, first wins.
+com.mitchellh.ghostty.desktop

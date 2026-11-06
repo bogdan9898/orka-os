@@ -4,8 +4,8 @@ local function bind(keys, cmd, description)
     hl.bind(keys, hl.dsp.exec_cmd(cmd), { description = description })
 end
 
--- Stand-in launcher until the Quickshell launcher exists: Hyprland's run dialog.
-bind("SUPER + SPACE",          "hyprland-run",                       "Run a program")
+-- App launcher (the OrkaOS shell); also runs a typed command.
+bind("SUPER + SPACE",          "qs -p /usr/share/orka/shell ipc call launcher toggle", "App launcher")
 bind("SUPER + K",              apps.tui("orka-keybindings", "keybindings"), "Show key bindings")
 
 -- Screenshots, recording, color picker, OCR
