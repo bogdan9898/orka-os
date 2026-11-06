@@ -15,6 +15,13 @@ bind("ALT + PRINT",            "orka-screenrecord",                  "Start/stop
 bind("SUPER + PRINT",          "pkill hyprpicker || hyprpicker -a",  "Color picker")
 bind("SUPER + CTRL + PRINT",   "orka-screenshot text",               "Copy text from screen region (OCR)")
 
+-- Notifications (the OrkaOS shell)
+bind("SUPER + comma",               "orka-notifications dismiss",     "Dismiss last notification")
+bind("SUPER + SHIFT + comma",       "orka-notifications dismiss-all", "Dismiss all notifications")
+bind("SUPER + ALT + comma",         "orka-notifications invoke",      "Invoke last notification")
+bind("SUPER + SHIFT + ALT + comma", "orka-notifications restore",     "Restore last notification")
+bind("SUPER + CTRL + comma",        "orka-notifications dnd",         "Toggle do not disturb")
+
 -- Night light, zoom
 bind("SUPER + CTRL + N",       "orka-nightlight",                    "Toggle night light")
 bind("SUPER + CTRL + Z",       "hyprctl eval 'hl.config({ cursor = { zoom_factor = 2 } })'", "Zoom in")

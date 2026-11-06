@@ -1,0 +1,14 @@
+#!/bin/bash
+# Control the OrkaOS notification popups (the Quickshell shell).
+#   orka-notifications dismiss | dismiss-all | invoke | restore | dnd | status
+set -euo pipefail
+case "${1:-}" in
+  dismiss)     fn=dismiss ;;
+  dismiss-all) fn=dismissAll ;;
+  invoke)      fn=invoke ;;
+  restore)     fn=restore ;;
+  dnd)         fn=toggleDnd ;;
+  status)      fn=status ;;
+  *) echo "usage: orka-notifications dismiss|dismiss-all|invoke|restore|dnd|status" >&2; exit 1 ;;
+esac
+exec qs -p /usr/share/orka/shell ipc call notifications "$fn"

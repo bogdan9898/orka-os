@@ -22,7 +22,7 @@ Default apps (terminal, browser, ...) are in `orka/apps.lua`; override them with
 
 ## Not there yet (planned Quickshell components)
 
-The bar is done ([quickshell](quickshell.md#the-bar)). Not there yet: notifications, launcher, volume OSD, lock screen, polkit agent or login screen. Stand-ins: `SUPER + SPACE` opens Hyprland's run dialog (`hyprland-run`); `SUPER + K` lists all bindings.
+The bar and notifications are done ([quickshell](quickshell.md#the-bar)). Not there yet: launcher, volume OSD, lock screen, polkit agent or login screen. Stand-ins: `SUPER + SPACE` opens Hyprland's run dialog (`hyprland-run`); `SUPER + K` lists all bindings.
 
 ## Key bindings
 
@@ -70,6 +70,9 @@ Based on Omarchy v3.8.4. `SUPER + K` shows the full list.
 |---|---|
 | `SUPER + SPACE` | Run a program (stand-in launcher) |
 | `SUPER + K` | Search key bindings |
+| `SUPER + ,` / `SUPER + SHIFT + ,` | Dismiss last / all notifications |
+| `SUPER + ALT + ,` / `SUPER + SHIFT + ALT + ,` | Invoke last notification / bring back the last one that disappeared |
+| `SUPER + CTRL + ,` | Do not disturb (only critical notifications pop up) |
 | `SUPER + C / V / X` | Copy / paste / cut (works in terminals too) |
 | `PRINT` / `SHIFT + PRINT` | Screenshot region / screen (edit in satty) |
 | `SUPER + CTRL + PRINT` | Copy text from a screen region (OCR) |

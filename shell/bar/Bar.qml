@@ -42,6 +42,7 @@ PanelWindow {
 
         Clock {}
         Recording {}
+        DndStatus {}
     }
 
     RowLayout {

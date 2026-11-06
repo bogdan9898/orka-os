@@ -140,6 +140,7 @@ evince                    # PDF viewer
 webp-pixbuf-loader
 firefox                   # browser
 xdg-user-dirs             # standard folders (Pictures, Videos...) for screenshots/recordings
+libnotify                 # notify-send, for scripts that show a notification
 libreoffice-fresh         # office suite (Writer, Calc, Impress, Draw...)
 pavucontrol               # audio settings GUI
 kdeconnect                # phone integration (needs ufw ports 1714-1764 open)

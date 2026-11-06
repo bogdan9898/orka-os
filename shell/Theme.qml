@@ -20,6 +20,7 @@ Singleton {
         workspace:   String.fromCodePoint(0xF14FB),   // the active workspace
         cpu:         String.fromCodePoint(0xF035B),
         recording:   String.fromCodePoint(0xF0EC2),
+        dnd:         String.fromCodePoint(0xF009B),   // bell with a slash
         btOn:        String.fromCodePoint(0xF293),
         btOff:       String.fromCodePoint(0xF00B2),
         btConnected: String.fromCodePoint(0xF00B1),
