@@ -1,0 +1,8 @@
+#!/bin/bash
+# Lock the screen (the OrkaOS shell's lock screen). Used by SUPER + CTRL + L
+# and by hypridle before sleep (loginctl lock-session -> lock_cmd).
+if ! qs -p /usr/share/orka/shell ipc call lock lock 2>/dev/null; then
+  echo "orka-lock: the OrkaOS shell is not running (systemctl --user status orka-shell)" >&2
+  notify-send -u critical "Screen not locked" "The OrkaOS shell is not running." 2>/dev/null
+  exit 1
+fi

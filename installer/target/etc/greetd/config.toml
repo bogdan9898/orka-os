@@ -1,0 +1,11 @@
+# OrkaOS login screen: greetd runs the Quickshell greeter (shell/greeter.qml)
+# as the "greeter" user, inside the cage kiosk compositor. After a login the
+# greeter starts Hyprland through uwsm.
+#   -s  allow switching to other consoles (CTRL + ALT + F2...)
+#   -d  no window decorations (and Qt's own title bar is turned off too)
+[terminal]
+vt = 1
+
+[default_session]
+command = "env QT_WAYLAND_DISABLE_WINDOWDECORATION=1 QS_DISABLE_CRASH_HANDLER=1 cage -s -d -- qs -p /usr/share/orka/shell/greeter.qml"
+user = "greeter"

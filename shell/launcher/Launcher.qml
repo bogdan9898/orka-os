@@ -252,7 +252,7 @@ Scope {
 
                             IconImage {
                                 implicitSize: 28
-                                source: Quickshell.iconPath(row.modelData.icon, "application-x-executable")
+                                source: Quickshell.iconPath(row.modelData.icon, true) || Quickshell.iconPath("application-x-executable", true)
                             }
                             ColumnLayout {
                                 Layout.fillWidth: true

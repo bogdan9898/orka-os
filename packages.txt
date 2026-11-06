@@ -69,6 +69,8 @@ hyprpicker
 hyprsunset
 uwsm
 quickshell                # Orka desktop shell toolkit
+greetd                    # login manager; the login screen is our Quickshell greeter
+cage                      # kiosk compositor the login screen runs in
 xdg-desktop-portal-hyprland
 xdg-desktop-portal-gtk
 xdg-terminal-exec

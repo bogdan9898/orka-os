@@ -1,0 +1,6 @@
+{
+  "idle": {
+    "lockAfter": 300,
+    "screenOffAfter": 330
+  }
+}

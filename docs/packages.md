@@ -57,7 +57,7 @@ Networking follows Omarchy v3: `iwd` + `impala` for Wi-Fi, no NetworkManager.
 
 ### Desktop tools removed (2026-11-05)
 
-`waybar`, `mako`, `swayosd`, `hyprlock`, `walker`/`elephant`, `sddm` and `polkit-gnome` are not installed: each will be replaced by our own Quickshell implementation (see [quickshell](quickshell.md)). Until then the system is used from the TTY.
+`waybar`, `mako`, `swayosd`, `hyprlock`, `walker`/`elephant`, `sddm` and `polkit-gnome` are not installed: each is replaced by our own Quickshell implementation (see [quickshell](quickshell.md)). `greetd` and `cage` are installed for the login screen.
 
 
 Notes for `install.sh`:

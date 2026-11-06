@@ -65,6 +65,9 @@ hl.config({
         key_press_enables_dpms     = true,
         mouse_move_enables_dpms    = true,
         vrr                        = 2,   -- variable refresh rate in fullscreen apps (FreeSync)
+        -- A restarted OrkaOS shell may take over the lock after a crash
+        -- (otherwise the session stays on Hyprland's "lock screen crashed" screen).
+        allow_session_lock_restore = true,
     },
 
     cursor = {

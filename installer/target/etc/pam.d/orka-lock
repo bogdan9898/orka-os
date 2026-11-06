@@ -1,0 +1,7 @@
+#%PAM-1.0
+# OrkaOS lock screen (shell/lock/Lock.qml, PamContext config "orka-lock").
+# Same password check as a console login, like swaylock and hyprlock. Note
+# that this includes pam_faillock: after 3 wrong passwords in a row the
+# account is locked for 10 minutes (/etc/security/faillock.conf); undo with
+# `faillock --user <name> --reset` as root, e.g. from another console.
+auth       include      login

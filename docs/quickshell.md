@@ -34,11 +34,11 @@ Omarchy's `shell/` uses all of these: 67 files import `Quickshell`, 21 `Quickshe
 
 ## Plan for OrkaOS
 
-No stock desktop tools: Waybar, Mako, SwayOSD, Hyprlock, Walker and SDDM are **not** installed. Every piece is our own Quickshell code, built over time. Until a piece exists, the TTY covers it (log in on the console, start Hyprland with `uwsm start hyprland`).
+No stock desktop tools: Waybar, Mako, SwayOSD, Hyprlock, Walker and SDDM are **not** installed. Every piece is our own Quickshell code, built over time. The only stock piece is greetd (with the cage compositor), which runs our login screen.
 
-1. `quickshell` (Arch `extra`, 0.3.2) is in the base package list. Our shell lives in this repo under `shell/`, is installed to `/usr/share/orka/shell/` and started from Hyprland (`qs -p /usr/share/orka/shell`, in `orka/autostart.lua`).
-2. Build components one at a time: **bar (done) → notifications (done) → polkit agent (done) → launcher (done) → OSD → lock screen**. The lock screen comes late because a broken lock screen is a security problem; until then, there is no screen lock.
-3. Last: a login greeter via greetd (`Quickshell.Services.Greetd`) to replace the TTY login.
+1. `quickshell` (Arch `extra`, 0.3.2) is in the base package list. Our shell lives in this repo under `shell/`, is installed to `/usr/share/orka/shell/` and runs as the systemd user service `orka-shell.service` (`qs -p /usr/share/orka/shell`), started with the Hyprland session and restarted if it crashes.
+2. Build components one at a time: **bar (done) → notifications (done) → polkit agent (done) → launcher (done) → lock screen (done) → OSD**.
+3. A login screen via greetd (`Quickshell.Services.Greetd`) instead of the TTY login: done, see [login screen](#login-screen).
 4. The polkit agent (admin password dialog) is ours too, built on `Quickshell.Services.Polkit` (included in Arch's 0.3.2); `polkit-gnome` is not installed. Done, see [polkit agent](#polkit-agent).
 
 ## The bar
@@ -60,11 +60,11 @@ Layout taken from Omarchy v3.8.4's Waybar; the code is our own (Omarchy v4's Qui
 
 Not in it (on purpose): battery (desktop), Omarchy's weather, update, dictation and idle indicators (no such features yet), tooltips (later).
 
-Files (`shell/`): `shell.qml` (one bar per monitor, the notification popups), `Notifications.qml` (the notification daemon), `notifications/` (popups), `polkit/` (the admin password dialog), `LauncherState.qml` + `launcher/` (the app launcher), `Theme.qml` (colors, font, glyphs; placeholder until the Orka theme), `Apps.qml` (start programs via uwsm, like `orka/apps.lua`), `bar/*.qml` (one file per widget). Network state comes from `orka-netstatus`, because Quickshell's Networking module only supports NetworkManager and OrkaOS uses iwd + systemd-networkd.
+Files (`shell/`): `shell.qml` (one bar per monitor, the notification popups), `Notifications.qml` (the notification daemon), `notifications/` (popups), `polkit/` (the admin password dialog), `LauncherState.qml` + `launcher/` (the app launcher), `LockState.qml` + `lock/` (lock screen, idle), `Settings.qml` (`~/.config/orka/settings.json`), `greeter.qml` + `greeter/` (the login screen), `Theme.qml` (colors, font, glyphs; placeholder until the Orka theme), `Apps.qml` (start programs via uwsm, like `orka/apps.lua`), `bar/*.qml` (one file per widget). Network state comes from `orka-netstatus`, because Quickshell's Networking module only supports NetworkManager and OrkaOS uses iwd + systemd-networkd.
 
 **Tested** 2026-11-06 in the VM (installed from the ISO, Hyprland on tty1): the bar starts with Hyprland, windows tile below it, workspaces follow `SUPER + 1..5`, the clock shows, the network icon shows wired with internet and offline without, volume shows muted (the VM has no sound device), Bluetooth is hidden (no adapter). Shell log: no QML errors. Not yet tried: the tray (needs a tray app such as KDE Connect), clicks, volume scrolling, the recording dot, multiple monitors, real Wi-Fi.
 
-**Working on it:** run a copy from the repo with `qs -p ~/dev/orka-os/shell` (stop the installed one first: `pkill -x qs` or `pkill quickshell`); saving a file reloads it. Logs: `qs log -p /usr/share/orka/shell` (or the repo path).
+**Working on it:** run a copy from the repo with `qs -p ~/dev/orka-os/shell` (stop the installed one first: `systemctl --user stop orka-shell`, and start it again afterwards); saving a file reloads it. Logs: `qs log -p /usr/share/orka/shell` (or the repo path).
 
 ## Notifications
 
@@ -119,6 +119,44 @@ When an app needs admin rights, polkit asks the session's agent for the password
 - IPC target `launcher`: `qs -p /usr/share/orka/shell ipc call launcher toggle|open|close`.
 
 **Tested** 2026-11-06 in the VM: app list with icons, search (`bto` → btop), letters in order (`ffx` → Firefox), Enter starts btop in Ghostty (terminal app), Escape closes, the count is saved, a typed command (`notify-send Launched`) runs. The resting-pointer case was a bug found in the test and fixed. Not yet tried: selecting with a moving mouse (QEMU's tablet can't be moved from the monitor), desktop actions (e.g. Firefox's "New private window"), several monitors.
+
+## Lock screen
+
+`lock/Lock.qml`: a real Wayland session lock (`WlSessionLock`, the ext-session-lock protocol) on every monitor, with a big clock, the date, the user and a password field. Enter checks the password with PAM (`/etc/pam.d/orka-lock`, which includes `login` like swaylock and hyprlock do), Escape clears it, a wrong password shows red and asks again. Notifications and other windows can't appear above it.
+
+| Locks when | How |
+|---|---|
+| `SUPER + CTRL + L` | `orka-lock` (`qs -p /usr/share/orka/shell ipc call lock lock`) |
+| Idle for `lockAfter` seconds (default 300) | `lock/Idle.qml` (`IdleMonitor`) |
+| Before suspend | hypridle: `before_sleep_cmd = loginctl lock-session` → `lock_cmd = orka-lock`, and `inhibit_sleep = 3` waits until the lock is up |
+
+There is deliberately no command or IPC call that unlocks: only the password does.
+
+**If the shell crashes while locked**, the session stays locked: that's how ext-session-lock works (Hyprland shows its "lock screen crashed" screen instead of the desktop). systemd restarts the shell (`orka-shell.service`, `Restart=on-failure`), Hyprland lets the new shell take over the lock (`misc.allow_session_lock_restore`), and the shell locks again at once because it finds `$XDG_RUNTIME_DIR/orka-locked`. Last resort: switch to another console (`CTRL + ALT + F2`), log in, `systemctl --user restart orka-shell`.
+
+**Wrong passwords:** the `login` PAM stack includes `pam_faillock`, so 3 wrong passwords in a row lock the account for 10 minutes (Arch's default, `/etc/security/faillock.conf`); the lock screen then shows PAM's message. Undo it from another console as root: `faillock --user <name> --reset`.
+
+### Idle settings
+
+The shell reads `~/.config/orka/settings.json` (`Settings.qml`) and watches it, so a change applies at once. A future settings app will write this file.
+
+```json
+{ "idle": { "lockAfter": 300, "screenOffAfter": 330 } }
+```
+
+Seconds without keyboard or mouse input until the screen locks / the monitors turn off (`0` = never). Apps that inhibit idle (a playing video) hold both off. Invalid JSON or missing values fall back to these defaults. hypridle no longer has idle timers; it only handles "lock before sleep".
+
+## Login screen
+
+At boot greetd shows our login screen on tty1: `greeter.qml` (a second entry point next to `shell.qml`, so it shares `Theme.qml` and the buttons), run as the `greeter` user inside **cage**, a kiosk compositor that shows one app full screen (`/etc/greetd/config.toml`: `cage -s -d -- qs -p /usr/share/orka/shell/greeter.qml`, with Qt's own title bar and crash dialog turned off).
+
+- Clock, date, the user (the only normal user, UID 1000+; with several, TAB or the arrows switch), password field. Enter logs in; a wrong password shows red and asks again.
+- After a login it starts `uwsm start -e -D Hyprland hyprland.desktop` (what Hyprland's own `hyprland-uwsm` session runs) and quits; cage exits with it and greetd starts the session.
+- **Reboot** / **Shut down** buttons (`systemctl`, allowed for the active seat).
+- KWallet is unlocked with the login password here too (`pam_kwallet5` in `/etc/pam.d/greetd`).
+- `cage -s` keeps console switching on: `CTRL + ALT + F2` still gives a text login if the login screen breaks.
+
+**Tested** 2026-11-06 in the VM (fresh install from the ISO): login screen shows at boot with the user filled in, a wrong password gives "Wrong password" and asks again, the right one starts Hyprland with the bar; `SUPER + CTRL + L` locks, wrong password is refused, right one unlocks; idle lock after `lockAfter` (set to 10 s by editing `settings.json` while running); a deliberate crash of the shell while locked (`pkill -SEGV`) brings the lock screen straight back. Bugs found and fixed in the test: a changed idle time had no effect (the monitor is now recreated), greetd's follow-up error replaced "Wrong password", a title bar on the login screen, Quickshell's crash-report dialog after the crash. Not yet tried: lock before suspend (the VM doesn't suspend), screen off after `screenOffAfter`, several monitors, Reboot / Shut down buttons, pam_faillock after 3 wrong passwords.
 
 ## References
 

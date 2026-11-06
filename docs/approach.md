@@ -41,7 +41,7 @@ orka-os/
 
 1. Boot the **OrkaOS ISO** (USB stick). No network needed: every package is in the ISO's local repo. Details: [ISO and installer](iso.md).
 2. `orka-install` starts automatically on the first console and asks for the disk, the mode (whole disk / free space), hostname, username and password, then partitions (2 GiB ESP + Btrfs with Snapper), installs all packages from the local repo, sets up Limine (`linux-zen`, `linux`, Windows), services, the firewall and the Hyprland dotfiles, and points pacman at the normal Arch mirrors for later updates.
-3. Reboot, log in on **tty1**: Hyprland starts. See [desktop](desktop.md).
+3. Reboot, log in on the login screen: Hyprland starts. See [desktop](desktop.md).
 
 ## Roadmap
 
@@ -66,7 +66,7 @@ Status on 2026-11-05 (end of day 1).
    - [ ] **TODO: choose Orka's fonts** (UI, monospace for terminal/editor, icon font). For now the current set is fine: `noto-fonts`, `noto-fonts-emoji`, `ttf-jetbrains-mono-nerd`, `woff2-font-awesome`.
    - [ ] Icon theme (Yaru was dropped: its AUR build needs gnome-shell)
 4. **Install on the host** (separate disk, Windows disks disconnected; checklist in [dual boot](hardware-and-dual-boot.md)). Then check what the VM can't: FreeSync/`highrr`, screenshots/recording, media keys, Wi-Fi/Bluetooth, KDE Connect.
-5. **Quickshell desktop**, one component at a time: bar, notifications, polkit agent, launcher (done: [quickshell](quickshell.md#the-bar)) → OSD → lock screen → login greeter.
+5. **Quickshell desktop**, one component at a time: bar, notifications, polkit agent, launcher, lock screen, login screen (done: [quickshell](quickshell.md#the-bar)) → OSD.
 
 ### Known small issues
 

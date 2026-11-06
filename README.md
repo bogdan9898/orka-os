@@ -38,8 +38,8 @@ Why "Orka" rather than "Orca": `orca` is already an Arch package (the GNOME scre
 | Bootloader | **Limine** | Windows entry, snapshot boot entries |
 | Kernel | **`linux-zen`**, with stock `linux` as fallback | Omarchy's custom kernel isn't needed on this hardware |
 | Locale | `en_US.UTF-8`, US keyboard, `Europe/Bucharest` | Taken from the Windows settings |
-| Desktop shell | **Our own Quickshell shell, no stock tools** | No Waybar, Mako, SwayOSD, Hyprlock, Walker or SDDM. Until each piece exists, use the TTY (login, then `uwsm start hyprland`). See [quickshell](docs/quickshell.md) |
-| Login screen | TTY for now, later a Quickshell greeter via greetd | |
+| Desktop shell | **Our own Quickshell shell, no stock tools** | No Waybar, Mako, SwayOSD, Hyprlock, Walker or SDDM. The login screen runs in greetd + cage. See [quickshell](docs/quickshell.md) |
+| Login screen | **Our Quickshell greeter via greetd** (in the cage compositor) | Password login, then Hyprland via uwsm |
 
 ## Open questions
 

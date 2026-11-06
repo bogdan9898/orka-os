@@ -27,6 +27,7 @@ bind("SUPER + CTRL + N",       "orka-nightlight",                    "Toggle nig
 bind("SUPER + CTRL + Z",       "hyprctl eval 'hl.config({ cursor = { zoom_factor = 2 } })'", "Zoom in")
 bind("SUPER + CTRL + ALT + Z", "hyprctl eval 'hl.config({ cursor = { zoom_factor = 1 } })'", "Reset zoom")
 
--- Leave the session. Deliberately awkward to press: there's no lock screen
--- or confirmation dialog yet (both are planned Quickshell components).
+-- Lock, leave the session. Logging out is deliberately awkward to press:
+-- there's no confirmation dialog yet.
+bind("SUPER + CTRL + L",       "orka-lock",                          "Lock the screen")
 hl.bind("SUPER + CTRL + ALT + ESCAPE", hl.dsp.exec_cmd("uwsm stop"), { description = "Log out" })

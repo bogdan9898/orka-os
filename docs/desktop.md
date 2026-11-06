@@ -9,20 +9,20 @@ Hyprland **0.57** is configured in **Lua** (`hyprland.lua`); the old `hyprland.c
 | `/usr/share/orka/hypr/orka/` | `config/hypr/orka/` | OrkaOS defaults. Replaced on updates; don't edit |
 | `~/.config/hypr/hyprland.lua` | `config/user/hypr/` | Your config: loads the defaults (`require("orka")`), then your files |
 | `~/.config/hypr/{monitors,input,looknfeel,bindings,autostart}.lua` | `config/user/hypr/` | Your overrides (loaded last, so they win) |
-| `~/.config/hypr/hypridle.conf` | `config/user/hypr/` | Idle: screen off after 10 min (no lock screen yet) |
+| `~/.config/hypr/hypridle.conf` | `config/user/hypr/` | Only "lock before sleep"; idle lock and screen off are done by the shell (`~/.config/orka/settings.json`) |
 | `/usr/local/bin/orka-*` | `bin/` | Helper commands used by the bindings |
 
 `orka-setup-user` seeds the user files and never overwrites them: if a default changed, the new version is written next to yours as `*.orka-new`.
 
 Default apps (terminal, browser, ...) are in `orka/apps.lua`; override them with `ORKA_APPS = { browser = "chromium" }` at the top of `~/.config/hypr/hyprland.lua`.
 
-**Session start:** log in on **tty1** and Hyprland starts (`uwsm start hyprland.desktop`, from `~/.bash_profile`). Other consoles (Ctrl+Alt+F2...) stay plain shells.
+**Session start:** the login screen (greetd + our Quickshell greeter, see [quickshell](quickshell.md#login-screen)) starts Hyprland through uwsm after you log in. Other consoles (Ctrl+Alt+F2...) stay plain shells; logging in on tty1 directly would also start Hyprland (`~/.bash_profile`), as a fallback when greetd is off.
 
 **Check a config change** without restarting: `Hyprland --verify-config -c ~/.config/hypr/hyprland.lua`. In the repo: `iso/test/verify-hypr.sh`.
 
 ## Not there yet (planned Quickshell components)
 
-The bar, notifications, the polkit agent (admin password dialog) and the app launcher are done ([quickshell](quickshell.md#the-bar)). Not there yet: volume OSD, lock screen or login screen. `SUPER + K` lists all bindings.
+The bar, notifications, the polkit agent (admin password dialog), the app launcher, the lock screen and the login screen are done ([quickshell](quickshell.md#the-bar)). Not there yet: the volume OSD. `SUPER + K` lists all bindings.
 
 ## Key bindings
 
@@ -81,6 +81,7 @@ Based on Omarchy v3.8.4. `SUPER + K` shows the full list.
 | `SUPER + CTRL + N` | Night light |
 | `SUPER + CTRL + Z` / `SUPER + CTRL + ALT + Z` | Zoom / reset |
 | Media keys | Volume, mute, play/pause, next/previous |
+| `SUPER + CTRL + L` | Lock the screen |
 | `SUPER + CTRL + ALT + ESCAPE` | Log out |
 
 ## Tested

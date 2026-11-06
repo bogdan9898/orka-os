@@ -411,15 +411,22 @@ btrfs quota disable / || true
 
 systemctl enable systemd-networkd systemd-resolved systemd-timesyncd iwd \
   bluetooth docker avahi-daemon fstrim.timer plocate-updatedb.timer \
-  snapper-cleanup.timer limine-snapper-sync.service orka-firstboot.service orka-windows-entry.service
+  snapper-cleanup.timer limine-snapper-sync.service orka-firstboot.service orka-windows-entry.service \
+  greetd
+# The OrkaOS shell, for every user's Hyprland session.
+systemctl --global enable orka-shell.service
 EOF
   printf '%s:%s\n' "$ORKA_USER" "$ORKA_PASSWORD" | arch-chroot "$TARGET" chpasswd
 
-  # KWallet: unlock (and on first login create) the wallet with the login password.
-  if ! grep -q pam_kwallet5 "$TARGET/etc/pam.d/login"; then
-    sed -i '/^auth.*system-local-login/a auth       optional     pam_kwallet5.so' "$TARGET/etc/pam.d/login"
-    echo 'session    optional     pam_kwallet5.so auto_start' >>"$TARGET/etc/pam.d/login"
-  fi
+  # KWallet: unlock (and on first login create) the wallet with the login
+  # password, on the login screen (greetd) and on the consoles (login).
+  local pamf
+  for pamf in greetd login; do
+    if ! grep -q pam_kwallet5 "$TARGET/etc/pam.d/$pamf"; then
+      sed -i '/^auth.*system-local-login/a auth       optional     pam_kwallet5.so' "$TARGET/etc/pam.d/$pamf"
+      echo 'session    optional     pam_kwallet5.so auto_start' >>"$TARGET/etc/pam.d/$pamf"
+    fi
+  done
 
   # Snapshots before/after every pacman transaction, now that Snapper is set up.
   install_late_packages
@@ -447,7 +454,7 @@ install_desktop() {
   arch-chroot "$TARGET" runuser -u "$ORKA_USER" -- env HOME="/home/$ORKA_USER" \
     /usr/local/bin/orka-setup-user >>"$LOG" 2>&1 || die "orka-setup-user failed (log: $LOG)"
   install_nvim_bundle
-  info "Hyprland starts after logging in on tty1"
+  info "Login screen at boot (greetd); Hyprland starts after logging in"
 }
 
 # Neovim plugins, parsers and language servers, prepared by `build.sh nvim`,
@@ -541,6 +548,9 @@ echo "nvim: $(cd /tmp && as_user nvim --headless /tmp/orka-selftest.lua -c 'lua 
   vim.cmd("qall!") end, 10000)' | tr '\n' ' ')"
 echo "nvim build paths left: $(grep -rIlF /orka-build/nvim-home "/home/$u/.local/share/nvim" | wc -l)"
 echo "git: pull.rebase=$(as_user git config pull.rebase) defaultBranch=$(as_user git config init.defaultBranch)"
+echo "login: greetd=$(systemctl is-enabled greetd 2>&1) active=$(systemctl is-active greetd 2>&1) greeter=$(pgrep -u greeter -x qs >/dev/null && echo running || echo missing) cage=$(pgrep -x cage >/dev/null && echo running || echo missing)"
+echo "shell service: $(systemctl --global is-enabled orka-shell.service 2>&1)"
+echo "lock: pam=$(test -f /etc/pam.d/orka-lock && echo ok || echo missing) kwallet-greetd=$(grep -c pam_kwallet5 /etc/pam.d/greetd) settings=$(as_user cat "/home/$u/.config/orka/settings.json" | tr -d ' \n')"
 echo "ORKA-SELFTEST-END"
 EOF
   cat >"$TARGET/etc/systemd/system/orka-selftest.service" <<'EOF'
@@ -568,7 +578,7 @@ finish() {
   sync
   umount -R "$TARGET"
   step "OrkaOS is installed"
-  info "Remove the USB stick and reboot, then log in on the console: Hyprland starts automatically on tty1."
+  info "Remove the USB stick and reboot, then log in on the login screen."
 }
 
 main() {

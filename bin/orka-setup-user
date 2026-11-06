@@ -30,6 +30,8 @@ install_file "$user_cfg/ghostty/config" "$HOME/.config/ghostty/config"
 install_file "$user_cfg/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
 install_file "$user_cfg/git/config" "$HOME/.config/git/config"
 install_file "$user_cfg/xdg-terminals.list" "$HOME/.config/xdg-terminals.list"
+# OrkaOS settings read by the shell (idle lock / screen off times).
+install_file "$user_cfg/orka/settings.json" "$HOME/.config/orka/settings.json"
 
 # Neovim (LazyVim). The plugins themselves are unpacked by the installer.
 while IFS= read -r -d '' f; do
