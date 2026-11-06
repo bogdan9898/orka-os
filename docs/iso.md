@@ -70,3 +70,15 @@ iso/test/install-test.sh --gui           # watch it in a window
 The VM runs with `restrict=on` networking: no internet, but SSH to the live ISO works (port 2222, key from a cloud-init seed). With `ORKA_TEST=1` the installer adds a serial console and `orka-selftest.service`, which prints a boot report the test script reads from the serial log.
 
 `iso/test/vm.sh --gui` boots the installed disk in a window for manual testing (with sound through WSLg). Headless runs get a silent virtual sound card (QEMU `-audiodev none`), so the guest still has an audio output and a microphone for volume and OSD tests.
+
+### Desktop tests (screenshots, keys, clicks)
+
+`iso/test/vm-session.sh` boots the installed disk headless and runs a list of steps, saving a screenshot after each one (`$SHOTS/shot1.png`, ..., default `/tmp/orka-shots`): type a command (`"@4 ls"`), press keys (`"!meta_l-k"`), type without Enter (`"%roman"`), click at a pixel (`"^445,360"`, through QEMU's QMP socket `/tmp/orka-qmp.sock`), or send a raw monitor command (`"#info status"`). The header of the script lists the details (`NOLOGIN=1` to log in on the graphical login screen yourself, `VMOPTS=` for network, `KEYWAIT=0.6` to catch the OSD). Example, as `bogdan` inside the `archlinux` WSL distro:
+
+```sh
+NOLOGIN=1 iso/test/vm-session.sh "@20 tester" "!meta_l-ret" "!meta_l-k" "%tmux" "!esc"
+```
+
+To move files into or out of the guest, boot it with network (`VMOPTS=`) and run `iso/test/vm-http.py <port> <serve dir> <upload dir>` on the host side: the guest fetches with `curl 10.0.2.2:<port>/file` and uploads with `curl --data-binary @- 10.0.2.2:<port>/name`. This is how changed shell files were tried without rebuilding the ISO (copy into `/usr/share/orka/...` with sudo, then `sync`, `hyprctl reload`, `systemctl --user restart orka-shell`).
+
+Gotchas: run everything in one `wsl ... bash -c` call (the VM stops when it returns); the session shuts the guest down with `system_powerdown` (killing QEMU can leave just-written files empty on the guest's Btrfs); stop helper servers by PID, never with `pkill -f` (it matches its own shell); the test user is `tester` / `tester`.

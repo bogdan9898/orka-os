@@ -45,19 +45,20 @@ orka-os/
 
 ## Roadmap
 
-Status on 2026-11-05 (end of day 1).
+Status on 2026-11-06 (end of day 2). **Next up**, in the order offered to the user: the real Orka theme (colors, Qt/Kvantum, icon theme), branding, then installing on the real machine.
 
 1. **Foundation**
    - [x] Package list (official + AUR), debloated from Omarchy v3.8.4 ([packages](packages.md))
    - [x] Offline ISO build (`iso/build.sh`) and installer (`orka-install`), UEFI only
    - [x] Multiple disks: contents shown in the disk menu, red warning before erasing any non-empty disk, Windows boot entry added at every boot (`orka-windows-entry`)
-   - [x] Hyprland 0.57 config in Lua, key bindings ported from Omarchy, `orka-*` helpers, Hyprland starts on tty1
+   - [x] Hyprland 0.57 config in Lua, key bindings ported from Omarchy (with sections, `orka/keys.lua`), `orka-*` helpers
    - [x] Shell and terminal setup: starship prompt, aliases (`eza`, `zoxide`, `fzf`), Ghostty and tmux configs ([shell](shell.md))
    - [x] Neovim config: LazyVim, plugins bundled into the ISO ([neovim](neovim.md))
    - [ ] Basic theme: theme switching works (4 themes, Settings → Theme, [settings](settings.md)); still to do: real Orka colors, Qt theming (Kvantum), icon theme
 2. **Test in a VM**
    - [x] QEMU/KVM in the `archlinux` WSL distro; automated offline install test incl. Windows next to it / on a 2nd disk (`iso/test/install-test.sh`)
    - [x] Hyprland starts and basic bindings work in the VM
+   - [x] Every desktop component checked in the VM with screenshots, keys and mouse clicks (QMP); headless VM has a silent sound card
    - [ ] Click through the interactive installer once (only the first screen and the warning box were checked visually)
 3. **Branding:** Orka logo, Plymouth theme, boot menu, fastfetch, wallpapers.
    - [ ] **TODO: create the logo with an actual orca** (not just a fin). Needs variants for the boot splash, boot menu, fastfetch (ASCII/image), icon and wallpaper.
@@ -66,10 +67,12 @@ Status on 2026-11-05 (end of day 1).
    - [ ] **TODO: choose Orka's fonts** (UI, monospace for terminal/editor, icon font). For now the current set is fine: `noto-fonts`, `noto-fonts-emoji`, `ttf-jetbrains-mono-nerd`, `woff2-font-awesome`.
    - [ ] Icon theme (Yaru was dropped: its AUR build needs gnome-shell)
 4. **Install on the host** (separate disk, Windows disks disconnected; checklist in [dual boot](hardware-and-dual-boot.md)). Then check what the VM can't: FreeSync/`highrr`, screenshots/recording, media keys, Wi-Fi/Bluetooth, KDE Connect.
-5. **Quickshell desktop**, one component at a time: bar, notifications, polkit agent, launcher, lock screen, login screen, cheat sheet, OSD (done: [quickshell](quickshell.md#the-bar)), settings app ([settings](settings.md)).
+5. **Quickshell desktop** (all done, see [quickshell](quickshell.md)): bar, notifications, polkit agent, launcher, lock screen, login screen (greetd + cage), cheat sheet, OSD (volume, mic, media, Caps/Num Lock), settings app ([settings](settings.md)). Possible later: notification center (history), tooltips in the bar, brightness via DDC/CI, confirmation dialog for log out.
 
 ### Known small issues
 
 - `pacman` warns "database file for 'core' does not exist" until the first time the installed system is online (`orka-firstboot` runs `pacman -Sy` when there is network).
 - The luarocks pacman hook prints `/usr/bin/lua5.1: No such file or directory` during install (harmless; add `lua51` if Neovim plugins need LuaRocks builds).
-- The current ISO in `~/orka-build/out` predates the last three commits (key list fix, erase warning); rebuild with `sudo ./iso/build.sh iso`.
+- The ISO in `~/orka-build/out` (`orkaos-2026.11.06`) is built from commit `fe4381b` (all of day 2). Rebuild with `sudo ./iso/build.sh iso` after changes (`nvim iso` if the Neovim config changed, `repo iso` if packages changed).
+- Faint rounded window shadow visible at the bottom edge behind the dimmed overlays (settings, cheat sheet) right after a theme change: Hyprland redraw, cosmetic.
+- Not testable in the VM, check on the real machine: FreeSync/`highrr`, several monitors (bar per monitor, popups on the focused one), suspend (lock before sleep), screen off after idle, real Wi-Fi/Bluetooth icons, the system tray with KDE Connect, sound device switching, notification clicks from real apps.
