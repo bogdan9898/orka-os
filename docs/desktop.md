@@ -22,7 +22,7 @@ Default apps (terminal, browser, ...) are in `orka/apps.lua`; override them with
 
 ## Not there yet (planned Quickshell components)
 
-No bar, notifications, launcher, volume OSD, lock screen, polkit agent or login screen. Stand-ins: `SUPER + SPACE` opens Hyprland's run dialog (`hyprland-run`); `SUPER + K` lists all bindings.
+The bar is done ([quickshell](quickshell.md#the-bar)). Not there yet: notifications, launcher, volume OSD, lock screen, polkit agent or login screen. Stand-ins: `SUPER + SPACE` opens Hyprland's run dialog (`hyprland-run`); `SUPER + K` lists all bindings.
 
 ## Key bindings
 

@@ -258,7 +258,7 @@ stage_iso() {
   cp -al "$REPO" "$PROFILE/airootfs/opt/orka/repo"
   cp "$B/nvim-data.tar.zst" "$PROFILE/airootfs/opt/orka/"
   install -d "$PROFILE/airootfs/opt/orka/src"
-  cp -r --no-preserve=mode,ownership "$SRC/installer" "$SRC/config" "$SRC/bin" \
+  cp -r --no-preserve=mode,ownership "$SRC/installer" "$SRC/config" "$SRC/bin" "$SRC/shell" \
     "$SRC/packages.txt" "$SRC/packages-aur.txt" "$PROFILE/airootfs/opt/orka/src/"
   install -Dm755 "$SRC/installer/orka-install" "$PROFILE/airootfs/usr/local/bin/orka-install"
 

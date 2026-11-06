@@ -1,0 +1,14 @@
+#!/bin/bash
+# Current network connection, for the bar (one line):
+#   wifi <signal 0-100>   ethernet <interface>   offline
+# "Current" = the interface the default route uses.
+dev="$(ip -o route get 1.1.1.1 2>/dev/null | sed -n 's/.* dev \([^ ]*\).*/\1/p')"
+if [[ -z "$dev" ]]; then
+  echo offline
+elif [[ -d "/sys/class/net/$dev/wireless" ]]; then
+  # Link quality, out of 70 (iwd/mac80211 scale).
+  quality="$(awk -v d="$dev:" '$1 == d { print int($3) }' /proc/net/wireless)"
+  echo "wifi $(( ${quality:-0} * 100 / 70 ))"
+else
+  echo "ethernet $dev"
+fi

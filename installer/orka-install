@@ -440,6 +440,9 @@ install_desktop() {
     rm -rf "$TARGET/usr/share/orka/$d"
     cp -r --no-preserve=mode,ownership "$SRC/config/$d" "$TARGET/usr/share/orka/$d"
   done
+  # The desktop shell (Quickshell), started by orka/autostart.lua.
+  rm -rf "$TARGET/usr/share/orka/shell"
+  cp -r --no-preserve=mode,ownership "$SRC/shell" "$TARGET/usr/share/orka/shell"
   install -m755 "$SRC"/bin/orka-* "$TARGET/usr/local/bin/"
   arch-chroot "$TARGET" runuser -u "$ORKA_USER" -- env HOME="/home/$ORKA_USER" \
     /usr/local/bin/orka-setup-user >>"$LOG" 2>&1 || die "orka-setup-user failed (log: $LOG)"
