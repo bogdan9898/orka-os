@@ -184,13 +184,14 @@ Only bindings with a description are listed: in Hyprland that's the `description
 | Volume (icon by level, bar, `45%`) / "Muted" | Any change of the default output: volume keys, scrolling on the bar's volume icon, a mixer | Watches Pipewire's default sink; quiet for 1.5 s at startup and after the output device changes, so those don't flash it |
 | "Microphone on" / "Microphone off" | Muting the default input (`XF86AudioMicMute`) | Watches the default source |
 | Play / pause icon with "Title — Artist" | Media keys | The bindings run `playerctl ...; orka-osd media`; the OSD reads the playing (or first) MPRIS player |
+| "Caps Lock on/off", "Num Lock on/off" | Pressing Caps Lock or Num Lock (with any modifiers) | Hyprland sends no event for lock keys, so pass-through bindings (`non_consuming`, no description, so not in the cheat sheet) run `orka-osd keylock caps|num`; the OSD then reads the main keyboard's state from `hyprctl devices -j` |
 | Any message, optionally with a bar | Scripts | `orka-osd <icon> <message> [0-100]`; used by `orka-nightlight` ("Night light on/off") |
 
 Icons for scripts: `volume muted mic mic-off play pause media night lock info`, or any Nerd Font glyph. IPC target `osd`: `display <icon> <message> <value|none>`, `media`, `hide`. (The function is not called `show`: `qs ipc` reads that as its own `show` command.)
 
 No brightness: the target machine is a desktop with external monitors and no brightness keys. External monitor brightness would need DDC/CI (`ddcutil`); the OSD can show it with `orka-osd info Brightness 70` once something sets it.
 
-**Tested** 2026-11-06 in the VM (now with a silent virtual sound card, `iso/test/vm.sh`): volume up/down and mute keys, microphone mute, "No media player" for the play key without a player, `orka-osd` messages with and without a bar. Not yet tried: a real player's track info, the bar's volume scroll, several monitors.
+**Tested** 2026-11-06 in the VM (now with a silent virtual sound card, `iso/test/vm.sh`): volume up/down and mute keys, microphone mute, Caps Lock and Num Lock on/off (the keys keep working: typed text came out in capitals), "No media player" for the play key without a player, `orka-osd` messages with and without a bar. Not yet tried: a real player's track info, the bar's volume scroll, several monitors.
 
 ## References
 

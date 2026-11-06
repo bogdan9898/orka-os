@@ -29,6 +29,8 @@ Singleton {
         music:       String.fromCodePoint(0xF075A),
         night:       String.fromCodePoint(0xF0594),   // moon
         info:        String.fromCodePoint(0xF02FD),
+        capsLock:    String.fromCodePoint(0xF0632),   // keyboard-caps
+        numLock:     String.fromCodePoint(0xF03A0),   // numeric
         btOn:        String.fromCodePoint(0xF293),
         btOff:       String.fromCodePoint(0xF00B2),
         btConnected: String.fromCodePoint(0xF00B1),

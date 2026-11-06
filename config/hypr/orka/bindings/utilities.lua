@@ -24,6 +24,14 @@ notify("SUPER + ALT + comma",         "orka-notifications invoke",      "Invoke 
 notify("SUPER + SHIFT + ALT + comma", "orka-notifications restore",     "Restore last notification")
 notify("SUPER + CTRL + comma",        "orka-notifications dnd",         "Toggle do not disturb")
 
+-- Caps Lock / Num Lock state on the OSD. Passed through (the keys still do
+-- their job), with any modifiers, and without a description so they stay
+-- out of the cheat sheet.
+for key, which in pairs({ Caps_Lock = "caps", Num_Lock = "num" }) do
+    hl.bind(key, hl.dsp.exec_cmd("orka-osd keylock " .. which),
+        { non_consuming = true, ignore_mods = true, locked = true })
+end
+
 -- Night light, zoom
 system("SUPER + CTRL + N",       "orka-nightlight",                    "Toggle night light")
 system("SUPER + CTRL + Z",       "hyprctl eval 'hl.config({ cursor = { zoom_factor = 2 } })'", "Zoom in")

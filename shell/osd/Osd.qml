@@ -7,6 +7,7 @@
 //                    bar, a mixer), not at startup or when the output changes.
 //   Microphone:      shown when the default input is muted or unmuted.
 //   Media keys:      `orka-osd media` after playerctl: play state and track.
+//   Caps/Num Lock:   `orka-osd keylock caps|num` from the key's binding.
 //   Scripts:         `orka-osd <icon> <message> [value 0-100]`
 //                    (IPC target "osd": display, media, hide; not "show", which `qs ipc` takes as its own command).
 import QtQuick
@@ -120,8 +121,46 @@ Scope {
         }
     }
 
+    // --- Caps Lock / Num Lock ---------------------------------------------------
+    // Hyprland sends no event when a lock key toggles, so its bindings
+    // (orka/bindings/utilities.lua, passed through to apps) call
+    // `orka-osd keylock caps|num`; then the main keyboard's state is read.
+    property string lockKey: ""
+    Timer {
+        id: lockTimer
+        interval: 120   // let the key press reach the keyboard state first
+        onTriggered: devices.running = true
+    }
+    Process {
+        id: devices
+        command: ["hyprctl", "devices", "-j"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                let keyboards = [];
+                try {
+                    keyboards = JSON.parse(text).keyboards || [];
+                } catch (e) {
+                    return;
+                }
+                const kb = keyboards.find(k => k.main) ?? keyboards[0];
+                if (!kb)
+                    return;
+                if (root.lockKey === "num")
+                    root.show(Theme.icons.numLock, "Num Lock " + (kb.numLock ? "on" : "off"));
+                else
+                    root.show(Theme.icons.capsLock, "Caps Lock " + (kb.capsLock ? "on" : "off"));
+            }
+        }
+    }
+
     IpcHandler {
         target: "osd"
+
+        // which: "caps" or "num"
+        function keylock(which: string): void {
+            root.lockKey = which;
+            lockTimer.restart();
+        }
 
         // value: "0".."100" for a bar, anything else (e.g. "none") for none.
         function display(icon: string, message: string, value: string): void {
