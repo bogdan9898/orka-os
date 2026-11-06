@@ -52,7 +52,7 @@ Status on 2026-11-05 (end of day 1).
    - [x] Offline ISO build (`iso/build.sh`) and installer (`orka-install`), UEFI only
    - [x] Multiple disks: contents shown in the disk menu, red warning before erasing any non-empty disk, Windows boot entry added at every boot (`orka-windows-entry`)
    - [x] Hyprland 0.57 config in Lua, key bindings ported from Omarchy, `orka-*` helpers, Hyprland starts on tty1
-   - [ ] Shell and terminal setup: starship prompt, aliases (`eza`, `zoxide`, `fzf`), Ghostty and tmux configs
+   - [x] Shell and terminal setup: starship prompt, aliases (`eza`, `zoxide`, `fzf`), Ghostty and tmux configs ([shell](shell.md))
    - [ ] Neovim config
    - [ ] Basic theme (colors are a placeholder, see `config/hypr/orka/theme.lua`); Qt/GTK theming (Kvantum, Adwaita-dark, icon theme)
 2. **Test in a VM**

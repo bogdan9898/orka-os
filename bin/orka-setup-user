@@ -7,10 +7,10 @@ src=/opt/orka/src
 [[ "${1:-}" == --src ]] && src="$2"
 user_cfg="$src/config/user"
 
-install_file() {   # install_file <from> <to>
-  local from="$1" to="$2"
+install_file() {   # install_file <from> <to> [stock file that may be replaced]
+  local from="$1" to="$2" stock="${3:-}"
   mkdir -p "$(dirname "$to")"
-  if [[ ! -e "$to" ]]; then
+  if [[ ! -e "$to" ]] || { [[ -n "$stock" ]] && cmp -s "$stock" "$to"; }; then
     cp "$from" "$to"
   elif ! cmp -s "$from" "$to"; then
     cp "$from" "$to.orka-new"
@@ -21,6 +21,14 @@ install_file() {   # install_file <from> <to>
 for f in "$user_cfg"/hypr/*; do
   install_file "$f" "$HOME/.config/hypr/$(basename "$f")"
 done
+
+# Shell and terminal. useradd copies Arch's stock ~/.bashrc from /etc/skel;
+# that one is replaced, a .bashrc you changed is kept.
+install_file "$user_cfg/bash/bashrc" "$HOME/.bashrc" /etc/skel/.bashrc
+install_file "$user_cfg/starship.toml" "$HOME/.config/starship.toml"
+install_file "$user_cfg/ghostty/config" "$HOME/.config/ghostty/config"
+install_file "$user_cfg/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
+install_file "$user_cfg/git/config" "$HOME/.config/git/config"
 
 # Start Hyprland after logging in on the first console (tty1).
 profile="$HOME/.bash_profile"

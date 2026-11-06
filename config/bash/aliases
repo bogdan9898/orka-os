@@ -1,0 +1,51 @@
+# Files
+if command -v eza &>/dev/null; then
+  alias ls='eza -lh --group-directories-first --icons=auto'
+  alias lsa='ls -a'
+  alias lt='eza --tree --level=2 --long --icons --git'
+  alias lta='lt -a'
+fi
+alias grep='grep --color=auto'
+
+# Fuzzy-find a file with a preview; eff opens it in the editor.
+alias ff="fzf --preview 'bat --style=numbers --color=always {}'"
+alias eff='$EDITOR "$(ff)"'
+
+# cd: a real directory works as usual; anything else is a zoxide jump
+# ("cd orka" goes to the most used directory matching "orka").
+if command -v zoxide &>/dev/null; then
+  alias cd='zd'
+  zd() {
+    if (( $# == 0 )); then
+      builtin cd ~ || return
+    elif [[ -d $1 || $1 == - ]]; then
+      builtin cd "$1" || return
+    else
+      z "$@" || { echo "Directory not found: $*"; return 1; }
+      printf '\U000F17A9 '
+      pwd
+    fi
+  }
+fi
+
+# Open a file with its default app, detached from the terminal.
+open() (
+  xdg-open "$@" >/dev/null 2>&1 &
+)
+
+# Directories
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+
+# Tools
+alias d='docker'
+alias t='tmux attach || tmux new -s Work'
+alias lg='lazygit'
+n() { if (( $# == 0 )); then command nvim .; else command nvim "$@"; fi; }
+
+# Git
+alias g='git'
+alias gcm='git commit -m'
+alias gcam='git commit -a -m'
+alias gcad='git commit -a --amend'

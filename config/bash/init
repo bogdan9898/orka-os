@@ -1,0 +1,14 @@
+# Prompt (config: ~/.config/starship.toml)
+if [[ $- == *i* && ${TERM:-} != dumb ]] && command -v starship &>/dev/null; then
+  eval "$(starship init bash)"
+fi
+
+# zoxide: z <part of a path> jumps to the most used matching directory.
+if command -v zoxide &>/dev/null; then
+  eval "$(zoxide init bash)"
+fi
+
+# fzf: CTRL+R history search, CTRL+T file picker, ALT+C cd, and "**<TAB>" completion.
+if [[ $- == *i* ]] && command -v fzf &>/dev/null; then
+  eval "$(fzf --bash)"
+fi

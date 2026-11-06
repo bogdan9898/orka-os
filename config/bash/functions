@@ -1,0 +1,66 @@
+# Archives
+compress() { tar -czf "${1%/}.tar.gz" "${1%/}"; }
+alias decompress='tar -xzf'
+
+# Write an ISO to a USB stick: iso2sd <file.iso> [/dev/sdX]
+# Without a device, pick one from the USB drives.
+iso2sd() {
+  (( $# >= 1 )) || { echo "Usage: iso2sd <file.iso> [device]"; return 1; }
+  local iso="$1" drive="${2:-}"
+  if [[ -z $drive ]]; then
+    local usb
+    usb="$(lsblk -dpno NAME,SIZE,MODEL,TRAN | awk '$NF == "usb"')"
+    [[ -n $usb ]] || { echo "No USB drives found"; return 1; }
+    drive="$(gum choose --header "Write $iso to (everything on it is erased):" <<<"$usb" | awk '{print $1}')"
+    [[ -n $drive ]] || { echo "No drive selected"; return 1; }
+  fi
+  gum confirm "Erase $drive and write $iso to it?" || return 1
+  sudo dd bs=4M status=progress oflag=sync if="$iso" of="$drive" && sudo eject "$drive"
+}
+
+# Erase a whole drive and make one exFAT partition: format-drive <device> <label>
+format-drive() {
+  if (( $# != 2 )); then
+    echo "Usage: format-drive <device> <label>   e.g. format-drive /dev/sda 'My Stuff'"
+    echo; lsblk -dpo NAME,SIZE,MODEL,TRAN
+    return 1
+  fi
+  gum confirm "Erase everything on $1 and format it as '$2'?" || return 1
+  sudo wipefs -a "$1"
+  sudo parted -s "$1" mklabel gpt mkpart primary 1MiB 100% set 1 msftdata on
+  local part; [[ $1 == *nvme* ]] && part="${1}p1" || part="${1}1"
+  sudo partprobe "$1"; sudo udevadm settle
+  sudo mkfs.exfat -n "$2" "$part" && echo "$1 formatted as exFAT, label '$2'."
+}
+
+# SSH port forwarding: fip <host> <port>... forwards, dip <port>... stops, lip lists.
+fip() {
+  (( $# >= 2 )) || { echo "Usage: fip <host> <port1> [port2] ..."; return 1; }
+  local host="$1"; shift
+  for port in "$@"; do
+    ssh -f -N -L "$port:localhost:$port" "$host" && echo "Forwarding localhost:$port -> $host:$port"
+  done
+}
+dip() {
+  (( $# >= 1 )) || { echo "Usage: dip <port1> [port2] ..."; return 1; }
+  for port in "$@"; do
+    pkill -f "ssh.*-L $port:localhost:$port" && echo "Stopped forwarding port $port" || echo "No forwarding on port $port"
+  done
+}
+lip() { pgrep -af "ssh.*-L [0-9]+:localhost:[0-9]+" || echo "No active forwards"; }
+
+# Git worktrees: ga <branch> makes ../<repo>--<branch> on a new branch and
+# goes there; gd (run inside it) removes the worktree and its branch.
+ga() {
+  [[ -n ${1:-} ]] || { echo "Usage: ga <branch>"; return 1; }
+  local wt
+  wt="../$(basename "$PWD")--$1"
+  git worktree add -b "$1" "$wt" && { builtin cd "$wt" || return; }
+}
+gd() {
+  local cwd="$PWD" dir root branch
+  dir="$(basename "$cwd")"; root="${dir%%--*}"; branch="${dir#*--}"
+  [[ $root != "$dir" ]] || { echo "Not a worktree made by ga (<repo>--<branch>)"; return 1; }
+  gum confirm "Remove worktree $dir and branch $branch?" || return 1
+  builtin cd "../$root" && git worktree remove "$cwd" --force && git branch -D "$branch"
+}

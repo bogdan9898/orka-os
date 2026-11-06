@@ -1,0 +1,12 @@
+#
+# ~/.bashrc (OrkaOS)
+#
+
+# Not interactive (scp, scripts): stop here.
+[[ $- != *i* ]] && return
+
+# OrkaOS defaults: prompt, aliases (ls = eza, cd = zoxide), fzf keys, history.
+# See /usr/share/orka/bash/. Anything you add below wins.
+source /usr/share/orka/bash/rc
+
+# Your settings:

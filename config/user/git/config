@@ -1,0 +1,9 @@
+# OrkaOS: your git config. The OrkaOS defaults (pull with rebase, short
+# aliases, clearer diffs, ...) are loaded first; settings below win.
+[include]
+	path = /usr/share/orka/git/config
+
+# Your settings, e.g.:
+# [user]
+# 	name = Your Name
+# 	email = you@example.com

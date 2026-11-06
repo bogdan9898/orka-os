@@ -1,0 +1,11 @@
+# OrkaOS bash defaults, sourced from ~/.bashrc. Replaced on updates; put your
+# own settings in ~/.bashrc after the line that sources this file.
+# Based on Omarchy v3.8.4 default/bash (MIT).
+ORKA_BASH=/usr/share/orka/bash
+
+source "$ORKA_BASH/envs"
+source "$ORKA_BASH/shell"
+source "$ORKA_BASH/aliases"
+source "$ORKA_BASH/functions"
+source "$ORKA_BASH/init"
+[[ $- == *i* ]] && bind -f "$ORKA_BASH/inputrc"

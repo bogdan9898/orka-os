@@ -431,12 +431,15 @@ EOF
   install_desktop
 }
 
-# Hyprland defaults, orka-* commands, and the user's dotfiles.
+# Hyprland, bash, tmux and git defaults, orka-* commands, and the user's dotfiles.
 install_desktop() {
-  step "Setting up the desktop (Hyprland)"
+  step "Setting up the desktop (Hyprland) and shell"
   install -d "$TARGET/usr/share/orka"
-  rm -rf "$TARGET/usr/share/orka/hypr"
-  cp -r --no-preserve=mode,ownership "$SRC/config/hypr" "$TARGET/usr/share/orka/hypr"
+  local d
+  for d in hypr bash tmux git; do
+    rm -rf "$TARGET/usr/share/orka/$d"
+    cp -r --no-preserve=mode,ownership "$SRC/config/$d" "$TARGET/usr/share/orka/$d"
+  done
   install -m755 "$SRC"/bin/orka-* "$TARGET/usr/local/bin/"
   arch-chroot "$TARGET" runuser -u "$ORKA_USER" -- env HOME="/home/$ORKA_USER" \
     /usr/local/bin/orka-setup-user >>"$LOG" 2>&1 || die "orka-setup-user failed (log: $LOG)"
@@ -501,6 +504,12 @@ u="$(getent passwd 1000 | cut -d: -f1)"
 echo "hyprland config: $(runuser -u "$u" -- env HOME="/home/$u" Hyprland --verify-config -c "/home/$u/.config/hypr/hyprland.lua" 2>&1 | sed -n '/parsing result/,$p' | tail -n +2 | sed '/^$/d' | tr '\n' ' ')"
 echo "user files: $(ls "/home/$u/.config/hypr" | tr '\n' ' ')"
 echo "bash_profile autostart: $(grep -c 'orka: start Hyprland' "/home/$u/.bash_profile")"
+as_user() { runuser -u "$u" -- env -i HOME="/home/$u" USER="$u" TERM=xterm-256color PATH=/usr/local/bin:/usr/bin "$@" 2>&1; }
+echo "bashrc: $(as_user bash -ic 'echo "ls=${BASH_ALIASES[ls]%% *} cd=$(type -t zd) prompt=${STARSHIP_SHELL:-none} editor=$EDITOR"' </dev/null \
+  | grep -v -e 'cannot set terminal process group' -e 'no job control' | tr '\n' ' ')"
+echo "tmux: $(as_user tmux -L selftest -f "/home/$u/.config/tmux/tmux.conf" new-session -d \; show -gv prefix \; kill-server | tr '\n' ' ')"
+echo "ghostty config: $(as_user ghostty +validate-config | tr '\n' ' ')"
+echo "git: pull.rebase=$(as_user git config pull.rebase) defaultBranch=$(as_user git config init.defaultBranch)"
 echo "ORKA-SELFTEST-END"
 EOF
   cat >"$TARGET/etc/systemd/system/orka-selftest.service" <<'EOF'

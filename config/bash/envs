@@ -1,0 +1,12 @@
+# Editor for terminal programs (git, sudoedit, ...). The GUI editor used by
+# the SUPER key bindings is set in Hyprland's apps.lua.
+export EDITOR="${EDITOR:-nvim}"
+export SUDO_EDITOR="$EDITOR"
+
+# bat: use the terminal's colors; also color man pages with it.
+export BAT_THEME=ansi
+export MANROFFOPT="-c"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+# Your own scripts.
+[[ ":$PATH:" == *":$HOME/.local/bin:"* ]] || export PATH="$PATH:$HOME/.local/bin"
