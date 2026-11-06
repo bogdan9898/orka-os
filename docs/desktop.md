@@ -26,7 +26,9 @@ The bar, notifications, the polkit agent (admin password dialog), the app launch
 
 ## Key bindings
 
-Based on Omarchy v3.8.4. `SUPER + K` shows the full list.
+Based on Omarchy v3.8.4. `SUPER + K` opens the cheat sheet with every shortcut (Hyprland and tmux, always up to date, see [quickshell](quickshell.md#cheat-sheet)); `SUPER + SHIFT + K` is the same list in a terminal (`orka-keybindings`).
+
+**Sections:** every OrkaOS binding is made with `orka/keys.lua` (`local bind = require("orka.keys").section("Apps")`), which stores the section in the description ("Apps: Terminal"); the cheat sheet groups by it. Use it for your own bindings in `~/.config/hypr/bindings.lua` too; bindings without a section are listed under "Your bindings".
 
 ### Windows and workspaces
 
@@ -69,7 +71,7 @@ Based on Omarchy v3.8.4. `SUPER + K` shows the full list.
 | Keys | Action |
 |---|---|
 | `SUPER + SPACE` | App launcher (also runs a typed command) |
-| `SUPER + K` | Search key bindings |
+| `SUPER + K` / `SUPER + SHIFT + K` | Cheat sheet of all shortcuts / the same in a terminal |
 | `SUPER + ,` / `SUPER + SHIFT + ,` | Dismiss last / all notifications |
 | `SUPER + ALT + ,` / `SUPER + SHIFT + ALT + ,` | Invoke last notification / bring back the last one that disappeared |
 | `SUPER + CTRL + ,` | Do not disturb (only critical notifications pop up) |

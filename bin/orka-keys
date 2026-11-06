@@ -1,0 +1,95 @@
+#!/bin/bash
+# All keyboard shortcuts as they are right now, as JSON for the cheat sheet
+# (SUPER + K): [{"section": ..., "keys": ..., "description": ...}, ...]
+#   orka-keys [--tsv]     (--tsv: section<TAB>keys<TAB>description)
+#
+# Hyprland: the live bindings (hyprctl binds); their description is
+# "Section: text" (orka/keys.lua), without a section they go to "Your bindings".
+# tmux: the running server's bindings, or a short-lived server with your
+# config; only bindings with a note (bind -N) are listed.
+# Rows that differ only in a number are merged ("Workspace 1…10"), and so are
+# several keys for the same action ("SUPER + TAB / SUPER + scroll down").
+set -uo pipefail
+
+hypr() {
+  hyprctl -j binds 2>/dev/null | jq -c '
+    .[] | select(.description != "") |
+    ([ (if .modmask >= 64 then "SUPER" else empty end),
+       (if (.modmask % 64) >= 8 then "ALT" else empty end),
+       (if (.modmask % 8) >= 4 then "CTRL" else empty end),
+       (if (.modmask % 2) == 1 then "SHIFT" else empty end) ] | join(" + ")) as $mods |
+    (if .keycode >= 10 and .keycode <= 19 then "\((.keycode - 9) % 10)"
+     elif .keycode == 20 then "-"
+     elif .keycode == 21 then "="
+     elif .key == "mouse:272" then "left drag"
+     elif .key == "mouse:273" then "right drag"
+     elif .key == "mouse_down" then "scroll down"
+     elif .key == "mouse_up" then "scroll up"
+     elif .key == "comma" then ","
+     elif .key == "period" then "."
+     elif (.key | startswith("XF86")) then (.key | ltrimstr("XF86") | gsub("(?<a>[a-z])(?<b>[A-Z])"; "\(.a) \(.b)")) + " key"
+     elif .key != "" then (.key | ascii_upcase)
+     else "code:\(.keycode)" end) as $key |
+    .description as $desc |
+    (($desc | capture("^(?<s>[^:]+): (?<d>.*)$")) // { s: "Your bindings", d: $desc }) as $text |
+    { section: $text.s, keys: (if $mods == "" then $key else "\($mods) + \($key)" end), description: $text.d }'
+}
+
+# tmux key names -> "CTRL + ALT + LEFT" style.
+tmux_key() {
+  local k="$1" mods=()
+  [[ $k == BTab ]] && { echo "SHIFT + TAB"; return; }
+  while [[ $k =~ ^([CMS])-(.+)$ ]]; do
+    case "${BASH_REMATCH[1]}" in C) mods+=(CTRL) ;; M) mods+=(ALT) ;; S) mods+=(SHIFT) ;; esac
+    k="${BASH_REMATCH[2]}"
+  done
+  if [[ $k =~ ^[A-Z]$ ]]; then mods+=(SHIFT); else k="${k^^}"; fi
+  k="${k/ENTER/RETURN}"
+  mods+=("$k")
+  local IFS='+' joined
+  joined="${mods[*]}"
+  echo "${joined//+/ + }"
+}
+
+tmux_keys() {
+  command -v tmux >/dev/null || return 0
+  local t=(tmux) temp=""
+  if ! tmux list-sessions >/dev/null 2>&1; then
+    temp="orka-keys-$$"
+    t=(tmux -L "$temp")
+    "${t[@]}" -f "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/tmux.conf" new-session -d -s keys 2>/dev/null || return 0
+  fi
+  local prefix table section key note
+  prefix="$(tmux_key "$("${t[@]}" show -gv prefix)")"
+  for table in root prefix copy-mode-vi; do
+    case $table in
+      root)         section="tmux" ;;
+      prefix)       section="tmux: after $prefix" ;;
+      copy-mode-vi) section="tmux: copy mode" ;;
+    esac
+    while read -r key note; do
+      [[ -n $key && -n $note ]] || continue
+      jq -cn --arg s "$section" --arg k "$(tmux_key "$key")" --arg d "$note" '{section: $s, keys: $k, description: $d}'
+    done < <("${t[@]}" list-keys -N -P "" -T "$table" 2>/dev/null)
+  done
+  [[ -n $temp ]] && "${t[@]}" kill-server 2>/dev/null
+}
+
+{ hypr; tmux_keys; } | jq -s '
+  to_entries | map(.value + { i: .key }) |
+  # 1. the same action on several keys: one row
+  group_by([.section, .description]) |
+  map(.[0] + { keys: (map(.keys) | unique | join(" / ")), i: (map(.i) | min) }) |
+  # 2. rows that differ only in a trailing number: one row with a range
+  map(. + { kp: (.keys | sub("[0-9]$"; "#")), dp: (.description | sub("[0-9]+$"; "#")) }) |
+  group_by([.section, .kp, .dp]) |
+  map(if length > 2 and (.[0].kp | endswith("#")) and (.[0].dp | endswith("#")) then
+        sort_by(.i) | .[0] as $first | .[-1] as $last |
+        ($first.keys[-1:] + "…" + $last.keys[-1:]) as $keyrange |
+        (($first.description | capture("(?<n>[0-9]+)$").n) + "…" + ($last.description | capture("(?<n>[0-9]+)$").n)) as $numrange |
+        { section: $first.section, i: $first.i,
+          keys: ($first.kp | rtrimstr("#") + $keyrange),
+          description: ($first.dp | rtrimstr("#") + $numrange) }
+      else .[] end) |
+  sort_by(.i) | map({ section, keys, description })' |
+  if [[ ${1:-} == --tsv ]]; then jq -r '.[] | [.section, .keys, .description] | @tsv'; else cat; fi

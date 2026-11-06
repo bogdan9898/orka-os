@@ -60,7 +60,7 @@ Layout taken from Omarchy v3.8.4's Waybar; the code is our own (Omarchy v4's Qui
 
 Not in it (on purpose): battery (desktop), Omarchy's weather, update, dictation and idle indicators (no such features yet), tooltips (later).
 
-Files (`shell/`): `shell.qml` (one bar per monitor, the notification popups), `Notifications.qml` (the notification daemon), `notifications/` (popups), `polkit/` (the admin password dialog), `LauncherState.qml` + `launcher/` (the app launcher), `LockState.qml` + `lock/` (lock screen, idle), `Settings.qml` (`~/.config/orka/settings.json`), `greeter.qml` + `greeter/` (the login screen), `Theme.qml` (colors, font, glyphs; placeholder until the Orka theme), `Apps.qml` (start programs via uwsm, like `orka/apps.lua`), `bar/*.qml` (one file per widget). Network state comes from `orka-netstatus`, because Quickshell's Networking module only supports NetworkManager and OrkaOS uses iwd + systemd-networkd.
+Files (`shell/`): `shell.qml` (one bar per monitor, the notification popups), `Notifications.qml` (the notification daemon), `notifications/` (popups), `polkit/` (the admin password dialog), `LauncherState.qml` + `launcher/` (the app launcher), `LockState.qml` + `lock/` (lock screen, idle), `Settings.qml` (`~/.config/orka/settings.json`), `greeter.qml` + `greeter/` (the login screen), `cheatsheet/` (keyboard shortcuts, SUPER + K), `Theme.qml` (colors, font, glyphs; placeholder until the Orka theme), `Apps.qml` (start programs via uwsm, like `orka/apps.lua`), `bar/*.qml` (one file per widget). Network state comes from `orka-netstatus`, because Quickshell's Networking module only supports NetworkManager and OrkaOS uses iwd + systemd-networkd.
 
 **Tested** 2026-11-06 in the VM (installed from the ISO, Hyprland on tty1): the bar starts with Hyprland, windows tile below it, workspaces follow `SUPER + 1..5`, the clock shows, the network icon shows wired with internet and offline without, volume shows muted (the VM has no sound device), Bluetooth is hidden (no adapter). Shell log: no QML errors. Not yet tried: the tray (needs a tray app such as KDE Connect), clicks, volume scrolling, the recording dot, multiple monitors, real Wi-Fi.
 
@@ -157,6 +157,23 @@ At boot greetd shows our login screen on tty1: `greeter.qml` (a second entry poi
 - `cage -s` keeps console switching on: `CTRL + ALT + F2` still gives a text login if the login screen breaks.
 
 **Tested** 2026-11-06 in the VM (fresh install from the ISO): login screen shows at boot with the user filled in, a wrong password gives "Wrong password" and asks again, the right one starts Hyprland with the bar; `SUPER + CTRL + L` locks, wrong password is refused, right one unlocks; idle lock after `lockAfter` (set to 10 s by editing `settings.json` while running); a deliberate crash of the shell while locked (`pkill -SEGV`) brings the lock screen straight back. Bugs found and fixed in the test: a changed idle time had no effect (the monitor is now recreated), greetd's follow-up error replaced "Wrong password", a title bar on the login screen, Quickshell's crash-report dialog after the crash. Not yet tried: lock before suspend (the VM doesn't suspend), screen off after `screenOffAfter`, several monitors, Reboot / Shut down buttons, pam_faillock after 3 wrong passwords.
+
+## Cheat sheet
+
+`SUPER + K` opens `cheatsheet/CheatSheet.qml`: every keyboard shortcut on one screen, grouped by section in as many columns as fit. Type to filter (e.g. `tmux`, `SUPER + SHIFT`, `screenshot`), `↑` `↓` / `PAGE UP` `PAGE DOWN` to scroll, Escape clears the search and then closes, a click outside closes.
+
+**Always up to date:** nothing is written down twice. Each time it opens, the sheet runs `orka-keys`, which reads the bindings as they are right now:
+
+| Source | Read from | Sections |
+|---|---|---|
+| Hyprland (windows, workspaces, apps, notifications, screenshots, media, ...) | `hyprctl binds -j`: the live bindings, so a changed `bindings.lua` shows after Hyprland reloads it (it does on save) | From the description, `"Section: text"`, written by `orka/keys.lua`; without a section: "Your bindings" |
+| tmux | The running tmux server's `list-keys -N`, or a short-lived server started with `~/.config/tmux/tmux.conf` when none runs | "tmux" (no prefix), "tmux: after CTRL + SPACE" (the prefix is read live too), "tmux: copy mode" |
+
+Only bindings with a description are listed: in Hyprland that's the `description` option (all OrkaOS bindings have one), in tmux a note (`bind -N "..."`; tmux's own default keys have notes, ours were given one).
+
+`orka-keys` also tidies the list: several keys for the same action become one row (`SUPER + TAB / SUPER + scroll down`), and rows that only differ in a number become a range (`SUPER + 1…0  Workspace 1…10`). Number-row, mouse and media keys get readable names. `orka-keys --tsv` prints it as text; `SUPER + SHIFT + K` (`orka-keybindings`) shows that list in a searchable terminal.
+
+**Tested** 2026-11-06 in the VM: the sheet lists all sections with ranges and merged keys, search filters (`notif` → the 5 notification keys), a binding added to `~/.config/hypr/bindings.lua` appears in its own section after the reload, a tmux binding added to `~/.config/tmux/tmux.conf` appears in "tmux: after CTRL + SPACE". (An interrupted VM test once left a just-copied `orka/keys.lua` empty, which put Hyprland into emergency mode: an empty module makes `require` return `true`. Not a bug in the config, but worth knowing: if Hyprland reports "attempt to index a boolean value" in the bindings, check that file.)
 
 ## References
 

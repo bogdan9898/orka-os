@@ -51,7 +51,7 @@ Default colors for now (the Orka theme is a roadmap TODO). `SHIFT + INSERT` / `C
 
 ## tmux
 
-Prefix is `CTRL + SPACE` (`CTRL + B` also works). Status bar on top, mouse on, windows numbered from 1, vi copy mode (`v` select, `y` copy). Reload: prefix + `q`.
+Prefix is `CTRL + SPACE` (`CTRL + B` also works). Status bar on top, mouse on, windows numbered from 1, vi copy mode (`v` select, `y` copy). Reload: prefix + `q`. Every binding has a note (`bind -N "..."`), which is what the cheat sheet (`SUPER + K`) shows; give your own tmux bindings one too, or they won't be listed.
 
 | Keys | Action |
 |---|---|

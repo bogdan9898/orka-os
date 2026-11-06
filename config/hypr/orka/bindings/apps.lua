@@ -1,8 +1,8 @@
 -- Application launchers. The default apps are defined in orka/apps.lua.
 local apps = require("orka.apps")
-local function bind(keys, cmd, description)
-    hl.bind(keys, hl.dsp.exec_cmd(cmd), { description = description })
-end
+local section = require("orka.keys").section
+local bind = section("Apps")
+local tool = section("System tools")
 
 bind("SUPER + RETURN",               apps.run(apps.terminal),       "Terminal")
 bind("SUPER + ALT + RETURN",         apps.run(apps.terminal .. " -e bash -c 'tmux attach || tmux new -s Work'"), "Terminal with tmux")
@@ -18,8 +18,8 @@ bind("SUPER + SHIFT + D",            apps.tui("lazydocker"),        "Docker (laz
 bind("SUPER + SHIFT + G",            apps.tui("lazygit"),           "Git (lazygit)")
 
 -- System TUIs (floating)
-bind("SUPER + CTRL + T",             apps.tui("btop"),              "Activity (btop)")
-bind("SUPER + CTRL + A",             apps.tui("wiremix"),           "Audio (wiremix)")
-bind("SUPER + CTRL + B",             apps.tui("bluetui"),           "Bluetooth (bluetui)")
-bind("SUPER + CTRL + W",             apps.tui("impala"),            "Wi-Fi (impala)")
-bind("XF86Calculator",               apps.run(apps.calculator),     "Calculator")
+tool("SUPER + CTRL + T",             apps.tui("btop"),              "Activity (btop)")
+tool("SUPER + CTRL + A",             apps.tui("wiremix"),           "Audio (wiremix)")
+tool("SUPER + CTRL + B",             apps.tui("bluetui"),           "Bluetooth (bluetui)")
+tool("SUPER + CTRL + W",             apps.tui("impala"),            "Wi-Fi (impala)")
+tool("XF86Calculator",               apps.run(apps.calculator),     "Calculator")

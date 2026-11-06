@@ -1,2 +1,6 @@
--- Your extra key bindings, e.g.:
--- hl.bind("SUPER + SHIFT + M", hl.dsp.exec_cmd("uwsm app -- spotify"), { description = "Music" })
+-- Your extra key bindings. Give them a section to group them in the cheat
+-- sheet (SUPER + K); without one they're listed under "Your bindings". E.g.:
+--   local bind = require("orka.keys").section("Music")
+--   bind("SUPER + SHIFT + M", "uwsm app -- spotify", "Spotify")
+-- or plain Hyprland:
+--   hl.bind("SUPER + SHIFT + M", hl.dsp.exec_cmd("uwsm app -- spotify"), { description = "Spotify" })

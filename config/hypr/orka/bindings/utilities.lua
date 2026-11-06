@@ -1,33 +1,35 @@
--- Launcher, screenshots, system actions.
+-- Launcher, screenshots, notifications, system actions.
 local apps = require("orka.apps")
-local function bind(keys, cmd, description)
-    hl.bind(keys, hl.dsp.exec_cmd(cmd), { description = description })
-end
+local section = require("orka.keys").section
+local system = section("System")
+local capture = section("Screenshots & recording")
+local notify = section("Notifications")
 
--- App launcher (the OrkaOS shell); also runs a typed command.
-bind("SUPER + SPACE",          "qs -p /usr/share/orka/shell ipc call launcher toggle", "App launcher")
-bind("SUPER + K",              apps.tui("orka-keybindings", "keybindings"), "Show key bindings")
+-- The OrkaOS shell: launcher (also runs a typed command), cheat sheet.
+system("SUPER + SPACE",          "qs -p /usr/share/orka/shell ipc call launcher toggle", "App launcher")
+system("SUPER + K",              "qs -p /usr/share/orka/shell ipc call cheatsheet toggle", "Keyboard shortcuts (cheat sheet)")
+system("SUPER + SHIFT + K",      apps.tui("orka-keybindings", "keybindings"), "Search key bindings (terminal)")
 
 -- Screenshots, recording, color picker, OCR
-bind("PRINT",                  "orka-screenshot region",             "Screenshot (region, edit)")
-bind("SHIFT + PRINT",          "orka-screenshot screen",             "Screenshot (screen, edit)")
-bind("ALT + PRINT",            "orka-screenrecord",                  "Start/stop screen recording")
-bind("SUPER + PRINT",          "pkill hyprpicker || hyprpicker -a",  "Color picker")
-bind("SUPER + CTRL + PRINT",   "orka-screenshot text",               "Copy text from screen region (OCR)")
+capture("PRINT",                  "orka-screenshot region",             "Screenshot (region, edit)")
+capture("SHIFT + PRINT",          "orka-screenshot screen",             "Screenshot (screen, edit)")
+capture("ALT + PRINT",            "orka-screenrecord",                  "Start/stop screen recording")
+capture("SUPER + PRINT",          "pkill hyprpicker || hyprpicker -a",  "Color picker")
+capture("SUPER + CTRL + PRINT",   "orka-screenshot text",               "Copy text from screen region (OCR)")
 
 -- Notifications (the OrkaOS shell)
-bind("SUPER + comma",               "orka-notifications dismiss",     "Dismiss last notification")
-bind("SUPER + SHIFT + comma",       "orka-notifications dismiss-all", "Dismiss all notifications")
-bind("SUPER + ALT + comma",         "orka-notifications invoke",      "Invoke last notification")
-bind("SUPER + SHIFT + ALT + comma", "orka-notifications restore",     "Restore last notification")
-bind("SUPER + CTRL + comma",        "orka-notifications dnd",         "Toggle do not disturb")
+notify("SUPER + comma",               "orka-notifications dismiss",     "Dismiss last notification")
+notify("SUPER + SHIFT + comma",       "orka-notifications dismiss-all", "Dismiss all notifications")
+notify("SUPER + ALT + comma",         "orka-notifications invoke",      "Invoke last notification")
+notify("SUPER + SHIFT + ALT + comma", "orka-notifications restore",     "Restore last notification")
+notify("SUPER + CTRL + comma",        "orka-notifications dnd",         "Toggle do not disturb")
 
 -- Night light, zoom
-bind("SUPER + CTRL + N",       "orka-nightlight",                    "Toggle night light")
-bind("SUPER + CTRL + Z",       "hyprctl eval 'hl.config({ cursor = { zoom_factor = 2 } })'", "Zoom in")
-bind("SUPER + CTRL + ALT + Z", "hyprctl eval 'hl.config({ cursor = { zoom_factor = 1 } })'", "Reset zoom")
+system("SUPER + CTRL + N",       "orka-nightlight",                    "Toggle night light")
+system("SUPER + CTRL + Z",       "hyprctl eval 'hl.config({ cursor = { zoom_factor = 2 } })'", "Zoom in")
+system("SUPER + CTRL + ALT + Z", "hyprctl eval 'hl.config({ cursor = { zoom_factor = 1 } })'", "Reset zoom")
 
 -- Lock, leave the session. Logging out is deliberately awkward to press:
 -- there's no confirmation dialog yet.
-bind("SUPER + CTRL + L",       "orka-lock",                          "Lock the screen")
-hl.bind("SUPER + CTRL + ALT + ESCAPE", hl.dsp.exec_cmd("uwsm stop"), { description = "Log out" })
+system("SUPER + CTRL + L",       "orka-lock",                          "Lock the screen")
+system("SUPER + CTRL + ALT + ESCAPE", "uwsm stop",                     "Log out")

@@ -11,6 +11,7 @@
 import QtQuick
 import Quickshell
 import qs.bar
+import qs.cheatsheet
 import qs.launcher
 import qs.lock
 import qs.notifications
@@ -25,6 +26,7 @@ ShellRoot {
     Popups {}
     PolkitDialog {}
     Launcher {}
+    CheatSheet {}
     Lock {}
     Idle {}
 }
