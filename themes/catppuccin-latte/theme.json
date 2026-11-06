@@ -1,0 +1,14 @@
+{
+  "name": "Catppuccin Latte",
+  "mode": "light",
+  "colors": {
+    "background": "#eff1f5",
+    "foreground": "#4c4f69",
+    "accent": "#1e66f5",
+    "accent2": "#8839ef",
+    "urgent": "#d20f39",
+    "inactive": "#9ca0b0"
+  },
+  "ghostty": "Catppuccin Latte",
+  "neovim": "catppuccin-latte"
+}

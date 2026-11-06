@@ -1,10 +1,18 @@
 #!/bin/bash
-# Set the desktop background: ~/.config/orka/background (any image) if it
-# exists, otherwise a plain dark color. Placeholder until OrkaOS wallpapers exist.
-bg="$HOME/.config/orka/background"
+# Set the desktop background (swaybg): the wallpaper picked in Settings
+# (`.wallpaper` in ~/.config/orka/settings.json), else the current theme's own
+# wallpaper, else the theme's background color.
+cfg="${XDG_CONFIG_HOME:-$HOME/.config}/orka"
+theme="$cfg/current/theme.json"
+wallpaper="$(jq -r '.wallpaper // ""' "$cfg/settings.json" 2>/dev/null)"
+if [[ -z $wallpaper && -f $theme ]]; then
+  wallpaper="$(jq -r 'if (.wallpaper // "") != "" then .dir + "/" + .wallpaper else "" end' "$theme")"
+fi
+color="$(jq -r '.colors.background // "#1a1b26"' "$theme" 2>/dev/null || echo '#1a1b26')"
+
 pkill -x swaybg
-if [[ -e "$bg" ]]; then
-  exec swaybg -i "$bg" -m fill
+if [[ -n $wallpaper && -f $wallpaper ]]; then
+  exec swaybg -i "$wallpaper" -m fill -c "$color"
 else
-  exec swaybg -c '#1a1b26'
+  exec swaybg -c "$color"
 fi

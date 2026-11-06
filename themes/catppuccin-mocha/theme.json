@@ -1,0 +1,14 @@
+{
+  "name": "Catppuccin Mocha",
+  "mode": "dark",
+  "colors": {
+    "background": "#1e1e2e",
+    "foreground": "#cdd6f4",
+    "accent": "#89b4fa",
+    "accent2": "#cba6f7",
+    "urgent": "#f38ba8",
+    "inactive": "#45475a"
+  },
+  "ghostty": "Catppuccin Mocha",
+  "neovim": "catppuccin-mocha"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Orka",
+  "mode": "dark",
+  "colors": {
+    "background": "#1a1a1a",
+    "foreground": "#e0e0e0",
+    "accent": "#1793d1",
+    "accent2": "#33ccff",
+    "urgent": "#e05252",
+    "inactive": "#595959"
+  },
+  "ghostty": "",
+  "neovim": "tokyonight-night"
+}

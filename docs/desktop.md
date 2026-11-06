@@ -72,6 +72,7 @@ Based on Omarchy v3.8.4. `SUPER + K` opens the cheat sheet with every shortcut (
 |---|---|
 | `SUPER + SPACE` | App launcher (also runs a typed command) |
 | `SUPER + K` / `SUPER + SHIFT + K` | Cheat sheet of all shortcuts / the same in a terminal |
+| `SUPER + ALT + SPACE` | Settings (theme, wallpaper, display, idle, sound, night light, keyboard), see [settings](settings.md) |
 | `SUPER + ,` / `SUPER + SHIFT + ,` | Dismiss last / all notifications |
 | `SUPER + ALT + ,` / `SUPER + SHIFT + ALT + ,` | Invoke last notification / bring back the last one that disappeared |
 | `SUPER + CTRL + ,` | Do not disturb (only critical notifications pop up) |

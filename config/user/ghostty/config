@@ -36,3 +36,7 @@ mouse-scroll-multiplier = 0.95
 
 # Avoids slowness on Hyprland (https://github.com/ghostty-org/ghostty/discussions/3224)
 async-backend = epoll
+
+# Colors from the OrkaOS theme (Settings → Theme). Loaded last, so it wins
+# over colors set above; remove this line to keep your own.
+config-file = ?"~/.config/orka/current/ghostty.conf"

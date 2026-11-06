@@ -1,10 +1,16 @@
 pragma Singleton
-// OrkaOS settings the shell uses, from ~/.config/orka/settings.json. The file
-// is watched, so edits apply right away. Meant to be written by a settings
-// app later; until then edit it by hand. Missing values use the defaults below.
+// OrkaOS settings, from ~/.config/orka/settings.json (watched: changes apply
+// right away). Written by the settings app (settings/SettingsApp.qml) through
+// `orka-settings set`, which also applies them (theme, wallpaper, monitors,
+// keyboard, night light); the shell itself uses the idle times. Missing
+// values use the defaults below.
 //
-//   { "idle": { "lockAfter": 300, "screenOffAfter": 330 } }
-//     seconds of inactivity until the screen locks / turns off; 0 = never
+//   theme            "orka"           a theme directory name (orka-settings themes)
+//   wallpaper        ""               an image path; "" = the theme's wallpaper or color
+//   idle             { lockAfter: 300, screenOffAfter: 330 }   seconds, 0 = never
+//   nightlight       { on: false, temperature: 4000 }
+//   keyboard         { layouts: ["us"], switch: "", repeatRate: 40, repeatDelay: 250 }
+//   monitors         { "DP-1": { mode: "2560x1440@165", scale: 1 } }
 import QtQuick
 import Quickshell
 import Quickshell.Io
@@ -18,8 +24,25 @@ Singleton {
     readonly property int lockAfter: number(idle.lockAfter, 300)
     readonly property int screenOffAfter: number(idle.screenOffAfter, 330)
 
+    readonly property string theme: data.theme || "orka"
+    readonly property string wallpaper: data.wallpaper || ""
+    readonly property var nightlight: data.nightlight || {}
+    readonly property bool nightlightOn: nightlight.on === true
+    readonly property int nightlightTemperature: number(nightlight.temperature, 4000)
+    readonly property var keyboard: data.keyboard || {}
+    readonly property var layouts: keyboard.layouts && keyboard.layouts.length ? keyboard.layouts : ["us"]
+    readonly property string layoutSwitch: keyboard.switch || ""
+    readonly property int repeatRate: number(keyboard.repeatRate, 40)
+    readonly property int repeatDelay: number(keyboard.repeatDelay, 250)
+    readonly property var monitors: data.monitors || {}
+
     function number(value, fallback) {
         return typeof value === "number" && value >= 0 ? Math.round(value) : fallback;
+    }
+
+    // Change one value (a jq path such as ".idle.lockAfter") and apply it.
+    function set(path, value) {
+        Quickshell.execDetached(["orka-settings", "set", path, JSON.stringify(value)]);
     }
 
     FileView {

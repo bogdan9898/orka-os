@@ -15,3 +15,6 @@ require("orka.bindings.media")
 require("orka.bindings.clipboard")
 require("orka.bindings.apps")
 require("orka.bindings.utilities")
+
+-- Monitors and keyboard from the OrkaOS settings app.
+require("orka.settings").apply()

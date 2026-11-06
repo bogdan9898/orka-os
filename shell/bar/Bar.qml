@@ -28,7 +28,7 @@ PanelWindow {
         BarIcon {
             text: Theme.icons.logo
             onClicked: LauncherState.open = !LauncherState.open
-            onRightClicked: Apps.run([Apps.terminal])
+            onRightClicked: SettingsState.open = !SettingsState.open
         }
         Workspaces {
             screen: bar.screen

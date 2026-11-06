@@ -54,6 +54,7 @@ Why "Orka" rather than "Orca": `orca` is already an Arch package (the GNOME scre
 - [Desktop](docs/desktop.md): Hyprland (Lua) config layout and key bindings
 - [Shell and terminal](docs/shell.md): bash, starship, Ghostty, tmux and git configs, aliases and key bindings
 - [Neovim](docs/neovim.md): LazyVim, bundled offline into the ISO
+- [Settings](docs/settings.md): the OrkaOS settings app, `orka-settings`, themes and wallpapers
 - [Quickshell](docs/quickshell.md): building our own bar, widgets, lock screen and more
 - [Hardware & dual boot](docs/hardware-and-dual-boot.md): target machine specs and the dual-boot checklist
 

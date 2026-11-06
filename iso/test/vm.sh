@@ -11,7 +11,8 @@
 #
 # The live ISO gets the test SSH key through a cloud-init seed:
 #   ssh -i ~/orka-test/id_orka -p 2222 root@127.0.0.1
-# Serial console output: /tmp/orka-serial.log, QEMU monitor: /tmp/orka-qmon.sock
+# Serial console output: /tmp/orka-serial.log, QEMU monitor: /tmp/orka-qmon.sock,
+# QMP (e.g. input-send-event for mouse clicks in tests): /tmp/orka-qmp.sock
 
 set -euo pipefail
 
@@ -65,6 +66,7 @@ args+=(
   -drive file=seed.iso,if=virtio,format=raw,readonly=on
   -nic "$net"
   -monitor unix:/tmp/orka-qmon.sock,server,nowait
+  -qmp unix:/tmp/orka-qmp.sock,server,nowait
   -serial file:/tmp/orka-serial.log
 )
 if ((GUI)); then

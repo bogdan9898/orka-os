@@ -17,6 +17,7 @@ import qs.lock
 import qs.notifications
 import qs.osd
 import qs.polkit
+import qs.settings
 
 ShellRoot {
     Variants {
@@ -29,6 +30,7 @@ ShellRoot {
     Launcher {}
     CheatSheet {}
     Osd {}
+    SettingsApp {}
     Lock {}
     Idle {}
 }

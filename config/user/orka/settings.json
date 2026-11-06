@@ -1,6 +1,19 @@
 {
+  "theme": "orka",
+  "wallpaper": "",
   "idle": {
     "lockAfter": 300,
     "screenOffAfter": 330
-  }
+  },
+  "nightlight": {
+    "on": false,
+    "temperature": 4000
+  },
+  "keyboard": {
+    "layouts": ["us"],
+    "switch": "",
+    "repeatRate": 40,
+    "repeatDelay": 250
+  },
+  "monitors": {}
 }

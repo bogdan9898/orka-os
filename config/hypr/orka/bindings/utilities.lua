@@ -9,6 +9,7 @@ local notify = section("Notifications")
 system("SUPER + SPACE",          "qs -p /usr/share/orka/shell ipc call launcher toggle", "App launcher")
 system("SUPER + K",              "qs -p /usr/share/orka/shell ipc call cheatsheet toggle", "Keyboard shortcuts (cheat sheet)")
 system("SUPER + SHIFT + K",      apps.tui("orka-keybindings", "keybindings"), "Search key bindings (terminal)")
+system("SUPER + ALT + SPACE",    "qs -p /usr/share/orka/shell ipc call settings toggle", "Settings")
 
 -- Screenshots, recording, color picker, OCR
 capture("PRINT",                  "orka-screenshot region",             "Screenshot (region, edit)")

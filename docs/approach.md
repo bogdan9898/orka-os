@@ -54,7 +54,7 @@ Status on 2026-11-05 (end of day 1).
    - [x] Hyprland 0.57 config in Lua, key bindings ported from Omarchy, `orka-*` helpers, Hyprland starts on tty1
    - [x] Shell and terminal setup: starship prompt, aliases (`eza`, `zoxide`, `fzf`), Ghostty and tmux configs ([shell](shell.md))
    - [x] Neovim config: LazyVim, plugins bundled into the ISO ([neovim](neovim.md))
-   - [ ] Basic theme (colors are a placeholder, see `config/hypr/orka/theme.lua`); Qt/GTK theming (Kvantum, Adwaita-dark, icon theme)
+   - [ ] Basic theme: theme switching works (4 themes, Settings → Theme, [settings](settings.md)); still to do: real Orka colors, Qt theming (Kvantum), icon theme
 2. **Test in a VM**
    - [x] QEMU/KVM in the `archlinux` WSL distro; automated offline install test incl. Windows next to it / on a 2nd disk (`iso/test/install-test.sh`)
    - [x] Hyprland starts and basic bindings work in the VM
@@ -66,7 +66,7 @@ Status on 2026-11-05 (end of day 1).
    - [ ] **TODO: choose Orka's fonts** (UI, monospace for terminal/editor, icon font). For now the current set is fine: `noto-fonts`, `noto-fonts-emoji`, `ttf-jetbrains-mono-nerd`, `woff2-font-awesome`.
    - [ ] Icon theme (Yaru was dropped: its AUR build needs gnome-shell)
 4. **Install on the host** (separate disk, Windows disks disconnected; checklist in [dual boot](hardware-and-dual-boot.md)). Then check what the VM can't: FreeSync/`highrr`, screenshots/recording, media keys, Wi-Fi/Bluetooth, KDE Connect.
-5. **Quickshell desktop**, one component at a time: bar, notifications, polkit agent, launcher, lock screen, login screen, cheat sheet, OSD (done: [quickshell](quickshell.md#the-bar)). Next: a settings app.
+5. **Quickshell desktop**, one component at a time: bar, notifications, polkit agent, launcher, lock screen, login screen, cheat sheet, OSD (done: [quickshell](quickshell.md#the-bar)), settings app ([settings](settings.md)).
 
 ### Known small issues
 

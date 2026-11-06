@@ -447,9 +447,13 @@ install_desktop() {
     rm -rf "$TARGET/usr/share/orka/$d"
     cp -r --no-preserve=mode,ownership "$SRC/config/$d" "$TARGET/usr/share/orka/$d"
   done
-  # The desktop shell (Quickshell), started by orka/autostart.lua.
-  rm -rf "$TARGET/usr/share/orka/shell"
-  cp -r --no-preserve=mode,ownership "$SRC/shell" "$TARGET/usr/share/orka/shell"
+  # The desktop shell (Quickshell, orka-shell.service), the built-in themes,
+  # and the folder for OrkaOS wallpapers (yours go in ~/Pictures/Wallpapers).
+  for d in shell themes; do
+    rm -rf "$TARGET/usr/share/orka/$d"
+    cp -r --no-preserve=mode,ownership "$SRC/$d" "$TARGET/usr/share/orka/$d"
+  done
+  install -d "$TARGET/usr/share/orka/wallpapers"
   install -m755 "$SRC"/bin/orka-* "$TARGET/usr/local/bin/"
   arch-chroot "$TARGET" runuser -u "$ORKA_USER" -- env HOME="/home/$ORKA_USER" \
     /usr/local/bin/orka-setup-user >>"$LOG" 2>&1 || die "orka-setup-user failed (log: $LOG)"
@@ -550,6 +554,7 @@ echo "nvim build paths left: $(grep -rIlF /orka-build/nvim-home "/home/$u/.local
 echo "git: pull.rebase=$(as_user git config pull.rebase) defaultBranch=$(as_user git config init.defaultBranch)"
 echo "login: greetd=$(systemctl is-enabled greetd 2>&1) active=$(systemctl is-active greetd 2>&1) greeter=$(pgrep -u greeter -x qs >/dev/null && echo running || echo missing) cage=$(pgrep -x cage >/dev/null && echo running || echo missing)"
 echo "shell service: $(systemctl --global is-enabled orka-shell.service 2>&1)"
+echo "settings: theme=$(jq -r .id "/home/$u/.config/orka/current/theme.json" 2>&1) current=[$(ls "/home/$u/.config/orka/current" | tr '\n' ' ')] themes=$(ls /usr/share/orka/themes | grep -vc README) dirs=$(test -d "/home/$u/Pictures/Wallpapers" && test -d "/home/$u/.config/orka/themes" && echo ok) desktop=$(test -f /usr/share/applications/org.orka.Settings.desktop && echo ok)"
 echo "lock: pam=$(test -f /etc/pam.d/orka-lock && echo ok || echo missing) kwallet-greetd=$(grep -c pam_kwallet5 /etc/pam.d/greetd) settings=$(as_user cat "/home/$u/.config/orka/settings.json" | tr -d ' \n')"
 echo "ORKA-SELFTEST-END"
 EOF

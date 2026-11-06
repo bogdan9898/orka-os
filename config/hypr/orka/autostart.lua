@@ -9,4 +9,5 @@ local apps = require("orka.apps")
 hl.on("hyprland.start", function()
     hl.exec_cmd(apps.run("hypridle"))
     hl.exec_cmd(apps.run("orka-wallpaper"))
+    hl.exec_cmd("orka-settings apply nightlight")   -- night light, if it was on
 end)
