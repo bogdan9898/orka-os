@@ -37,7 +37,7 @@ Omarchy's `shell/` uses all of these: 67 files import `Quickshell`, 21 `Quickshe
 No stock desktop tools: Waybar, Mako, SwayOSD, Hyprlock, Walker and SDDM are **not** installed. Every piece is our own Quickshell code, built over time. The only stock piece is greetd (with the cage compositor), which runs our login screen.
 
 1. `quickshell` (Arch `extra`, 0.3.2) is in the base package list. Our shell lives in this repo under `shell/`, is installed to `/usr/share/orka/shell/` and runs as the systemd user service `orka-shell.service` (`qs -p /usr/share/orka/shell`), started with the Hyprland session and restarted if it crashes.
-2. Build components one at a time: **bar (done) → notifications (done) → polkit agent (done) → launcher (done) → lock screen (done) → OSD**.
+2. Build components one at a time: **bar (done) → notifications (done) → polkit agent (done) → launcher (done) → lock screen (done) → cheat sheet (done) → OSD (done)**.
 3. A login screen via greetd (`Quickshell.Services.Greetd`) instead of the TTY login: done, see [login screen](#login-screen).
 4. The polkit agent (admin password dialog) is ours too, built on `Quickshell.Services.Polkit` (included in Arch's 0.3.2); `polkit-gnome` is not installed. Done, see [polkit agent](#polkit-agent).
 
@@ -60,7 +60,7 @@ Layout taken from Omarchy v3.8.4's Waybar; the code is our own (Omarchy v4's Qui
 
 Not in it (on purpose): battery (desktop), Omarchy's weather, update, dictation and idle indicators (no such features yet), tooltips (later).
 
-Files (`shell/`): `shell.qml` (one bar per monitor, the notification popups), `Notifications.qml` (the notification daemon), `notifications/` (popups), `polkit/` (the admin password dialog), `LauncherState.qml` + `launcher/` (the app launcher), `LockState.qml` + `lock/` (lock screen, idle), `Settings.qml` (`~/.config/orka/settings.json`), `greeter.qml` + `greeter/` (the login screen), `cheatsheet/` (keyboard shortcuts, SUPER + K), `Theme.qml` (colors, font, glyphs; placeholder until the Orka theme), `Apps.qml` (start programs via uwsm, like `orka/apps.lua`), `bar/*.qml` (one file per widget). Network state comes from `orka-netstatus`, because Quickshell's Networking module only supports NetworkManager and OrkaOS uses iwd + systemd-networkd.
+Files (`shell/`): `shell.qml` (one bar per monitor, the notification popups), `Notifications.qml` (the notification daemon), `notifications/` (popups), `polkit/` (the admin password dialog), `LauncherState.qml` + `launcher/` (the app launcher), `LockState.qml` + `lock/` (lock screen, idle), `Settings.qml` (`~/.config/orka/settings.json`), `greeter.qml` + `greeter/` (the login screen), `cheatsheet/` (keyboard shortcuts, SUPER + K), `osd/` (on-screen display), `Theme.qml` (colors, font, glyphs; placeholder until the Orka theme), `Apps.qml` (start programs via uwsm, like `orka/apps.lua`), `bar/*.qml` (one file per widget). Network state comes from `orka-netstatus`, because Quickshell's Networking module only supports NetworkManager and OrkaOS uses iwd + systemd-networkd.
 
 **Tested** 2026-11-06 in the VM (installed from the ISO, Hyprland on tty1): the bar starts with Hyprland, windows tile below it, workspaces follow `SUPER + 1..5`, the clock shows, the network icon shows wired with internet and offline without, volume shows muted (the VM has no sound device), Bluetooth is hidden (no adapter). Shell log: no QML errors. Not yet tried: the tray (needs a tray app such as KDE Connect), clicks, volume scrolling, the recording dot, multiple monitors, real Wi-Fi.
 
@@ -174,6 +174,23 @@ Only bindings with a description are listed: in Hyprland that's the `description
 `orka-keys` also tidies the list: several keys for the same action become one row (`SUPER + TAB / SUPER + scroll down`), and rows that only differ in a number become a range (`SUPER + 1…0  Workspace 1…10`). Number-row, mouse and media keys get readable names. `orka-keys --tsv` prints it as text; `SUPER + SHIFT + K` (`orka-keybindings`) shows that list in a searchable terminal.
 
 **Tested** 2026-11-06 in the VM: the sheet lists all sections with ranges and merged keys, search filters (`notif` → the 5 notification keys), a binding added to `~/.config/hypr/bindings.lua` appears in its own section after the reload, a tmux binding added to `~/.config/tmux/tmux.conf` appears in "tmux: after CTRL + SPACE". (An interrupted VM test once left a just-copied `orka/keys.lua` empty, which put Hyprland into emergency mode: an empty module makes `require` return `true`. Not a bug in the config, but worth knowing: if Hyprland reports "attempt to index a boolean value" in the bindings, check that file.)
+
+## On-screen display
+
+`osd/Osd.qml`, the SwayOSD replacement, adapted from Omarchy v4's Quickshell OSD (`shell/plugins/osd`, MIT): a small card at the bottom of the focused monitor with an icon and either a bar with a value or a message. It never takes clicks or keys (empty input region) and hides 1.2 s after the last change.
+
+| Shows | When | How |
+|---|---|---|
+| Volume (icon by level, bar, `45%`) / "Muted" | Any change of the default output: volume keys, scrolling on the bar's volume icon, a mixer | Watches Pipewire's default sink; quiet for 1.5 s at startup and after the output device changes, so those don't flash it |
+| "Microphone on" / "Microphone off" | Muting the default input (`XF86AudioMicMute`) | Watches the default source |
+| Play / pause icon with "Title — Artist" | Media keys | The bindings run `playerctl ...; orka-osd media`; the OSD reads the playing (or first) MPRIS player |
+| Any message, optionally with a bar | Scripts | `orka-osd <icon> <message> [0-100]`; used by `orka-nightlight` ("Night light on/off") |
+
+Icons for scripts: `volume muted mic mic-off play pause media night lock info`, or any Nerd Font glyph. IPC target `osd`: `display <icon> <message> <value|none>`, `media`, `hide`. (The function is not called `show`: `qs ipc` reads that as its own `show` command.)
+
+No brightness: the target machine is a desktop with external monitors and no brightness keys. External monitor brightness would need DDC/CI (`ddcutil`); the OSD can show it with `orka-osd info Brightness 70` once something sets it.
+
+**Tested** 2026-11-06 in the VM (now with a silent virtual sound card, `iso/test/vm.sh`): volume up/down and mute keys, microphone mute, "No media player" for the play key without a player, `orka-osd` messages with and without a bar. Not yet tried: a real player's track info, the bar's volume scroll, several monitors.
 
 ## References
 

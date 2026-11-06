@@ -15,6 +15,7 @@ import qs.cheatsheet
 import qs.launcher
 import qs.lock
 import qs.notifications
+import qs.osd
 import qs.polkit
 
 ShellRoot {
@@ -27,6 +28,7 @@ ShellRoot {
     PolkitDialog {}
     Launcher {}
     CheatSheet {}
+    Osd {}
     Lock {}
     Idle {}
 }

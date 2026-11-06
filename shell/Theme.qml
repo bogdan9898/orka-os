@@ -22,6 +22,13 @@ Singleton {
         recording:   String.fromCodePoint(0xF0EC2),
         dnd:         String.fromCodePoint(0xF009B),   // bell with a slash
         lock:        String.fromCodePoint(0xF033E),
+        mic:         String.fromCodePoint(0xF036C),
+        micOff:      String.fromCodePoint(0xF036D),
+        play:        String.fromCodePoint(0xF040A),
+        pause:       String.fromCodePoint(0xF03E4),
+        music:       String.fromCodePoint(0xF075A),
+        night:       String.fromCodePoint(0xF0594),   // moon
+        info:        String.fromCodePoint(0xF02FD),
         btOn:        String.fromCodePoint(0xF293),
         btOff:       String.fromCodePoint(0xF00B2),
         btConnected: String.fromCodePoint(0xF00B1),

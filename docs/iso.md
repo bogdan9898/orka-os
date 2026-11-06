@@ -69,4 +69,4 @@ iso/test/install-test.sh --gui           # watch it in a window
 
 The VM runs with `restrict=on` networking: no internet, but SSH to the live ISO works (port 2222, key from a cloud-init seed). With `ORKA_TEST=1` the installer adds a serial console and `orka-selftest.service`, which prints a boot report the test script reads from the serial log.
 
-`iso/test/vm.sh --gui` boots the installed disk in a window for manual testing.
+`iso/test/vm.sh --gui` boots the installed disk in a window for manual testing (with sound through WSLg). Headless runs get a silent virtual sound card (QEMU `-audiodev none`), so the guest still has an audio output and a microphone for volume and OSD tests.

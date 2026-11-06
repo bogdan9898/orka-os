@@ -2,7 +2,7 @@
 
 A personal, Arch-based Linux setup with its own name and branding, inspired by [Omarchy](https://github.com/omacom/omarchy). Built for one machine only (see [hardware](docs/hardware-and-dual-boot.md)), dual-booted alongside Windows 11. Not intended for public release.
 
-> Status (2026-11-06): **offline installer ISO works** (tested in QEMU, incl. Windows on another disk); **Hyprland desktop config** in place; **shell, terminal, git and Neovim (LazyVim, offline)** set up; own **Quickshell desktop**: bar, notifications, polkit agent, app launcher. Next: theme, branding, OSD and lock screen, then install on the real machine. See the [roadmap](docs/approach.md#roadmap).
+> Status (2026-11-06): **offline installer ISO works** (tested in QEMU, incl. Windows on another disk); **Hyprland desktop config** in place; **shell, terminal, git and Neovim (LazyVim, offline)** set up; own **Quickshell desktop**: bar, notifications, polkit agent, launcher, lock and login screens, cheat sheet, OSD. Next: theme, branding, a settings app, then install on the real machine. See the [roadmap](docs/approach.md#roadmap).
 
 ## Naming
 

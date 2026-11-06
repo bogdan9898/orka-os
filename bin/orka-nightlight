@@ -1,6 +1,8 @@
 #!/bin/bash
 # Toggle a warm night light (hyprsunset). Temperature: $ORKA_NIGHTLIGHT_K (default 4000).
 if pkill -x hyprsunset; then
+  orka-osd night "Night light off" 2>/dev/null
   exit 0
 fi
+orka-osd night "Night light on" 2>/dev/null
 exec setsid uwsm app -- hyprsunset -t "${ORKA_NIGHTLIGHT_K:-4000}"

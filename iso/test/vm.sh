@@ -74,7 +74,11 @@ if ((GUI)); then
   args+=(-device virtio-vga-gl -display gtk,gl=on
          -audiodev pa,id=snd0,server=unix:/mnt/wslg/PulseServer -device ich9-intel-hda -device hda-output,audiodev=snd0)
 else
-  args+=(-device virtio-vga -display none)
+  # A silent sound card, so the guest has an audio output and a microphone
+  # (volume, mute and the OSD can be tested headless).
+  # shellcheck disable=SC2054
+  args+=(-device virtio-vga -display none
+         -audiodev none,id=snd0 -device ich9-intel-hda -device hda-duplex,audiodev=snd0)
 fi
 [[ -n "$ISO" ]] && args+=(-cdrom "$ISO" -boot once=d)
 

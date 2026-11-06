@@ -22,7 +22,7 @@ Default apps (terminal, browser, ...) are in `orka/apps.lua`; override them with
 
 ## Not there yet (planned Quickshell components)
 
-The bar, notifications, the polkit agent (admin password dialog), the app launcher, the lock screen and the login screen are done ([quickshell](quickshell.md#the-bar)). Not there yet: the volume OSD. `SUPER + K` lists all bindings.
+The bar, notifications, the polkit agent (admin password dialog), the app launcher, the lock screen, the login screen, the cheat sheet and the on-screen display (volume, mute, media) are done ([quickshell](quickshell.md#the-bar)). `SUPER + K` lists all bindings.
 
 ## Key bindings
 

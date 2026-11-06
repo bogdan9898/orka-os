@@ -1,0 +1,12 @@
+#!/bin/bash
+# Show something on the OrkaOS on-screen display (the shell's OSD).
+#   orka-osd <icon> <message> [value]   value 0-100 adds a bar
+#   orka-osd media                       current player: play state and track
+# Icons: volume muted mic mic-off play pause media night lock info, or any
+# Nerd Font glyph. Volume and mute changes are shown without this.
+shell=(qs -p /usr/share/orka/shell ipc call osd)
+case "${1:-}" in
+  "")    echo "usage: orka-osd <icon> <message> [value 0-100] | orka-osd media" >&2; exit 1 ;;
+  media) exec "${shell[@]}" media ;;
+  *)     exec "${shell[@]}" display "$1" "${2:-}" "${3:-none}" ;;
+esac
