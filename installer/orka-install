@@ -307,6 +307,10 @@ BOOT_ORDER="linux-zen, *, *fallback, Snapshots"
 MAX_SNAPSHOT_ENTRIES=5
 EOF
 
+  # Boot menu wallpaper (branding/limine, "Deep water"), on the ESP where
+  # Limine can read it.
+  install -Dm644 "$SRC/branding/limine/wallpaper.jpg" "$TARGET/boot/orka/wallpaper.jpg"
+
   # Global menu options; the OS entries are appended by limine-entry-tool.
   cat >"$TARGET/boot/limine.conf" <<'EOF'
 # OrkaOS boot menu. Entries below are managed by limine-entry-tool
@@ -314,9 +318,24 @@ EOF
 timeout: 3
 # Entry 1 is the "OrkaOS" folder; 2 is its first kernel (linux-zen).
 default_entry: 2
-interface_branding: OrkaOS
-interface_branding_colour: 1793D1
 hash_mismatch_panic: no
+
+# Look: the OrkaOS "Deep water" theme (themes/orka). Colors are RRGGBB;
+# term_background is TTRRGGBB, TT = transparency (00 opaque, ff invisible):
+# invisible, so the whole wallpaper shows behind the menu.
+wallpaper: boot():/orka/wallpaper.jpg
+wallpaper_style: stretched
+backdrop: 0d1620
+interface_branding: OrkaOS
+interface_branding_colour: 3fa7d6
+interface_help_colour: 7f8b97
+interface_help_colour_bright: 7fd1c7
+term_background: ff0d1620
+term_foreground: dce6ef
+term_background_bright: 2e3d4d
+term_foreground_bright: f1f6fa
+term_palette: 1a2733;ef6461;8cc98a;e8c26b;3fa7d6;b393e0;7fd1c7;b7c5d3
+term_palette_bright: 4a5b6c;ff8a85;a8dba5;f2d48f;6cc0e8;c9b0ee;a3e3da;f1f6fa
 EOF
 
   # Initramfs: systemd-based, plus the overlay hook that makes read-only

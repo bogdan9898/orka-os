@@ -82,3 +82,13 @@ NOLOGIN=1 iso/test/vm-session.sh "@20 tester" "!meta_l-ret" "!meta_l-k" "%tmux" 
 To move files into or out of the guest, boot it with network (`VMOPTS=`) and run `iso/test/vm-http.py <port> <serve dir> <upload dir>` on the host side: the guest fetches with `curl 10.0.2.2:<port>/file` and uploads with `curl --data-binary @- 10.0.2.2:<port>/name`. This is how changed shell files were tried without rebuilding the ISO (copy into `/usr/share/orka/...` with sudo, then `sync`, `hyprctl reload`, `systemctl --user restart orka-shell`).
 
 Gotchas: run everything in one `wsl ... bash -c` call (the VM stops when it returns); the session shuts the guest down with `system_powerdown` (killing QEMU can leave just-written files empty on the guest's Btrfs); stop helper servers by PID, never with `pkill -f` (it matches its own shell); the test user is `tester` / `tester`.
+
+## Boot menu look
+
+The installed system's boot menu (Limine) uses the Orka "Deep water" theme. The global options at the top of `/boot/limine.conf` (written by `prepare_boot` in `installer/orka-install`; limine-entry-tool only manages the entries below them) set:
+
+- `wallpaper: boot():/orka/wallpaper.jpg`: the ESP copy of `branding/limine/wallpaper.jpg`, the ocean from below with light rays. Regenerate it with `branding/limine/make-wallpaper.sh [WIDTHxHEIGHT]` (ImageMagick 7; default 2560x1440, Limine stretches it to the screen).
+- `interface_branding_colour` (the "OrkaOS" title) = the accent `3fa7d6`; help text `7f8b97`, countdown `7fd1c7`.
+- `term_*`: text colors and the 16-color palette of the Orka Ghostty theme; `term_background: ff0d1620` makes the text background invisible (`TT` = transparency), so the whole wallpaper shows behind the menu (a translucent panel was tried: it hid the light rays and looked boxy).
+
+To change it on an installed system, edit the top of `/boot/limine.conf` as root; it applies at the next boot. The live ISO's own boot menu (systemd-boot, from archiso) stays plain on purpose: systemd-boot can't be themed, archiso can't build a Limine ISO, and switching the ISO to GRUB just for its looks wasn't worth it (decided 2026-11-07). Its entries are already named "OrkaOS installer".

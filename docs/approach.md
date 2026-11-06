@@ -31,9 +31,9 @@ orka-os/
 ├── config/user/        # user dotfiles → ~/.config (seeded once by orka-setup-user)
 ├── bin/                # orka-* helper commands → /usr/local/bin
 ├── iso/                # build.sh, archiso profile overlay, test/ (QEMU VM + install test)
-├── themes/             # (later) color schemes and wallpapers
-├── branding/           # (later) logo, Plymouth theme, fastfetch art
-├── shell/              # Quickshell desktop (the bar so far)
+├── themes/             # color themes (theme.json + ghostty.conf) → /usr/share/orka/themes
+├── branding/           # limine/ (boot menu wallpaper + its generator); later: logo, Plymouth, fastfetch
+├── shell/              # Quickshell desktop
 └── docs/
 ```
 
@@ -63,11 +63,11 @@ Status on 2026-11-06 (end of day 2). **Next up**, in the order offered to the us
    - [x] Every desktop component checked in the VM with screenshots, keys and mouse clicks (QMP); headless VM has a silent sound card
    - [ ] Click through the interactive installer once (only the first screen and the warning box were checked visually)
 3. **Branding:** Orka logo, Plymouth theme, boot menu, fastfetch, wallpapers.
+   - [x] Boot menu (Limine) in the Deep water theme: wallpaper (`branding/limine/make-wallpaper.sh`), menu colors, OrkaOS branding color ([iso](iso.md#boot-menu-look)). The logo can be added to the wallpaper once it exists.
    - [ ] **TODO: create the logo with an actual orca** (not just a fin). Needs variants for the boot splash, boot menu, fastfetch (ASCII/image), icon and wallpaper.
    - [ ] **TODO: rebrand fastfetch:** replace the Arch logo and text with the Orka logo and name.
-   - [ ] **TODO: replace every occurrence of the OS name** so the system shows **OrkaOS** instead of "Arch Linux": `/etc/os-release` (`NAME`, `PRETTY_NAME`, `ID=orka` with `ID_LIKE=arch` so Arch tools still recognize it, `LOGO`), Limine boot entries, ISO label and boot menu, Plymouth, the TTY login banner (`/etc/issue`), fastfetch.
+   - [ ] **TODO: replace every occurrence of the OS name** so the system shows **OrkaOS** instead of "Arch Linux": `/etc/os-release` (`NAME`, `PRETTY_NAME`, `ID=orka` with `ID_LIKE=arch` so Arch tools still recognize it, `LOGO`), Limine boot entries, ISO label, Plymouth, the TTY login banner (`/etc/issue`), fastfetch.
    - [ ] **TODO: choose Orka's fonts** (UI, monospace for terminal/editor, icon font). For now the current set is fine: `noto-fonts`, `noto-fonts-emoji`, `ttf-jetbrains-mono-nerd`, `woff2-font-awesome`.
-   - [ ] Icon theme (Yaru was dropped: its AUR build needs gnome-shell)
 4. **Install on the host** (separate disk, Windows disks disconnected; checklist in [dual boot](hardware-and-dual-boot.md)). Then check what the VM can't: FreeSync/`highrr`, screenshots/recording, media keys, Wi-Fi/Bluetooth, KDE Connect.
 5. **Quickshell desktop** (all done, see [quickshell](quickshell.md)): bar, notifications, polkit agent, launcher, lock screen, login screen (greetd + cage), cheat sheet, OSD (volume, mic, media, Caps/Num Lock), settings app ([settings](settings.md)). Possible later: notification center (history), tooltips in the bar, brightness via DDC/CI, confirmation dialog for log out.
 
