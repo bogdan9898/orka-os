@@ -467,8 +467,9 @@ install_desktop() {
     cp -r --no-preserve=mode,ownership "$SRC/config/$d" "$TARGET/usr/share/orka/$d"
   done
   # The desktop shell (Quickshell, orka-shell.service), the built-in themes,
-  # and the folder for OrkaOS wallpapers (yours go in ~/Pictures/Wallpapers).
-  for d in shell themes; do
+  # OrkaOS's own apps (apps/calculator: orka-calculator), and the folder for
+  # OrkaOS wallpapers (yours go in ~/Pictures/Wallpapers).
+  for d in shell themes apps; do
     rm -rf "$TARGET/usr/share/orka/$d"
     cp -r --no-preserve=mode,ownership "$SRC/$d" "$TARGET/usr/share/orka/$d"
   done
@@ -575,6 +576,7 @@ echo "login: greetd=$(systemctl is-enabled greetd 2>&1) active=$(systemctl is-ac
 echo "shell service: $(systemctl --global is-enabled orka-shell.service 2>&1)"
 echo "settings: theme=$(jq -r .id "/home/$u/.config/orka/current/theme.json" 2>&1) current=[$(ls "/home/$u/.config/orka/current" | tr '\n' ' ')] themes=$(ls /usr/share/orka/themes | grep -vc README) dirs=$(test -d "/home/$u/Pictures/Wallpapers" && test -d "/home/$u/.config/orka/themes" && echo ok) desktop=$(test -f /usr/share/applications/org.orka.Settings.desktop && echo ok)"
 echo "theming: qt6ct=$(as_user grep -E '^(style|icon_theme)=' "/home/$u/.config/qt6ct/qt6ct.conf" | tr '\n' ' ')kdeglobals=$(grep -c '^\[Colors:' "/home/$u/.config/kdeglobals") gtk=$(grep -c 'orka/current/gtk.css' "/home/$u/.config/gtk-3.0/gtk.css" "/home/$u/.config/gtk-4.0/gtk.css" | tr '\n' ' ')icons=$(test -f /usr/share/icons/Papirus-Dark/index.theme && echo ok) styles=$(ls /usr/lib/qt6/plugins/styles/ | tr '\n' ' ')"
+echo "calculator: $(python3 /usr/share/orka/apps/calculator/tests/test_calculator.py 2>&1 | tail -1) pyside6=$(python3 -c 'import PySide6.QtQuick; print("ok")' 2>&1 | tail -1) desktop=$(test -f /usr/share/applications/org.orka.Calculator.desktop && echo ok) gnome-calculator=$(pacman -Q gnome-calculator >/dev/null 2>&1 && echo installed || echo gone)"
 echo "lock: pam=$(test -f /etc/pam.d/orka-lock && echo ok || echo missing) kwallet-greetd=$(grep -c pam_kwallet5 /etc/pam.d/greetd) settings=$(as_user cat "/home/$u/.config/orka/settings.json" | tr -d ' \n')"
 echo "ORKA-SELFTEST-END"
 EOF

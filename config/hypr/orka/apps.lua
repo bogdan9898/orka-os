@@ -7,7 +7,7 @@ local apps = {
     private     = "firefox --private-window",
     files       = "dolphin",
     editor      = "subl",
-    calculator  = "gnome-calculator",
+    calculator  = "orka-calculator",
 }
 for k, v in pairs(ORKA_APPS or {}) do apps[k] = v end
 

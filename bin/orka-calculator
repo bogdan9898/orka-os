@@ -1,0 +1,5 @@
+#!/bin/bash
+# Orka Calculator (the calculator key, or "Calculator" in the launcher).
+#   orka-calculator [--mode standard|expert|programmer]
+# Python + Qt Quick (PySide6); the app is in /usr/share/orka/apps/calculator.
+exec python3 "${ORKA_CALCULATOR_DIR:-/usr/share/orka/apps/calculator}/main.py" "$@"

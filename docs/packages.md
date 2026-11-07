@@ -22,6 +22,7 @@ The lists live in [`packages.txt`](../packages.txt) (official repos) and [`packa
 | `qt6ct` + `breeze` | Qt theming: the Breeze style with colors generated from the OrkaOS theme. Replaces `kvantum-qt5` (and Kvantum, tried first) |
 | `adw-gtk-theme` | GTK 3 apps in the libadwaita look, colored by the OrkaOS theme. Replaces `gnome-themes-extra` |
 | `papirus-icon-theme` | Icon theme (Omarchy uses `yaru-icon-theme`, whose AUR build needs gnome-shell) |
+| `pyside6` | Python + Qt Quick for OrkaOS's own apps: [Orka Calculator](calculator.md), which replaces `gnome-calculator` (its look didn't fit) and `libqalculate` (unused; Python does the math). Removing them also drops `gtksourceview5` and `libgee` |
 | `bibata-cursor-theme-bin` (AUR) | Mouse cursor: Bibata Modern Classic (black) in every theme, picked on 2026-11-07 from Adwaita, Breeze, Capitaine, Vimix, Bibata and phinger. The `-bin` package is the official release (no build tools needed) |
 
 ### Dropped: hardware this machine doesn't have

@@ -15,13 +15,14 @@ hl.window_rule({ name = "opacity-default",  match = { class = ".*" }, opacity = 
 hl.window_rule({ name = "opacity-browsers", match = { class = "^([fF]irefox|zen|librewolf|chromium)$" }, opacity = "1.0 0.97" })
 hl.window_rule({
     name    = "opacity-opaque",
-    match   = { class = "^(mpv|imv|vlc|qemu|org.kde.filelight|libreoffice.*|soffice|gpu-screen-recorder.*)$" },
+    match   = { class = "^(mpv|imv|vlc|qemu|org.kde.filelight|org.orka.Calculator|libreoffice.*|soffice|gpu-screen-recorder.*)$" },
     opacity = "1 1",
 })
 
--- Floating, centered windows: our TUIs (org.orka.*), small tools and dialogs.
+-- Floating, centered windows: our TUIs (org.orka.<lowercase id>), small
+-- tools and dialogs.
 local float_classes = table.concat({
-    [[org\.orka\..*]], [[org\.gnome\.Calculator]], [[org\.gnome\.Evince]], [[com\.gabm\.satty]],
+    [[org\.orka\.[a-z].*]], [[org\.gnome\.Evince]], [[com\.gabm\.satty]],
     "imv", "mpv", [[org\.pulseaudio\.pavucontrol]], "hyprland-run", [[org\.kde\.kdeconnect\.app]],
 }, "|")
 hl.window_rule({
@@ -30,6 +31,14 @@ hl.window_rule({
     float  = true,
     center = true,
     size   = "875 600",
+})
+-- Orka's own apps (org.orka.Calculator): floating and centered, at the size
+-- they ask for (the calculator changes it with its mode).
+hl.window_rule({
+    name   = "float-orka-apps",
+    match  = { class = [[^org\.orka\.[A-Z].*$]] },
+    float  = true,
+    center = true,
 })
 hl.window_rule({
     name   = "float-dialogs",

@@ -82,6 +82,7 @@ kwallet-pam               # unlocks the wallet at login (PAM)
 adw-gtk-theme             # GTK 3 apps in the libadwaita look (themes adw-gtk3, adw-gtk3-dark)
 qt6ct                     # Qt apps: style, colors and icons outside KDE Plasma
 breeze                    # Qt widget style, native for the KDE apps (Dolphin...)
+pyside6                   # Python + Qt Quick: OrkaOS apps (orka-calculator)
 papirus-icon-theme        # icons (Papirus-Dark / Papirus-Light, follows the theme)
 xcur2png                  # cursor previews in Settings → Mouse cursor
 # Cursors: Bibata and phinger come from the AUR; breeze brings Breeze cursors.
@@ -138,8 +139,6 @@ kdegraphics-thumbnailers  # Dolphin: PDF and image thumbnails
 gparted                   # partition editor (replaces gnome-disk-utility)
 ntfsprogs                 # GParted: NTFS support (the Windows partitions)
 filelight                 # disk usage map (also in Dolphin's menu)
-gnome-calculator
-libqalculate
 imv                       # image viewer
 mpv                       # video player
 ffmpeg

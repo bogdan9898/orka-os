@@ -1,0 +1,20 @@
+[Desktop Entry]
+Type=Application
+Name=Calculator
+GenericName=Calculator
+Comment=Standard, expert (scientific) and programmer calculator
+Icon=accessories-calculator
+Exec=orka-calculator
+Terminal=false
+StartupWMClass=org.orka.Calculator
+Categories=Utility;Calculator;
+Keywords=calculator;calc;math;scientific;programmer;hex;binary;
+Actions=expert;programmer;
+
+[Desktop Action expert]
+Name=Expert (scientific)
+Exec=orka-calculator --mode expert
+
+[Desktop Action programmer]
+Name=Programmer
+Exec=orka-calculator --mode programmer
