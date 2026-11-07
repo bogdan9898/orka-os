@@ -14,6 +14,8 @@ window-padding-y = 14
 confirm-close-surface = false
 resize-overlay = never
 gtk-toolbar-style = flat
+# No "Reloaded the configuration" pop-up when the theme or dark mode changes
+app-notifications = no-config-reload
 
 # Cursor (all shell-integration features must be set on one line)
 cursor-style = block

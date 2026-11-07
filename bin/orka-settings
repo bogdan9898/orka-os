@@ -5,9 +5,10 @@
 #
 #   orka-settings get [.path]                print a value (or everything)
 #   orka-settings set .path <json>           change a value and apply it, e.g.
-#       orka-settings set .theme '"tokyo-night"'
+#       orka-settings set .appearance.dark '"tokyo-night"'   (theme for dark mode)
 #       orka-settings set .cursor '{"theme":"Bibata-Modern-Ice","size":32}'
 #       orka-settings set .keyboard.layouts '["us","ro"]'
+#   orka-settings mode [dark|light|toggle]   print or switch dark/light mode
 #   orka-settings apply [all|theme|apps|cursor|hyprland|wallpaper|nightlight]
 #   orka-settings themes                     installed themes (JSON)
 #   orka-settings cursors                    installed cursor themes (JSON)
@@ -15,7 +16,7 @@
 #
 # Generated files (don't edit, they're rewritten): ~/.config/orka/current/
 #   theme.json     the current theme (read by the shell and Neovim)
-#   hyprland.lua   theme colors, monitors, keyboard, cursor (orka/settings.lua)
+#   hyprland.lua   theme colors, monitors, keyboard, cursor, animations (orka/settings.lua)
 #   ghostty.conf   the terminal theme (included by ~/.config/ghostty/config)
 #   gtk.css        GTK 3/4 colors (imported by ~/.config/gtk-{3,4}.0/gtk.css)
 #   qt6ct-colors.conf  Qt colors (qt6ct)
@@ -59,10 +60,59 @@ write() {  # write <file> (stdin): replace atomically
   cat >"$1.tmp" && mv "$1.tmp" "$1"
 }
 
+# --- Dark / light mode ------------------------------------------------------
+# settings.json keeps one theme for each mode and which mode is on:
+#   "appearance": { "mode": "dark", "dark": "orka", "light": "orka-light" }
+# The theme in use is the one of the current mode.
+
+theme_mode() {  # theme_mode <id>: dark or light (from its theme.json)
+  local dir
+  dir="$(theme_dir "$1")"
+  if [[ -n $dir && "$(jq -r '.mode // "dark"' "$dir/theme.json" 2>/dev/null)" == light ]]; then echo light; else echo dark; fi
+}
+
+current_mode() { [[ "$(setting .appearance.mode)" == light ]] && echo light || echo dark; }
+
+active_theme() {
+  local mode id
+  mode="$(current_mode)"
+  id="$(setting ".appearance.$mode")"
+  if [[ -n $id ]]; then echo "$id"; elif [[ $mode == light ]]; then echo orka-light; else echo orka; fi
+}
+
+# Settings from before the dark/light split had one "theme": it becomes the
+# theme of its own mode, and that mode is switched on.
+migrate_appearance() {
+  local legacy mode
+  jq -e 'has("theme") or (has("appearance") | not)' "$SETTINGS" >/dev/null 2>&1 || return 0
+  legacy="$(setting .theme)"
+  mode=dark
+  [[ -n $legacy ]] && mode="$(theme_mode "$legacy")"
+  jq --arg legacy "$legacy" --arg mode "$mode" '
+    .appearance = ({ mode: $mode, dark: "orka", light: "orka-light" }
+                   + (if $legacy != "" then { ($mode): $legacy } else {} end)
+                   + (.appearance // {}))
+    | del(.theme)' "$SETTINGS" | write "$SETTINGS"
+}
+
+# mode [dark|light|toggle]: print the mode, or switch it and apply the theme.
+mode() {
+  local want=${1:-}
+  case "$want" in
+    "") current_mode; return ;;
+    toggle) [[ "$(current_mode)" == dark ]] && want=light || want=dark ;;
+    dark|light) ;;
+    *) echo "usage: orka-settings mode [dark|light|toggle]" >&2; return 1 ;;
+  esac
+  jq --arg m "$want" '.appearance.mode = $m' "$SETTINGS" | write "$SETTINGS"
+  apply theme
+  echo "$want"
+}
+
 apply_theme() {
   local id dir ghostty mode
-  id="$(setting .theme)"
-  dir="$(theme_dir "${id:-orka}")"
+  id="$(active_theme)"
+  dir="$(theme_dir "$id")"
   [[ -n $dir ]] || { echo "orka-settings: no themes found" >&2; return 1; }
   jq --arg id "$(basename "$dir")" --arg dir "$dir" '. + { id: $id, dir: $dir }' "$dir/theme.json" | write "$CURRENT/theme.json"
 
@@ -348,7 +398,7 @@ apply_cursor() {
 
 # Theme colors, monitors and keyboard for Hyprland (orka/settings.lua).
 apply_hyprland() {
-  local theme="$CURRENT/theme.json" accent accent2 inactive monitors input cursor
+  local theme="$CURRENT/theme.json" accent accent2 inactive monitors input cursor animations
   [[ -f $theme ]] || apply_theme
   rgba() { local hex; hex="$(jq -r "$1 // \"$2\"" "$theme")"; echo "rgba(${hex#\#}$3)"; }
   accent="$(rgba .colors.accent '#3fa7d6' ee)"
@@ -362,6 +412,12 @@ apply_hyprland() {
       (if .repeatRate then "repeat_rate = \(.repeatRate)" else empty end),
       (if .repeatDelay then "repeat_delay = \(.repeatDelay)" else empty end) ] | join(", ")' "$SETTINGS")"
   cursor="theme = $(cursor_theme | jq -R .), size = $(cursor_size)"
+  # Animations: only known values get through (anything else = the default).
+  animations="$(jq -r '.animations // {} |
+    "enabled = \(.enabled != false), speed = \((.speed | numbers | if . < 0.2 then 0.2 elif . > 3 then 3 else . end) // 1), " +
+    "windows = \((.windows | select(IN("popin", "slide", "gnomed", "fade"))) // "popin" | tojson), " +
+    "workspaces = \((.workspaces | select(IN("off", "slide", "slidevert", "fade", "slidefade"))) // "off" | tojson), " +
+    "moves = \(.moves != false)"' "$SETTINGS")"
   write "$CURRENT/hyprland.lua" <<EOF
 -- Generated by orka-settings from ~/.config/orka/settings.json and the
 -- current theme. Don't edit: it's rewritten on every change.
@@ -372,6 +428,7 @@ $monitors
     },
     input = { $input },
     cursor = { $cursor },
+    animations = { $animations },
 }
 EOF
   in_hyprland && hyprctl reload >/dev/null
@@ -481,21 +538,34 @@ about() {
 }
 
 case "${1:-}" in
+  set|apply|mode|get) migrate_appearance ;;
+esac
+
+case "${1:-}" in
   get)
     jq "${2:-.}" "$SETTINGS" ;;
   set)
     [[ $# -eq 3 ]] || { echo "usage: orka-settings set .path <json value>" >&2; exit 1; }
-    jq --argjson v "$3" "$2 = \$v" "$SETTINGS" | write "$SETTINGS" || exit 1
+    if [[ $2 == .theme ]]; then
+      # The old single theme: it becomes its mode's theme, and that mode is on.
+      id="$(jq -r 'strings' <<<"$3")"
+      [[ -n $id ]] || { echo "orka-settings: .theme needs a theme id, e.g. '\"orka\"'" >&2; exit 1; }
+      m="$(theme_mode "$id")"
+      jq --arg id "$id" --arg m "$m" '.appearance[$m] = $id | .appearance.mode = $m' "$SETTINGS" | write "$SETTINGS" || exit 1
+    else
+      jq --argjson v "$3" "$2 = \$v" "$SETTINGS" | write "$SETTINGS" || exit 1
+    fi
     case "$2" in
-      .theme*)               apply theme ;;
+      .theme*|.appearance*)  apply theme ;;
       .wallpaper*)           apply wallpaper ;;
-      .monitors*|.keyboard*) apply hyprland ;;
+      .monitors*|.keyboard*|.animations*) apply hyprland ;;
       .cursor*)              apply hyprland; apply_cursor ;;
       .nightlight*)          apply nightlight ;;
     esac ;;
   apply)  apply "${2:-all}" ;;
+  mode)    mode "${2:-}" ;;
   themes)  themes ;;
   cursors) cursors ;;
   about)   about ;;
-  *) sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 1 ;;
+  *) sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 1 ;;
 esac

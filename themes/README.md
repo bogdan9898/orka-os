@@ -1,13 +1,13 @@
 # OrkaOS themes
 
-One directory per theme. Installed to `/usr/share/orka/themes/`; your own go in `~/.config/orka/themes/<id>/` (a theme there with the same `<id>` replaces the built-in one). Pick one in Settings → Theme or with `orka-settings set .theme '"<id>"'`.
+One directory per theme. Installed to `/usr/share/orka/themes/`; your own go in `~/.config/orka/themes/<id>/` (a theme there with the same `<id>` replaces the built-in one). Settings → Theme has one choice for dark mode (themes with `"mode": "dark"`) and one for light mode (`"mode": "light"`); dark mode is switched with SUPER + CTRL + D. From a terminal: `orka-settings set .appearance.dark '"<id>"'` (or `.appearance.light`), `orka-settings mode toggle`.
 
 `theme.json`:
 
 ```json
 {
   "name": "Tokyo Night",
-  "mode": "dark",                 // or "light": GTK/portal color scheme
+  "mode": "dark",                 // or "light": which mode it's offered for; GTK/portal color scheme
   "colors": {                     // the shell, Hyprland borders, plain wallpaper
     "background": "#1a1b26", "foreground": "#c0caf5",
     "accent": "#7aa2f7", "accent2": "#bb9af7",

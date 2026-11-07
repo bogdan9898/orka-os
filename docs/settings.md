@@ -6,8 +6,9 @@ Everything it changes is stored in **`~/.config/orka/settings.json`** and applie
 
 ```sh
 orka-settings get                          # all settings
-orka-settings set .theme '"tokyo-night"'   # change one value and apply it
+orka-settings set .appearance.dark '"tokyo-night"'   # change one value and apply it
 orka-settings set .idle.lockAfter 600
+orka-settings mode toggle                  # dark ↔ light mode (also: dark, light; no argument prints it)
 orka-settings apply                        # re-apply everything
 orka-settings themes                       # installed themes (JSON)
 orka-settings about                        # system information (JSON)
@@ -17,8 +18,9 @@ orka-settings about                        # system information (JSON)
 
 | Page | What | Stored as | Applied by |
 |---|---|---|---|
-| Theme | Pick a theme (color swatches, light/dark) | `.theme` | `current/theme.json`, `current/ghostty.conf`, `current/hyprland.lua`, `hyprctl reload`, Ghostty reload (SIGUSR2), GTK `color-scheme` |
+| Theme | Dark mode switch; the theme for dark mode and the theme for light mode, picked independently (color swatches) | `.appearance.mode` (`"dark"`/`"light"`), `.appearance.dark`, `.appearance.light` | `current/theme.json`, `current/ghostty.conf`, `current/hyprland.lua`, `hyprctl reload`, Ghostty reload (SIGUSR2), GTK `color-scheme` → portal (see [Dark and light mode](#dark-and-light-mode)) |
 | Wallpaper | Theme default (its wallpaper or background color), or an image from your folder | `.wallpaper` (path, `""` = theme default) | `orka-wallpaper` (swaybg) |
+| Animations | On/off; speed (Relaxed ×1.5, Normal, Quick ×0.7, Snappy ×0.45); opening and closing windows (Pop in, Slide, Grow, Fade only); switching workspaces (Off, Slide, Slide up/down, Fade, Slide + fade); moving and resizing windows on/off | `.animations.enabled`, `.speed`, `.windows` (`popin` `slide` `gnomed` `fade`), `.workspaces` (`off` `slide` `slidevert` `fade` `slidefade`), `.moves` | `current/hyprland.lua` → `orka/looknfeel.lua` (`hl.animation`), `hyprctl reload` |
 | Mouse cursor | Size (24, 32, 40, 48) and a cursor theme, each shown with its arrow, hand, text and busy cursor | `.cursor.theme`, `.cursor.size` | see [Mouse cursor](#mouse-cursor) |
 | Display | Resolution + refresh rate (from the modes the monitor reports), scale (100–200 %), per monitor. **Goes back after 15 s** unless you press Keep | `.monitors["DP-1"] = { mode, scale }` | `current/hyprland.lua` → `hl.monitor`, `hyprctl reload` |
 | Idle & lock | Lock after / screen off after: 1, 2, 5, 10, 15, 30 min, 1 h, never; "Lock now" | `.idle.lockAfter`, `.idle.screenOffAfter` (seconds) | The shell (`lock/Idle.qml`) |
@@ -39,7 +41,21 @@ All three pages have an "Open … folder" button.
 
 ## Themes
 
-Built in (all work offline, also in Ghostty and Neovim): **Orka** ("Deep water": navy, ocean blue, sea-glass teal; the default), **Orka Light**, **Tokyo Night**, **Catppuccin Mocha**, **Catppuccin Latte** (light).
+Built in (all work offline, also in Ghostty and Neovim): **Orka** ("Deep water": navy, ocean blue, sea-glass teal; the default for dark mode), **Orka Light** (the default for light mode), **Tokyo Night**, **Catppuccin Mocha**, **Catppuccin Latte** (light).
+
+### Dark and light mode
+
+There's a theme for dark mode and one for light mode (Settings → Theme lists the dark themes under one and the light themes under the other). The **Dark mode** switch on that page, **SUPER + CTRL + D** (`orka-darkmode`, with an on-screen notice) or `orka-settings mode toggle` changes which one is in use, everywhere at once.
+
+Apps learn the mode the standard way: `orka-settings` sets the GNOME setting `org.gnome.desktop.interface color-scheme` (`prefer-dark` / `prefer-light`), and `xdg-desktop-portal-gtk` publishes it as the portal setting **`org.freedesktop.appearance color-scheme`** (1 = dark, 2 = light), with a `SettingChanged` signal on every switch. Firefox, Chromium-based browsers (and so websites' `prefers-color-scheme`), Electron apps and GTK 4/libadwaita apps read it from there and follow along live. To ask from a script:
+
+```sh
+orka-settings mode                                   # dark / light
+busctl --user call org.freedesktop.portal.Desktop /org/freedesktop/portal/desktop \
+  org.freedesktop.portal.Settings ReadOne ss org.freedesktop.appearance color-scheme   # v u 1 (dark) / v u 2 (light)
+```
+
+Older settings files with a single `"theme"` are converted on the next change or login: that theme becomes the theme of its own mode, and that mode is switched on.
 
 A theme reaches:
 
@@ -91,6 +107,10 @@ Most apps let Hyprland draw the cursor (Wayland cursor-shape protocol), so it ch
 The login screen doesn't use these settings (it runs before you log in, as another user).
 
 ## Tested
+
+2026-11-07 (animations) in the VM from a fresh install: the Animations page shows the defaults; `orka-settings set .animations '{"speed":0.7,"windows":"slide","workspaces":"slidefade","moves":false}'` changes Hyprland's live table (`hyprctl animations`: windowsIn 2.87 `slide`, workspaces 2.45 `slidefade 20%`, windowsMove off) and the page follows; turning animations off sets `animations:enabled` false. All 20 window × workspace style combinations pass `Hyprland --verify-config`; unknown values fall back to the defaults. Not judged yet: how the animations look and feel (screenshots can't show motion; check on the real machine).
+
+2026-11-07 (dark/light mode) in the VM from a fresh install: SUPER + CTRL + D switches the shell, Ghostty, Hyprland borders and Firefox (its window and the page's color scheme, live) to Orka Light; the Settings → Theme switch turns dark mode back on; the portal's `org.freedesktop.appearance color-scheme` reads 1 in dark mode and 2 in light mode, `gsettings` `color-scheme` `prefer-dark`/`prefer-light`. Old settings with a single `"theme"` are converted (tested in WSL for a dark and a light theme). Not yet seen: a Chromium-based browser, an Electron app.
 
 2026-11-07 (btop, cursor) in the VM from a fresh install: btop opens in the Orka colors (`color_theme = "orka"` set on the first login); Bibata Modern Classic in the session (`XCURSOR_THEME`, gsettings); Settings → Mouse cursor lists the themes with previews, a click on a theme changes the pointer at once, and so does the size (Huge, 48). A running btop takes a changed theme file on SIGUSR2 (tested in WSL). Not yet seen: the login screen's cursor, a theme of your own from `~/.local/share/icons` in the VM (tested only with `orka-settings cursors` in WSL), XWayland apps.
 

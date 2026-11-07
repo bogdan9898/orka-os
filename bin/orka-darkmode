@@ -1,0 +1,12 @@
+#!/bin/bash
+# Switch between dark and light mode (SUPER + CTRL + D): the theme picked
+# for that mode in Settings → Theme is applied everywhere, and apps that
+# follow the system (browsers, GTK/libadwaita, Electron) are told through
+# the desktop portal's color-scheme setting.
+#   orka-darkmode [dark|light|toggle]     default: toggle
+mode="$(orka-settings mode "${1:-toggle}")" || exit 1
+if [[ $mode == dark ]]; then
+  orka-osd "$(printf '\U000F0594')" "Dark mode" 2>/dev/null
+else
+  orka-osd "$(printf '\U000F0599')" "Light mode" 2>/dev/null
+fi

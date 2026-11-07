@@ -82,6 +82,7 @@ Based on Omarchy v3.8.4. `SUPER + K` opens the cheat sheet with every shortcut (
 | `ALT + PRINT` | Start/stop screen recording |
 | `SUPER + PRINT` | Color picker |
 | `SUPER + CTRL + N` | Night light |
+| `SUPER + CTRL + D` | Dark / light mode (the themes picked in Settings → Theme) |
 | `SUPER + CTRL + Z` / `SUPER + CTRL + ALT + Z` | Zoom / reset |
 | Media keys | Volume, mute, play/pause, next/previous |
 | `SUPER + CTRL + L` | Lock the screen |

@@ -19,6 +19,7 @@ Scope {
         { id: "theme", label: "Theme", icon: Theme.icons.palette },
         { id: "wallpaper", label: "Wallpaper", icon: Theme.icons.image },
         { id: "cursor", label: "Mouse cursor", icon: Theme.icons.cursor },
+        { id: "animations", label: "Animations", icon: Theme.icons.animation },
         { id: "display", label: "Display", icon: Theme.icons.display },
         { id: "idle", label: "Idle & lock", icon: Theme.icons.lock },
         { id: "sound", label: "Sound", icon: Theme.icons.volume[2] },
@@ -147,6 +148,7 @@ Scope {
                     ThemePage { anchors.fill: parent; visible: SettingsState.page === "theme" }
                     WallpaperPage { anchors.fill: parent; visible: SettingsState.page === "wallpaper" }
                     CursorPage { anchors.fill: parent; visible: SettingsState.page === "cursor" }
+                    AnimationsPage { anchors.fill: parent; visible: SettingsState.page === "animations" }
                     DisplayPage { anchors.fill: parent; visible: SettingsState.page === "display" }
                     IdlePage { anchors.fill: parent; visible: SettingsState.page === "idle" }
                     SoundPage { anchors.fill: parent; visible: SettingsState.page === "sound" }

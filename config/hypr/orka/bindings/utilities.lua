@@ -33,8 +33,9 @@ for key, which in pairs({ Caps_Lock = "caps", Num_Lock = "num" }) do
         { non_consuming = true, ignore_mods = true, locked = true })
 end
 
--- Night light, zoom
+-- Night light, dark/light mode, zoom
 system("SUPER + CTRL + N",       "orka-nightlight",                    "Toggle night light")
+system("SUPER + CTRL + D",       "orka-darkmode",                      "Toggle dark / light mode")
 system("SUPER + CTRL + Z",       "hyprctl eval 'hl.config({ cursor = { zoom_factor = 2 } })'", "Zoom in")
 system("SUPER + CTRL + ALT + Z", "hyprctl eval 'hl.config({ cursor = { zoom_factor = 1 } })'", "Reset zoom")
 

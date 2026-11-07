@@ -5,12 +5,17 @@ pragma Singleton
 // keyboard, night light); the shell itself uses the idle times. Missing
 // values use the defaults below.
 //
-//   theme            "orka"           a theme directory name (orka-settings themes)
+//   appearance       { mode: "dark", dark: "orka", light: "orka-light" }
+//                    the theme for each mode (theme directory names,
+//                    orka-settings themes) and which mode is on
 //   wallpaper        ""               an image path; "" = the theme's wallpaper or color
 //   idle             { lockAfter: 300, screenOffAfter: 330 }   seconds, 0 = never
 //   nightlight       { on: false, temperature: 4000 }
 //   keyboard         { layouts: ["us"], switch: "", repeatRate: 40, repeatDelay: 250 }
 //   cursor           { theme: "Bibata-Modern-Classic", size: 24 }   (orka-settings cursors)
+//   animations       { enabled: true, speed: 1, windows: "popin", workspaces: "off", moves: true }
+//                    speed multiplies durations (0.45–1.5); windows: popin slide
+//                    gnomed fade; workspaces: off slide slidevert fade slidefade
 //   monitors         { "DP-1": { mode: "2560x1440@165", scale: 1 } }
 import QtQuick
 import Quickshell
@@ -25,7 +30,11 @@ Singleton {
     readonly property int lockAfter: number(idle.lockAfter, 300)
     readonly property int screenOffAfter: number(idle.screenOffAfter, 330)
 
-    readonly property string theme: data.theme || "orka"
+    readonly property var appearance: data.appearance || {}
+    readonly property bool darkMode: appearance.mode !== "light"
+    readonly property string darkTheme: appearance.dark || "orka"
+    readonly property string lightTheme: appearance.light || "orka-light"
+    readonly property string theme: darkMode ? darkTheme : lightTheme
     readonly property string wallpaper: data.wallpaper || ""
     readonly property var nightlight: data.nightlight || {}
     readonly property bool nightlightOn: nightlight.on === true
@@ -38,6 +47,12 @@ Singleton {
     readonly property var cursor: data.cursor || {}
     readonly property string cursorTheme: cursor.theme || "Bibata-Modern-Classic"
     readonly property int cursorSize: number(cursor.size, 24)
+    readonly property var animations: data.animations || {}
+    readonly property bool animationsOn: animations.enabled !== false
+    readonly property real animationSpeed: typeof animations.speed === "number" ? animations.speed : 1
+    readonly property string windowAnimation: animations.windows || "popin"
+    readonly property string workspaceAnimation: animations.workspaces || "off"
+    readonly property bool moveAnimation: animations.moves !== false
     readonly property var monitors: data.monitors || {}
 
     function number(value, fallback) {

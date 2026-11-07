@@ -49,7 +49,7 @@ hl.config({
         },
     },
 
-    animations = { enabled = true },
+    animations = { enabled = require("orka.settings").animations.enabled ~= false },
 
     dwindle   = { preserve_split = true, force_split = 2 },
     master    = { new_status = "master" },
@@ -84,18 +84,42 @@ hl.curve("linear",         { type = "bezier", points = { {0, 0},       {1, 1}   
 hl.curve("almostLinear",   { type = "bezier", points = { {0.5, 0.5},   {0.75, 1} } })
 hl.curve("quick",          { type = "bezier", points = { {0.15, 0},    {0.1, 1}  } })
 
-hl.animation({ leaf = "global",           enabled = true,  speed = 10,   bezier = "default" })
-hl.animation({ leaf = "border",           enabled = true,  speed = 5.39, bezier = "easeOutQuint" })
-hl.animation({ leaf = "windows",          enabled = true,  speed = 3.79, bezier = "easeOutQuint" })
-hl.animation({ leaf = "windowsIn",        enabled = true,  speed = 4.1,  bezier = "easeOutQuint", style = "popin 87%" })
-hl.animation({ leaf = "windowsOut",       enabled = true,  speed = 1.49, bezier = "linear",       style = "popin 87%" })
-hl.animation({ leaf = "fadeIn",           enabled = true,  speed = 1.73, bezier = "almostLinear" })
-hl.animation({ leaf = "fadeOut",          enabled = true,  speed = 1.46, bezier = "almostLinear" })
-hl.animation({ leaf = "fade",             enabled = true,  speed = 3.03, bezier = "quick" })
-hl.animation({ leaf = "layers",           enabled = true,  speed = 3.81, bezier = "easeOutQuint" })
-hl.animation({ leaf = "layersIn",         enabled = true,  speed = 4,    bezier = "easeOutQuint", style = "fade" })
-hl.animation({ leaf = "layersOut",        enabled = true,  speed = 1.5,  bezier = "linear",       style = "fade" })
-hl.animation({ leaf = "fadeLayersIn",     enabled = true,  speed = 1.79, bezier = "almostLinear" })
-hl.animation({ leaf = "fadeLayersOut",    enabled = true,  speed = 1.39, bezier = "almostLinear" })
-hl.animation({ leaf = "workspaces",       enabled = false })
-hl.animation({ leaf = "specialWorkspace", enabled = true,  speed = 3,    bezier = "easeOutQuint", style = "slidevert" })
+-- Animations: Settings → Animations (settings.json .animations, through
+-- orka/settings.lua). speed multiplies every duration (Hyprland counts in
+-- tenths of a second: 4.1 = 0.41 s), windows is the open/close style,
+-- workspaces the workspace switch, moves = moving/resizing windows.
+local anim = require("orka.settings").animations
+local factor = tonumber(anim.speed) or 1
+local window_styles = { popin = "popin 87%", slide = "slide", gnomed = "gnomed", fade = "popin 100%" }
+local window_style = window_styles[anim.windows] or window_styles.popin
+local workspace_styles = { slide = "slide", slidevert = "slidevert", fade = "fade", slidefade = "slidefade 20%" }
+local workspace_style = workspace_styles[anim.workspaces]   -- nil = off (instant)
+
+local function animate(leaf, speed, bezier, style)
+    hl.animation({ leaf = leaf, enabled = true, speed = speed * factor, bezier = bezier, style = style })
+end
+
+animate("global",           10,   "default")
+animate("border",           5.39, "easeOutQuint")
+animate("windows",          3.79, "easeOutQuint")
+animate("windowsIn",        4.1,  "easeOutQuint", window_style)
+animate("windowsOut",       1.49, "linear",       window_style)
+if anim.moves == false then
+    hl.animation({ leaf = "windowsMove", enabled = false })
+else
+    animate("windowsMove",  3.79, "easeOutQuint")
+end
+animate("fadeIn",           1.73, "almostLinear")
+animate("fadeOut",          1.46, "almostLinear")
+animate("fade",             3.03, "quick")
+animate("layers",           3.81, "easeOutQuint")
+animate("layersIn",         4,    "easeOutQuint", "fade")
+animate("layersOut",        1.5,  "linear",       "fade")
+animate("fadeLayersIn",     1.79, "almostLinear")
+animate("fadeLayersOut",    1.39, "almostLinear")
+if workspace_style then
+    animate("workspaces",   3.5,  "easeOutQuint", workspace_style)
+else
+    hl.animation({ leaf = "workspaces", enabled = false })
+end
+animate("specialWorkspace", 3,    "easeOutQuint", "slidevert")
