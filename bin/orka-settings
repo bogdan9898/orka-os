@@ -521,9 +521,11 @@ cursors() {
 }
 
 about() {
-  # shellcheck disable=SC1091  # /etc/os-release is only read for PRETTY_NAME
+  # shellcheck disable=SC1091  # /etc/os-release: only NAME, VERSION and PRETTY_NAME are read
   jq -n \
     --arg os "$(. /etc/os-release 2>/dev/null; echo "${PRETTY_NAME:-}")" \
+    --arg osName "$(. /etc/os-release 2>/dev/null; echo "${NAME:-}")" \
+    --arg osVersion "$(. /etc/os-release 2>/dev/null; echo "${VERSION:-}")" \
     --arg host "$(cat /etc/hostname 2>/dev/null)" \
     --arg kernel "$(uname -r)" \
     --arg cpu "$(awk -F': ' '/model name/ { print $2; exit }' /proc/cpuinfo)" \
@@ -532,7 +534,7 @@ about() {
     --arg disk "$(df -h / | awk 'NR == 2 { print $3 " used of " $2 " (" $5 ")" }')" \
     --arg uptime "$(uptime -p | sed 's/^up //')" \
     --arg hyprland "$(in_hyprland && hyprctl version -j 2>/dev/null | jq -r '.version // empty')" \
-    --arg quickshell "$(qs --version 2>/dev/null | head -1)" \
+    --arg quickshell "$(qs --version 2>/dev/null | head -1 | sed -E 's/^[Qq]uickshell[[:space:]]+([^[:space:]]+).*/\1/')" \
     --arg installed "$(stat -c %w /opt/orka/src 2>/dev/null | cut -d' ' -f1)" \
     '$ARGS.named'
 }

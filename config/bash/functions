@@ -64,3 +64,12 @@ gd() {
   gum confirm "Remove worktree $dir and branch $branch?" || return 1
   builtin cd "../$root" && git worktree remove "$cwd" --force && git branch -D "$branch"
 }
+
+# fastfetch: the OrkaOS logo as an image in Ghostty (and kitty), drawn with
+# characters everywhere else (the text consoles can't show images).
+fastfetch() {
+  case "${TERM:-}" in
+    xterm-ghostty | xterm-kitty) command fastfetch "$@" ;;
+    *) command fastfetch --logo-type file --logo /usr/share/orka/branding/fastfetch/orkaos.txt --logo-color-1 white "$@" ;;
+  esac
+}

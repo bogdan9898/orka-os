@@ -25,8 +25,7 @@ PanelWindow {
         anchors.verticalCenter: parent.verticalCenter
         spacing: 10
 
-        BarIcon {
-            text: Theme.icons.logo
+        BarLogo {
             onClicked: LauncherState.open = !LauncherState.open
             onRightClicked: SettingsState.open = !SettingsState.open
         }

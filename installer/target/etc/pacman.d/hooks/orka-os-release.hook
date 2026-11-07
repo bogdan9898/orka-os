@@ -1,0 +1,12 @@
+# OrkaOS: the filesystem package ships Arch's /usr/lib/os-release; put the
+# OrkaOS one (NAME, VERSION 1.0, ID_LIKE=arch) back after it's updated.
+[Trigger]
+Type = Path
+Operation = Install
+Operation = Upgrade
+Target = usr/lib/os-release
+
+[Action]
+Description = Keeping the OrkaOS name in os-release...
+When = PostTransaction
+Exec = /usr/bin/install -m644 /usr/share/orka/branding/os-release /usr/lib/os-release

@@ -207,16 +207,29 @@ FloatingWindow {
         }
     }
 
-    // Branding placeholder until the Orka logo exists.
-    Text {
+    // OrkaOS: the badge and the name, bottom left.
+    Row {
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.margins: 24
-        text: Theme.icons.logo + "  OrkaOS"
-        color: Theme.foreground
-        opacity: 0.6
-        font.family: Theme.font
-        font.pixelSize: Theme.fontSize + 2
+        spacing: 10
+        Image {
+            anchors.verticalCenter: parent.verticalCenter
+            width: 28
+            height: 28
+            source: Theme.logoBadge
+            sourceSize: Qt.size(84, 84)
+            smooth: true
+            mipmap: true
+        }
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            text: "OrkaOS"
+            color: Theme.foreground
+            opacity: 0.7
+            font.family: Theme.font
+            font.pixelSize: Theme.fontSize + 2
+        }
     }
 
     RowLayout {

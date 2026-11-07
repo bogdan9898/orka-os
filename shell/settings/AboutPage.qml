@@ -38,9 +38,28 @@ Page {
         }
     }
 
-    Label {
-        heading: true
-        text: Theme.icons.logo + "  OrkaOS"
+    RowLayout {
+        spacing: 20
+        Image {
+            Layout.preferredWidth: 120
+            Layout.preferredHeight: 120
+            source: Theme.logoFull
+            sourceSize: Qt.size(240, 240)
+            smooth: true
+            mipmap: true
+        }
+        ColumnLayout {
+            spacing: 4
+            Label {
+                heading: true
+                text: page.info.osName || "OrkaOS"
+            }
+            Label {
+                dim: true
+                text: page.info.osVersion ? "Version " + page.info.osVersion : ""
+                visible: text !== ""
+            }
+        }
     }
     Repeater {
         model: page.rows.filter(r => r[1])

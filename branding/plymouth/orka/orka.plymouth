@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=OrkaOS
+Description=OrkaOS boot screen: the logo above ripples, on the Deep water background
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/orka
+ScriptFile=/usr/share/plymouth/themes/orka/orka.script

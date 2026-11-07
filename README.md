@@ -2,7 +2,7 @@
 
 A personal, Arch-based Linux setup with its own name and branding, inspired by [Omarchy](https://github.com/omacom/omarchy). Built for one machine only (see [hardware](docs/hardware-and-dual-boot.md)), dual-booted alongside Windows 11. Not intended for public release.
 
-> Status (2026-11-07, end of day 3): **offline installer ISO works** (tested in QEMU, incl. Windows on another disk); **Hyprland desktop config**; **shell, terminal, git and Neovim (LazyVim, offline)**; our own **Quickshell desktop** is complete: bar, notifications, polkit agent, launcher, lock and login screens, cheat sheet, OSD, settings app with themes and wallpapers. **Orka theme "Deep water"** (+ Orka Light) colors the shell, terminal, GTK and Qt apps, with Papirus icons; the **boot menu (Limine)** is themed too. btop follows the theme, the mouse cursor (Bibata Modern Classic) can be changed in Settings, and a dark/light mode switch (SUPER + CTRL + D) changes between your dark and light theme, also for browsers. Our own **Calculator** (Standard, Expert, Programmer) replaces GNOME Calculator. Next: the rest of branding (logo, OS name, fastfetch, wallpapers), then install on the real machine. See the [roadmap](docs/approach.md#roadmap).
+> Status (2026-11-07, end of day 3): **offline installer ISO works** (tested in QEMU, incl. Windows on another disk); **Hyprland desktop config**; **shell, terminal, git and Neovim (LazyVim, offline)**; our own **Quickshell desktop** is complete: bar, notifications, polkit agent, launcher, lock and login screens, cheat sheet, OSD, settings app with themes and wallpapers. **Orka theme "Deep water"** (+ Orka Light) colors the shell, terminal, GTK and Qt apps, with Papirus icons; the **boot menu (Limine)** is themed too. btop follows the theme, the mouse cursor (Bibata Modern Classic) can be changed in Settings, and a dark/light mode switch (SUPER + CTRL + D) changes between your dark and light theme, also for browsers. Our own **Calculator** (Standard, Expert, Programmer) replaces GNOME Calculator. **Branding**: the OrkaOS logo (bar, boot screen with ripples, fastfetch, About) and the name **OrkaOS 1.0** everywhere. Next: OrkaOS wallpapers, then install on the real machine. See the [roadmap](docs/approach.md#roadmap).
 
 ## Naming
 
@@ -56,6 +56,7 @@ Why "Orka" rather than "Orca": `orca` is already an Arch package (the GNOME scre
 - [Neovim](docs/neovim.md): LazyVim, bundled offline into the ISO
 - [Settings](docs/settings.md): the OrkaOS settings app, `orka-settings`, themes and wallpapers
 - [Calculator](docs/calculator.md): Orka Calculator (Standard, Expert, Programmer), Python + Qt Quick
+- [Branding](docs/branding.md): the logo, the OrkaOS 1.0 name, boot screen (Plymouth), fastfetch
 - [Quickshell](docs/quickshell.md): building our own bar, widgets, lock screen and more
 - [Hardware & dual boot](docs/hardware-and-dual-boot.md): target machine specs and the dual-boot checklist
 

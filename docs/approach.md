@@ -32,7 +32,7 @@ orka-os/
 ├── bin/                # orka-* helper commands → /usr/local/bin
 ├── iso/                # build.sh, archiso profile overlay, test/ (QEMU VM + install test)
 ├── themes/             # color themes (theme.json + ghostty.conf) → /usr/share/orka/themes
-├── branding/           # limine/ (boot menu wallpaper + its generator); later: logo, Plymouth, fastfetch
+├── branding/           # logo/ (the logo + make.sh), plymouth/ (boot screen), fastfetch/, limine/ (boot menu wallpaper), os-release
 ├── shell/              # Quickshell desktop
 └── docs/
 ```
@@ -67,9 +67,10 @@ Status on 2026-11-07 (evening, after day 3): the theme is done (Orka Deep water 
    - [ ] Click through the interactive installer once (only the first screen and the warning box were checked visually)
 3. **Branding:** Orka logo, Plymouth theme, boot menu, fastfetch, wallpapers.
    - [x] Boot menu (Limine) in the Deep water theme: wallpaper (`branding/limine/make-wallpaper.sh`), menu colors, OrkaOS branding color ([iso](iso.md#boot-menu-look)). The logo can be added to the wallpaper once it exists.
-   - [ ] **TODO: create the logo with an actual orca** (not just a fin). Needs variants for the boot splash, boot menu, fastfetch (ASCII/image), icon and wallpaper.
-   - [ ] **TODO: rebrand fastfetch:** replace the Arch logo and text with the Orka logo and name.
-   - [ ] **TODO: replace every occurrence of the OS name** so the system shows **OrkaOS** instead of "Arch Linux": `/etc/os-release` (`NAME`, `PRETTY_NAME`, `ID=orka` with `ID_LIKE=arch` so Arch tools still recognize it, `LOGO`), Limine boot entries, ISO label, Plymouth, the TTY login banner (`/etc/issue`), fastfetch.
+   - [x] Logo: the user's own design (orca over a wave in a ring, "Orka OS"), traced to SVG; badge for the bar, login screen, About and app icon ([branding](branding.md))
+   - [x] fastfetch: the logo as a white image in Ghostty, half-block text logo on the consoles, OrkaOS info layout
+   - [x] The name **OrkaOS 1.0** instead of Arch Linux: os-release (`ID_LIKE=arch`, kept by a pacman hook), `/etc/issue`, About, boot screen (Plymouth: logo above ripples on the Deep water background)
+   - [ ] **TODO: OrkaOS wallpapers** (designs offered 2026-11-07: Layers, Currents, Light rays + orca, Bubbles, Pixel tide, Shallows; user hasn't picked yet)
    - [ ] **TODO: choose Orka's fonts** (UI, monospace for terminal/editor, icon font). For now the current set is fine: `noto-fonts`, `noto-fonts-emoji`, `ttf-jetbrains-mono-nerd`, `woff2-font-awesome`.
 4. **Install on the host** (separate disk, Windows disks disconnected; checklist in [dual boot](hardware-and-dual-boot.md)). Then check what the VM can't: FreeSync/`highrr`, screenshots/recording, media keys, Wi-Fi/Bluetooth, KDE Connect.
 5. **Quickshell desktop** (all done, see [quickshell](quickshell.md)): bar, notifications, polkit agent, launcher, lock screen, login screen (greetd + cage), cheat sheet, OSD (volume, mic, media, Caps/Num Lock), settings app ([settings](settings.md)). Possible later: notification center (history), tooltips in the bar, brightness via DDC/CI, confirmation dialog for log out.

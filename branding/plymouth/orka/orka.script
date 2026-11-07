@@ -1,0 +1,55 @@
+# OrkaOS boot screen (Plymouth script theme), shown from the Limine menu to
+# the login screen: the boot menu's Deep water background, the OrkaOS logo
+# (white) and below it ripples spreading on the water.
+# Images (PNG only: Plymouth can't load JPEG): background.png (the boot menu
+# wallpaper), logo.png and ripple.png, all made by branding/logo/make.sh.
+
+screen_w = Window.GetWidth();
+screen_h = Window.GetHeight();
+Window.SetBackgroundTopColor(0.06, 0.13, 0.20);
+Window.SetBackgroundBottomColor(0.02, 0.03, 0.05);
+
+# The background, filling the screen (cropped, not stretched).
+bg_image = Image("background.png");
+bg_scale = Math.Max(screen_w / bg_image.GetWidth(), screen_h / bg_image.GetHeight());
+bg_w = Math.Int(bg_image.GetWidth() * bg_scale) + 1;
+bg_h = Math.Int(bg_image.GetHeight() * bg_scale) + 1;
+background = Sprite(bg_image.Scale(bg_w, bg_h));
+background.SetX(Math.Int((screen_w - bg_w) / 2));
+background.SetY(Math.Int((screen_h - bg_h) / 2));
+background.SetZ(-100);
+
+# The logo, 30% of the screen height, centred a bit above the middle.
+logo_image = Image("logo.png");
+logo_size = Math.Int(screen_h * 0.30);
+logo = Sprite(logo_image.Scale(logo_size, logo_size));
+logo.SetX(Math.Int((screen_w - logo_size) / 2));
+logo.SetY(Math.Int(screen_h * 0.42 - logo_size / 2));
+logo.SetZ(10);
+
+# Three ripples below it, each growing from small to full size while it
+# fades out, one after the other (a 2 s cycle at 50 frames per second).
+ripple_image = Image("ripple.png");
+ripple_full = screen_h * 0.11;
+ripple_ratio = ripple_image.GetHeight() / ripple_image.GetWidth();
+ripple_y = screen_h * 0.68;
+for (i = 0; i < 3; i++) {
+    ripples[i] = Sprite();
+    ripples[i].SetZ(10);
+}
+frame = 0;
+
+fun refresh() {
+    frame++;
+    for (i = 0; i < 3; i++) {
+        p = (frame + i * 33) / 100;
+        p = p - Math.Int(p);
+        w = Math.Int(ripple_full * (0.2 + p)) + 1;
+        h = Math.Int(w * ripple_ratio) + 1;
+        ripples[i].SetImage(ripple_image.Scale(w, h));
+        ripples[i].SetX(Math.Int(screen_w / 2 - w / 2));
+        ripples[i].SetY(Math.Int(ripple_y - h / 2));
+        ripples[i].SetOpacity(0.9 * (1 - p));
+    }
+}
+Plymouth.SetRefreshFunction(refresh);

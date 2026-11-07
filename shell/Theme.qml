@@ -19,6 +19,12 @@ Singleton {
     readonly property color inactive: colors.inactive || "#2e3d4d"
     readonly property bool light: theme.mode === "light"
 
+    // The OrkaOS logo (branding/logo, installed by orka-install): the badge
+    // without the name (bar, small places) and the full one with "Orka OS".
+    // Both have the black disc, so they look the same in every theme.
+    readonly property string logoBadge: "file:///usr/share/orka/branding/orkaos-badge.svg"
+    readonly property string logoFull: "file:///usr/share/orka/branding/orkaos-logo-badge.svg"
+
     FileView {
         path: (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/orka/current/theme.json"
         watchChanges: true
@@ -40,7 +46,6 @@ Singleton {
 
     // Nerd Font glyphs (Material Design range), same as Omarchy's bar.
     readonly property var icons: ({
-        logo:        String.fromCodePoint(0xF023A),   // fish, until the Orka logo exists
         workspace:   String.fromCodePoint(0xF14FB),   // the active workspace
         cpu:         String.fromCodePoint(0xF035B),
         recording:   String.fromCodePoint(0xF0EC2),
