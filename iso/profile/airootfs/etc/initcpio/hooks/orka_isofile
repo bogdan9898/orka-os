@@ -1,0 +1,78 @@
+#!/usr/bin/ash
+#
+# OrkaOS: boot the live system from the ISO *file* when the ISO volume itself
+# is not visible as a block device.
+#
+# The boot entry finds the live medium by its UUID (archisosearchuuid=). That
+# works for a stick written with dd/Rufus, a DVD or a VM, and for Ventoy as
+# long as Ventoy's initramfs helper maps the ISO file to a device. When that
+# helper does not run or fails (seen on real hardware), the volume never shows
+# up and archiso drops to an emergency shell. This hook keeps the normal search
+# first and only then looks for an .iso file whose volume UUID matches, in the
+# top two directory levels of every partition (removable ones first), and
+# boots it through archiso_loop_mnt's loop-device handler.
+
+# archisodevice, img_dev, img_loop, img_flags and archisosearchuuid are shared
+# with the archiso / archiso_loop_mnt hooks (same shell).
+# shellcheck disable=SC2034,SC2154
+
+run_hook() {
+    # Only for the UUID boot of the OrkaOS entries, and not when the boot
+    # loader already passed an ISO file (GRUB loopback: img_dev/img_loop).
+    [ -n "$(getarg 'archisosearchuuid')" ] || return 0
+    [ -z "$(getarg 'img_loop')" ] || return 0
+    export mount_handler="orka_isofile_mount_handler"
+}
+
+_orka_find_isofile() {
+    local uuid="$1" dev f mnt=/run/orka-isosearch
+
+    mkdir -p "$mnt"
+    for dev in $(lsblk -no PATH -Q 'RM == 1 && TYPE == "part"') \
+        $(lsblk -no PATH -Q 'RM == 0 && TYPE == "part"'); do
+        [ -b "$dev" ] || continue
+        umount "$mnt" 2>/dev/null
+        mount -r "$dev" "$mnt" 2>/dev/null || continue
+        for f in "$mnt"/*.iso "$mnt"/*/*.iso; do
+            [ -f "$f" ] || continue
+            if [ "$(blkid -p -s UUID -o value "$f" 2>/dev/null)" = "$uuid" ]; then
+                img_dev="$dev"
+                img_loop="${f#"$mnt"/}"
+                umount "$mnt"
+                rmdir "$mnt"
+                return 0
+            fi
+        done
+    done
+    umount "$mnt" 2>/dev/null
+    rmdir "$mnt"
+    return 1
+}
+
+orka_isofile_mount_handler() {
+    local newroot="$1" dev
+
+    # The normal way: the ISO volume is a block device (dd-written stick,
+    # DVD, VM, or Ventoy's mapping). Same lookup archiso does first.
+    # /run/orka-boot-device (kept after switch_root) names the device holding
+    # the live medium, so the installer never offers that disk as a target.
+    if dev="$(resolve_device "UUID=${archisosearchuuid}")" && [ -b "$dev" ]; then
+        archisodevice="$dev"
+        echo "$dev" > /run/orka-boot-device
+        archiso_mount_handler "$newroot"
+        return
+    fi
+
+    msg ":: OrkaOS: live medium not found as a device, looking for the ISO file ..."
+    if _orka_find_isofile "$archisosearchuuid"; then
+        msg ":: OrkaOS: found '${img_loop}' on '${img_dev}'"
+        echo "$img_dev" > /run/orka-boot-device
+        img_flags="defaults"
+        archiso_loop_mount_handler "$newroot"
+    else
+        # Fall through to archiso's own search and its error message.
+        archiso_mount_handler "$newroot"
+    fi
+}
+
+# vim: set ft=sh:

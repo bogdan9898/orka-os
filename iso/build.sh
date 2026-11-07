@@ -244,6 +244,12 @@ stage_iso() {
   rm -rf "$PROFILE/syslinux" "$PROFILE/grub"
   sed -i 's/Arch Linux install medium/OrkaOS installer/' "$PROFILE"/efiboot/loader/entries/*.conf
 
+  # Boot from the ISO file when the ISO volume is not a block device (Ventoy
+  # sticks whose helper fails): see iso/profile/airootfs/etc/initcpio/hooks/orka_isofile.
+  sed -i 's/archiso_loop_mnt /archiso_loop_mnt orka_isofile /' "$PROFILE/airootfs/etc/mkinitcpio.conf.d/archiso.conf"
+  grep -q ' orka_isofile ' "$PROFILE/airootfs/etc/mkinitcpio.conf.d/archiso.conf" ||
+    die "could not add the orka_isofile hook to the live initramfs"
+
   # zstd instead of xz: the payload is mostly already-compressed packages.
   sed -i "s|^airootfs_image_tool_options=.*|airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '15' '-b' '1M')|" "$PROFILE/profiledef.sh"
 

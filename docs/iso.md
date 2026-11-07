@@ -51,6 +51,12 @@ Boots straight into `orka-install` on the first console. It asks for the disk, t
 
 Unattended mode (used by the test): `ORKA_UNATTENDED=1 ORKA_DISK=/dev/vda ORKA_MODE=wipe ORKA_HOSTNAME=… ORKA_USER=… ORKA_PASSWORD=… orka-install`. See the header of `installer/orka-install`.
 
+### USB sticks and Ventoy
+
+The live system finds its medium by the ISO's UUID (`archisosearchuuid=`). That works for a stick written with `dd`/Rufus (DD mode), a DVD or a VM. On a Ventoy stick the ISO is only a file on Ventoy's data partition; Ventoy's initramfs helper normally maps it to a device-mapper device, and then the UUID lookup finds it. On the first real-hardware boot (2026-11-07) that mapping never appeared, and archiso dropped to the `[rootfs ~]#` emergency shell with `ERROR: Device '<uuid>' not found` (archiso's file search only scans plain partitions).
+
+The build adds the hook `orka_isofile` (`iso/profile/airootfs/etc/initcpio/`) to the live initramfs, right after `archiso_loop_mnt`. It tries the UUID first as before; if the volume is not there, it looks for an `.iso` file with the matching volume UUID in the top two directory levels of every partition (removable first) and boots it through archiso's loop-device handler. It also writes the boot device to `/run/orka-boot-device`, which the installer uses to hide the USB stick from the disk menu (before, the Ventoy stick was listed first and pre-selected).
+
 ### Offline details
 
 - archiso's keyring service waits for an NTP time sync, which never happens offline; the build removes `systemd-time-wait-sync` from the live system.
@@ -66,6 +72,8 @@ iso/test/install-test.sh --windows-disk during   # 2nd disk with fake Windows at
 iso/test/install-test.sh --windows-disk later    # ...attached only afterwards (boot service adds the entry)
 iso/test/install-test.sh --gui           # watch it in a window
 ```
+
+`iso/test/ventoy-test.sh [ISO]` (as root) boots the ISO from a Ventoy stick: it downloads Ventoy into `~bogdan/ventoy-test`, makes a 6 GiB stick image with an ext4 data partition (the WSL kernel cannot write exFAT), and boots it on USB next to an empty NVMe disk, with a screenshot every 5 s in `/tmp/orka-ventoy`. The last screenshot should show the installer's disk menu without the stick. The fallback path, with no Ventoy helper, was tested on 2026-11-07 like this: an exFAT partition (Ventoy's `tool/x86_64/mkexfatfs`) holding `isos/<iso>`, and the ISO's kernel and initramfs booted directly under OVMF with `archisobasedir=orka archisosearchuuid=<uuid>`.
 
 The VM runs with `restrict=on` networking: no internet, but SSH to the live ISO works (port 2222, key from a cloud-init seed). With `ORKA_TEST=1` the installer adds a serial console and `orka-selftest.service`, which prints a boot report the test script reads from the serial log.
 

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#
+# OrkaOS: see /etc/initcpio/hooks/orka_isofile
+
+build() {
+    add_binary blkid
+    add_binary lsblk
+    add_binary losetup
+    add_runscript
+}
+
+help() {
+    cat <<HELPEOF
+  Boots the live system from the OrkaOS ISO file on a partition (e.g. a
+  Ventoy stick) when the ISO volume is not visible as a block device.
+HELPEOF
+}
+
+# vim: set ft=sh:

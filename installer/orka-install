@@ -85,10 +85,15 @@ preflight() {
 # ---------------------------------------------------------------------------
 
 # The disk the live system was booted from (USB stick), never a target.
+# /run/orka-boot-device comes from the live initramfs (orka_isofile hook): the
+# ISO volume, Ventoy's mapping of the ISO file (dm on a partition) or the
+# partition holding the ISO file. /run/archiso/bootmnt is gone after
+# copy-to-RAM, so it is only the fallback. Prints e.g. "sdb".
 boot_disk() {
   local src
-  src="$(findmnt -no SOURCE /run/archiso/bootmnt 2>/dev/null || true)"
-  [[ -n "$src" ]] && lsblk -no PKNAME "$src" 2>/dev/null | head -1
+  src="$(cat /run/orka-boot-device 2>/dev/null || findmnt -no SOURCE /run/archiso/bootmnt 2>/dev/null || true)"
+  [[ -n "$src" ]] || return 0
+  lsblk -rnso NAME,TYPE "$src" 2>/dev/null | awk '$2 == "disk" { print $1; exit }'
 }
 
 # What is on a disk, for the disk menu: "empty", or e.g. "Windows, 3 partitions".
