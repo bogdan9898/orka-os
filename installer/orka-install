@@ -514,6 +514,10 @@ install_branding() {
   install -Dm644 "$SRC/branding/logo/orkaos-badge.svg" "$TARGET/usr/share/icons/hicolor/scalable/apps/orkaos.svg"
   arch-chroot "$TARGET" gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor >>"$LOG" 2>&1 || true
   install -Dm644 "$SRC/branding/fastfetch/config.jsonc" "$TARGET/etc/xdg/fastfetch/config.jsonc"
+  # Wallpapers (Settings → Wallpaper; orka-ocean.png is the default one, see
+  # config/user/orka/settings.json), plus the boot menu's light rays.
+  install -m644 "$SRC"/branding/wallpapers/*.jpg "$SRC"/branding/wallpapers/*.png "$TARGET/usr/share/orka/wallpapers/"
+  install -m644 "$SRC/branding/limine/wallpaper.jpg" "$TARGET/usr/share/orka/wallpapers/deep-water-rays.jpg"
 }
 
 install_nvim_bundle() {
@@ -610,6 +614,7 @@ echo "shell service: $(systemctl --global is-enabled orka-shell.service 2>&1)"
 echo "settings: theme=$(jq -r .id "/home/$u/.config/orka/current/theme.json" 2>&1) current=[$(ls "/home/$u/.config/orka/current" | tr '\n' ' ')] themes=$(ls /usr/share/orka/themes | grep -vc README) dirs=$(test -d "/home/$u/Pictures/Wallpapers" && test -d "/home/$u/.config/orka/themes" && echo ok) desktop=$(test -f /usr/share/applications/org.orka.Settings.desktop && echo ok)"
 echo "theming: qt6ct=$(as_user grep -E '^(style|icon_theme)=' "/home/$u/.config/qt6ct/qt6ct.conf" | tr '\n' ' ')kdeglobals=$(grep -c '^\[Colors:' "/home/$u/.config/kdeglobals") gtk=$(grep -c 'orka/current/gtk.css' "/home/$u/.config/gtk-3.0/gtk.css" "/home/$u/.config/gtk-4.0/gtk.css" | tr '\n' ' ')icons=$(test -f /usr/share/icons/Papirus-Dark/index.theme && echo ok) styles=$(ls /usr/lib/qt6/plugins/styles/ | tr '\n' ' ')"
 initrd="$(find /boot -name 'initramfs-linux-zen.img' 2>/dev/null | head -1)"
+echo "wallpapers: $(ls /usr/share/orka/wallpapers | tr '\n' ' ')default=$(as_user jq -r .wallpaper "/home/$u/.config/orka/settings.json")"
 echo "branding: os=[$(. /etc/os-release; echo "$NAME|$VERSION|$ID|$ID_LIKE")] plymouth=$(plymouth-set-default-theme 2>&1) initramfs-plymouth=$(lsinitcpio "$initrd" 2>/dev/null | grep -c 'plymouth/themes/orka/') hook=$(test -f /etc/pacman.d/hooks/orka-os-release.hook && echo ok) icon=$(test -f /usr/share/icons/hicolor/scalable/apps/orkaos.svg && echo ok) fastfetch=$(test -f /etc/xdg/fastfetch/config.jsonc && echo ok) cmdline=[$(grep -o 'quiet splash\|splash' /proc/cmdline | head -1)]"
 echo "calculator: $(python3 /usr/share/orka/apps/calculator/tests/test_calculator.py 2>&1 | tail -1) pyside6=$(python3 -c 'import PySide6.QtQuick; print("ok")' 2>&1 | tail -1) desktop=$(test -f /usr/share/applications/org.orka.Calculator.desktop && echo ok) gnome-calculator=$(pacman -Q gnome-calculator >/dev/null 2>&1 && echo installed || echo gone)"
 echo "lock: pam=$(test -f /etc/pam.d/orka-lock && echo ok || echo missing) kwallet-greetd=$(grep -c pam_kwallet5 /etc/pam.d/greetd) settings=$(as_user cat "/home/$u/.config/orka/settings.json" | tr -d ' \n')"

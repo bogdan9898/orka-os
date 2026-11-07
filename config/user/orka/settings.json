@@ -4,7 +4,7 @@
     "dark": "orka",
     "light": "orka-light"
   },
-  "wallpaper": "",
+  "wallpaper": "/usr/share/orka/wallpapers/orka-ocean.png",
   "idle": {
     "lockAfter": 300,
     "screenOffAfter": 330

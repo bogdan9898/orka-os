@@ -45,3 +45,16 @@ Terminals that can't show images (the text consoles): the `fastfetch` shell func
 ## Tests
 
 The installed system's self-test prints a `branding:` line (os-release values, Plymouth theme, Plymouth in the initramfs, hook, icon, fastfetch config, `splash` on the command line). `iso/test/boot-splash-shots.sh` boots the test VM and saves a screenshot every half second (the boot menu, the boot screen, the login screen).
+
+## Wallpapers
+
+In `/usr/share/orka/wallpapers/` (Settings → Wallpaper lists them), all 2560×1440:
+
+| File | What |
+|---|---|
+| `orka-ocean.png` | Orcas swimming under the light from the surface (the user's picture). **The default** for new users (`.wallpaper` in `config/user/orka/settings.json`) |
+| `deep-water-rays.jpg` | The boot menu's light rays (`branding/limine/wallpaper.jpg`) |
+| `deep-water-bubbles.jpg` | Light from above, bubbles rising through dark water (`branding/wallpapers/bubbles.py`) |
+| `orka-moon.png` | An orca leaping in front of the full moon at night (the user's picture) |
+
+`branding/wallpapers/make.sh` makes the bubbles one (python3, librsvg, imagemagick). "Theme default" in Settings → Wallpaper still means the theme's own wallpaper or its background color.
