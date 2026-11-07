@@ -35,8 +35,8 @@ Collected from Windows on 2026-11-05.
 - [ ] Back up anything important
 - [ ] **Secure Boot off** in the BIOS
 - [ ] **Windows Fast Startup off** (*Control Panel → Power Options → Choose what the power buttons do*). With the Windows disks disconnected this doesn't affect the install, but it matters when Linux later reads the Windows disks.
-- [ ] Clock fix: Windows uses local time, Linux uses UTC. Set Windows to UTC with `reg add "HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /t REG_DWORD /d 1 /f` (run as admin)
-- [ ] Disconnect both Windows disks, install, reconnect, set the BIOS boot order (Limine first)
+- [x] Clock fix (done 2026-11-08, as a QWORD): Windows uses local time, Linux uses UTC. Set Windows to UTC with `reg add "HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /t REG_QWORD /d 1 /f` (run as admin), reboot, then *Sync now* in Windows' time settings. Before this, the live ISO stopped with "pacman keyring initialization did not finish" on the real PC (it was online). The installer now retries the keyring setup once by itself, then shows the clock with options to set the time and retry.
+- [ ] Install on the new SSD dedicated to OrkaOS; Windows disks may stay connected (only the chosen disk is touched), then set the BIOS boot order (Limine first)
 - [x] Test the full setup in a VM first (offline install, next to Windows, Windows disk attached during and after the install)
 
 ## Test environment

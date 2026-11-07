@@ -59,6 +59,7 @@ The build adds the hook `orka_isofile` (`iso/profile/airootfs/etc/initcpio/`) to
 
 ### Offline details
 
+- **Keyring failures:** if `pacman-init` fails (or is not done after 120 s), the installer re-runs it once on a fresh keyring tmpfs, then shows a screen with the current clock and the choices *Set the correct time and retry* (live system only, the hardware clock is not touched), *Retry*, *Show the error* (journal) and *Quit*. Seen once on the real PC (online, Windows kept the hardware clock in local time); not reproducible in the VM with a wrong clock, online or offline. Tested by masking the service (`systemd.mask=pacman-init.service`).
 - archiso's keyring service waits for an NTP time sync, which never happens offline; the build removes `systemd-time-wait-sync` from the live system.
 - The live system's keyring checks the official packages' signatures; the AUR packages are our own unsigned builds (`SigLevel = Optional TrustAll` for the `orka` repo only).
 - The installed system gets a fixed mirrorlist (`geo` + `fastly` mirrors) for later updates.

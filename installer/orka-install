@@ -71,13 +71,81 @@ preflight() {
 
   # The live system initializes its pacman keyring at boot (pacman-init);
   # package signatures are checked against it.
+  wait_keyring && return 0
+  # Usual failure: the clock was wrong at boot (Windows keeps the hardware
+  # clock in local time) and got corrected by a network time sync during
+  # pacman-init, so its own key looks "created in the future". A fresh run
+  # with the synced clock works: retry once on our own.
+  info "the pacman keyring setup failed, trying again..."
+  retry_keyring && return 0
+  interactive || die "pacman keyring initialization did not finish (clock: $(date -u '+%F %H:%M UTC'))"
+  keyring_rescue
+}
+
+# Waits up to 120 s for pacman-init; stops early when it has failed.
+wait_keyring() {
   local i
   for i in $(seq 120); do
-    systemctl is-active -q pacman-init.service && break
+    systemctl is-active -q pacman-init.service && return 0
+    systemctl is-failed -q pacman-init.service && return 1
     ((i == 1)) && info "waiting for the pacman keyring to be initialized..."
     sleep 1
   done
-  systemctl is-active -q pacman-init.service || die "pacman keyring initialization did not finish"
+  return 1
+}
+
+# Re-runs pacman-init on a fresh keyring directory (a tmpfs mount).
+retry_keyring() {
+  systemctl stop pacman-init.service 2>/dev/null || true
+  systemctl reset-failed pacman-init.service 2>/dev/null || true
+  systemctl restart etc-pacman.d-gnupg.mount 2>/dev/null || true
+  if command -v gum >/dev/null; then
+    gum spin --title "Setting up the pacman keyring..." -- systemctl start pacman-init.service 2>/dev/null || true
+  else
+    systemctl start pacman-init.service 2>/dev/null || true
+  fi
+  systemctl is-active -q pacman-init.service
+}
+
+# pacman-init failed twice. Seen on the first real install (2026-11-07):
+# Windows kept the hardware clock in local time, Linux read it as UTC, and a
+# network time sync moved the clock back during pacman-init. Show the clock,
+# offer to correct it (live system only, the hardware clock is not touched)
+# and retry.
+keyring_rescue() {
+  local choice when
+  while :; do
+    banner
+    gum style --border thick --padding "0 2" --border-foreground 1 --foreground 1 --bold \
+      "The pacman keyring could not be set up." \
+      "" "Its key checks depend on the date and time, and this PC's clock reads:" \
+      "  $(TZ="$ORKA_TIMEZONE" date '+%A %F %H:%M') ($ORKA_TIMEZONE)" \
+      "" "If that time is wrong, the usual cause is Windows keeping the hardware clock" \
+      "in local time. Set the correct time below. To fix it for good, make Windows" \
+      "keep the clock in UTC: registry value RealTimeIsUniversal = 1 (QWORD) in" \
+      "HKLM\\SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation, then restart."
+    echo
+    choice="$(gum choose --header "What now?" \
+      "Set the correct time and retry" \
+      "Retry (the time is correct)" \
+      "Show the error" \
+      "Quit")" || exit 1
+    case "$choice" in
+      "Set the correct time"*)
+        when="$(gum input --header "Current date and time ($ORKA_TIMEZONE), YYYY-MM-DD HH:MM" \
+          --value "$(TZ="$ORKA_TIMEZONE" date '+%F %H:%M')")" || continue
+        if ! TZ="$ORKA_TIMEZONE" date -s "$when" >/dev/null 2>&1; then
+          gum style --foreground 1 "Not a valid date and time: $when"; sleep 2; continue
+        fi
+        info "clock set to $(TZ="$ORKA_TIMEZONE" date '+%F %H:%M') ($ORKA_TIMEZONE)"
+        retry_keyring && return 0 ;;
+      "Retry"*) retry_keyring && return 0 ;;
+      "Show the error")
+        journalctl -b -u pacman-init.service --no-pager 2>/dev/null | tail -25
+        gum input --placeholder "Press Enter to go back" >/dev/null || true ;;
+      *) exit 1 ;;
+    esac
+  done
 }
 
 # ---------------------------------------------------------------------------
