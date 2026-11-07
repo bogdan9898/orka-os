@@ -65,6 +65,7 @@ for line in "$@"; do
         " ") k=spc ;; "-") k=minus ;; ".") k="dot" ;; "/") k=slash ;; ";") k=semicolon ;; "|") k=shift-backslash ;;
         "_") k=shift-minus ;; "=") k=equal ;; "'") k=apostrophe ;; '"') k=shift-apostrophe ;; "&") k=shift-7 ;;
         ">") k=shift-dot ;; "<") k=shift-comma ;; ",") k=comma ;; "*") k=shift-8 ;; "\$") k=shift-4 ;;
+        "[") k=bracket_left ;; "]") k=bracket_right ;; "{") k=shift-bracket_left ;; "}") k=shift-bracket_right ;;
         "?") k=shift-slash ;; "@") k=shift-2 ;; "(") k=shift-9 ;; ")") k=shift-0 ;; ":") k=shift-semicolon ;; "~") k=shift-grave_accent ;; [A-Z]) k="shift-${c,,}" ;; *) k="$c" ;;
       esac
       mon "sendkey $k"; sleep 0.05

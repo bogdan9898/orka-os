@@ -7,3 +7,5 @@ limine-snapper-sync       # Btrfs snapshots as Limine boot entries
 limine-mkinitcpio-hook    # installs kernels into Limine automatically
 claude-code               # Claude Code CLI
 sublime-text-4            # Sublime Text 4 (stable build)
+bibata-cursor-theme-bin   # mouse cursor (Bibata Modern Classic), official release build
+phinger-cursors           # another cursor choice in Settings → Mouse cursor

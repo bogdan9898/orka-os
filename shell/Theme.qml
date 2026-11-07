@@ -58,6 +58,7 @@ Singleton {
         settings:    String.fromCodePoint(0xF0493),   // cog
         palette:     String.fromCodePoint(0xF03D8),
         image:       String.fromCodePoint(0xF02E9),
+        cursor:      String.fromCodePoint(0xF01BF),   // cursor-default-outline
         display:     String.fromCodePoint(0xF0379),   // monitor
         keyboard:    String.fromCodePoint(0xF030C),
         timer:       String.fromCodePoint(0xF051B),

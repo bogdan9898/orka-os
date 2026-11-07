@@ -1,6 +1,12 @@
 -- Environment for apps started by Hyprland.
-hl.env("XCURSOR_SIZE", "24")
-hl.env("HYPRCURSOR_SIZE", "24")
+
+-- Mouse cursor: Bibata Modern Classic, size 24, unless settings.json has
+-- .cursor.theme / .cursor.size (through orka/settings.lua). orka-settings
+-- also sets it in a running session (hyprctl setcursor) and for GTK/KDE.
+local cursor = require("orka.settings").cursor
+hl.env("XCURSOR_THEME", cursor.theme or "Bibata-Modern-Classic")
+hl.env("XCURSOR_SIZE", tostring(cursor.size or 24))
+hl.env("HYPRCURSOR_SIZE", tostring(cursor.size or 24))
 
 -- Prefer Wayland everywhere, with X11 as fallback.
 hl.env("GDK_BACKEND", "wayland,x11,*")

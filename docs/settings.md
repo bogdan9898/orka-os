@@ -19,6 +19,7 @@ orka-settings about                        # system information (JSON)
 |---|---|---|---|
 | Theme | Pick a theme (color swatches, light/dark) | `.theme` | `current/theme.json`, `current/ghostty.conf`, `current/hyprland.lua`, `hyprctl reload`, Ghostty reload (SIGUSR2), GTK `color-scheme` |
 | Wallpaper | Theme default (its wallpaper or background color), or an image from your folder | `.wallpaper` (path, `""` = theme default) | `orka-wallpaper` (swaybg) |
+| Mouse cursor | Size (24, 32, 40, 48) and a cursor theme, each shown with its arrow, hand, text and busy cursor | `.cursor.theme`, `.cursor.size` | see [Mouse cursor](#mouse-cursor) |
 | Display | Resolution + refresh rate (from the modes the monitor reports), scale (100–200 %), per monitor. **Goes back after 15 s** unless you press Keep | `.monitors["DP-1"] = { mode, scale }` | `current/hyprland.lua` → `hl.monitor`, `hyprctl reload` |
 | Idle & lock | Lock after / screen off after: 1, 2, 5, 10, 15, 30 min, 1 h, never; "Lock now" | `.idle.lockAfter`, `.idle.screenOffAfter` (seconds) | The shell (`lock/Idle.qml`) |
 | Sound | Default output and input device, volume, mute | Pipewire itself (remembered by WirePlumber) | Pipewire |
@@ -32,8 +33,9 @@ orka-settings about                        # system information (JSON)
 |---|---|
 | `~/.config/orka/themes/<name>/theme.json` | Your themes (a name that exists in `/usr/share/orka/themes` replaces the built-in one). Format: [themes/README.md](../themes/README.md) |
 | `~/Pictures/Wallpapers/` | Your wallpapers (JPEG, PNG, WebP), shown as thumbnails. `/usr/share/orka/wallpapers/` is for OrkaOS's own (none yet: branding TODO) |
+| `~/.local/share/icons/<name>/` | Your cursor themes: the folder that has a `cursors/` folder inside (as found in the downloaded archive, e.g. from GitHub or gnome-look.org). A name that also exists in `/usr/share/icons` replaces that one. `~/.icons` works too |
 
-Both pages have an "Open … folder" button.
+All three pages have an "Open … folder" button.
 
 ## Themes
 
@@ -52,8 +54,35 @@ A theme reaches:
 | Qt / KDE apps (Dolphin, Filelight, KDE Connect) | `QT_QPA_PLATFORMTHEME=qt6ct`: Breeze style, palette `current/qt6ct-colors.conf` and icon theme set in `~/.config/qt6ct/qt6ct.conf`; KDE colors in `~/.config/kdeglobals` (only those keys are changed, the rest of both files is yours) | When an app starts |
 | Icons | Papirus-Dark, or Papirus-Light for light themes (`"icons"` in `theme.json` to choose another), for GTK, Qt and KDE apps | As above |
 | Wallpaper | The theme's `wallpaper` image, or its background color, when the wallpaper is "Theme default" | At once |
+| btop | `~/.config/btop/themes/orka.theme`, generated from the theme's colors; `color_theme = "orka"` in `~/.config/btop/btop.conf` is set only while btop's theme is `"Default"` (or not set), so a theme you pick in btop's options stays | At once (SIGUSR2) |
 
-The GTK, Qt and icon settings are also applied at each login (`orka-settings apply apps`), because `gsettings` needs the session's D-Bus. Not themed yet: btop, the mouse cursor.
+The GTK, Qt, icon, btop and cursor settings are also applied at each login (`orka-settings apply apps`), because `gsettings` needs the session's D-Bus.
+
+## Mouse cursor
+
+Default: **Bibata Modern Classic** (black), size 24, the same in every color theme. Settings → Mouse cursor offers every installed cursor theme:
+
+- **Bibata** (`bibata-cursor-theme-bin`, AUR): Modern (rounded) and Original (pointed), each in Classic (black), Ice (white) and Amber, plus left-handed `-Right` versions
+- **phinger** (`phinger-cursors`, AUR): light and dark, plus left-handed versions
+- **Breeze** and **Breeze Light** (`breeze-cursors`, comes with the Breeze Qt style), **Adwaita** (GNOME's)
+- your own, from `~/.local/share/icons`
+
+The previews are made by `orka-settings cursors` with `xcur2png` and cached in `~/.cache/orka/cursor-previews/`. From a terminal:
+
+```sh
+orka-settings cursors                                                  # installed cursor themes (JSON)
+orka-settings set .cursor '{"theme":"Bibata-Modern-Ice","size":32}'
+```
+
+Most apps let Hyprland draw the cursor (Wayland cursor-shape protocol), so it changes everywhere at once; an app that draws its own (some X11 apps) picks it up when it's started again.
+
+| Where | How |
+|---|---|
+| Hyprland and the apps it starts | `XCURSOR_THEME`/`XCURSOR_SIZE`/`HYPRCURSOR_SIZE` in `orka/envs.lua` (from `current/hyprland.lua`); in a running session `hyprctl setcursor` |
+| GTK | `gsettings` `cursor-theme`, `cursor-size` |
+| Qt / KDE apps | `[Mouse]` in `~/.config/kcminputrc` |
+| X11 apps (XWayland) | `~/.local/share/icons/default/index.theme` (`Inherits=`) |
+| Login screen | `XCURSOR_THEME` in `/etc/greetd/config.toml` (fixed, not from your settings) |
 
 ## How Hyprland gets the values
 
@@ -62,6 +91,8 @@ The GTK, Qt and icon settings are also applied at each login (`orka-settings app
 The login screen doesn't use these settings (it runs before you log in, as another user).
 
 ## Tested
+
+2026-11-07 (btop, cursor) in the VM from a fresh install: btop opens in the Orka colors (`color_theme = "orka"` set on the first login); Bibata Modern Classic in the session (`XCURSOR_THEME`, gsettings); Settings → Mouse cursor lists the themes with previews, a click on a theme changes the pointer at once, and so does the size (Huge, 48). A running btop takes a changed theme file on SIGUSR2 (tested in WSL). Not yet seen: the login screen's cursor, a theme of your own from `~/.local/share/icons` in the VM (tested only with `orka-settings cursors` in WSL), XWayland apps.
 
 2026-11-07 (theming) in the VM from a fresh install: the session and the shell get `QT_QPA_PLATFORMTHEME=qt6ct`; Dolphin (Breeze style, Papirus icons, Deep water colors, soft unfocused selection), gnome-calculator (libadwaita) and the launcher's app icons in Orka, then `orka-settings set .theme '"orka-light"'` switches the bar, Ghostty, Hyprland borders, GTK and, for newly started apps, Qt. Without `[UiSettings] ColorScheme=*` in kdeglobals, Dolphin ignored the qt6ct palette (Breeze Light with unreadable labels).
 

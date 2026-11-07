@@ -10,6 +10,7 @@ pragma Singleton
 //   idle             { lockAfter: 300, screenOffAfter: 330 }   seconds, 0 = never
 //   nightlight       { on: false, temperature: 4000 }
 //   keyboard         { layouts: ["us"], switch: "", repeatRate: 40, repeatDelay: 250 }
+//   cursor           { theme: "Bibata-Modern-Classic", size: 24 }   (orka-settings cursors)
 //   monitors         { "DP-1": { mode: "2560x1440@165", scale: 1 } }
 import QtQuick
 import Quickshell
@@ -34,6 +35,9 @@ Singleton {
     readonly property string layoutSwitch: keyboard.switch || ""
     readonly property int repeatRate: number(keyboard.repeatRate, 40)
     readonly property int repeatDelay: number(keyboard.repeatDelay, 250)
+    readonly property var cursor: data.cursor || {}
+    readonly property string cursorTheme: cursor.theme || "Bibata-Modern-Classic"
+    readonly property int cursorSize: number(cursor.size, 24)
     readonly property var monitors: data.monitors || {}
 
     function number(value, fallback) {
