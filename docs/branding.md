@@ -56,5 +56,7 @@ In `/usr/share/orka/wallpapers/` (Settings → Wallpaper lists them), all 2560×
 | `deep-water-rays.jpg` | The boot menu's light rays (`branding/limine/wallpaper.jpg`) |
 | `deep-water-bubbles.jpg` | Light from above, bubbles rising through dark water (`branding/wallpapers/bubbles.py`) |
 | `orka-moon.png` | An orca leaping in front of the full moon at night (the user's picture) |
+| `orka-ice.png` | Orcas swimming among ice floes, seen from above (the user's picture) |
+| `orka-fins.png` | Orca fins cutting through the waves, the water seen above and below the surface (the user's picture) |
 
 `branding/wallpapers/make.sh` makes the bubbles one (python3, librsvg, imagemagick). "Theme default" in Settings → Wallpaper still means the theme's own wallpaper or its background color.

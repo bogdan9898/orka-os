@@ -10,6 +10,10 @@
 #                           the default wallpaper
 #   orka-moon.png           the user's own picture (an orca leaping in front
 #                           of the moon), as is
+#   orka-ice.png            the user's own picture (orcas among ice floes,
+#                           seen from above)
+#   orka-fins.png           the user's own picture (orca fins on the waves,
+#                           above and below the surface)
 #   deep-water-rays.jpg     the boot menu wallpaper (../limine/wallpaper.jpg),
 #                           copied by orka-install
 set -euo pipefail

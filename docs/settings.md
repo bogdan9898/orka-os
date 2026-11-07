@@ -34,7 +34,7 @@ orka-settings about                        # system information (JSON)
 | Folder | For |
 |---|---|
 | `~/.config/orka/themes/<name>/theme.json` | Your themes (a name that exists in `/usr/share/orka/themes` replaces the built-in one). Format: [themes/README.md](../themes/README.md) |
-| `~/Pictures/Wallpapers/` | Your wallpapers (JPEG, PNG, WebP), shown as thumbnails. `/usr/share/orka/wallpapers/` has OrkaOS's own: `orka-ocean.png` (orcas in the ocean, **the default**), `deep-water-rays.jpg` (the boot menu's light rays), `deep-water-bubbles.jpg`, `orka-moon.png` (an orca leaping in front of the moon); see [branding](branding.md#wallpapers) |
+| `~/Pictures/Wallpapers/` | Your wallpapers (JPEG, PNG, WebP), shown as thumbnails. `/usr/share/orka/wallpapers/` has OrkaOS's own: `orka-ocean.png` (orcas in the ocean, **the default**), `deep-water-rays.jpg` (the boot menu's light rays), `deep-water-bubbles.jpg`, `orka-moon.png` (an orca leaping in front of the moon), `orka-ice.png` (orcas among ice floes), `orka-fins.png` (orca fins on the waves); see [branding](branding.md#wallpapers) |
 | `~/.local/share/icons/<name>/` | Your cursor themes: the folder that has a `cursors/` folder inside (as found in the downloaded archive, e.g. from GitHub or gnome-look.org). A name that also exists in `/usr/share/icons` replaces that one. `~/.icons` works too |
 
 All three pages have an "Open … folder" button.

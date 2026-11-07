@@ -70,7 +70,7 @@ Status on 2026-11-07 (evening, after day 3): the theme is done (Orka Deep water 
    - [x] Logo: the user's own design (orca over a wave in a ring, "Orka OS"), traced to SVG; badge for the bar, login screen, About and app icon ([branding](branding.md))
    - [x] fastfetch: the logo as a white image in Ghostty, half-block text logo on the consoles, OrkaOS info layout
    - [x] The name **OrkaOS 1.0** instead of Arch Linux: os-release (`ID_LIKE=arch`, kept by a pacman hook), `/etc/issue`, About, boot screen (Plymouth: logo above ripples on the Deep water background)
-   - [x] Wallpapers (2560×1440): orcas in the ocean (the default, the user's picture), light rays, bubbles, an orca leaping in front of the moon ([branding](branding.md#wallpapers))
+   - [x] Wallpapers (2560×1440): orcas in the ocean (the default, the user's picture), light rays, bubbles, moon, ice floes, fins ([branding](branding.md#wallpapers))
    - [ ] **TODO: choose Orka's fonts** (UI, monospace for terminal/editor, icon font). For now the current set is fine: `noto-fonts`, `noto-fonts-emoji`, `ttf-jetbrains-mono-nerd`, `woff2-font-awesome`.
 4. **Install on the host** (separate disk, Windows disks disconnected; checklist in [dual boot](hardware-and-dual-boot.md)). Then check what the VM can't: FreeSync/`highrr`, screenshots/recording, media keys, Wi-Fi/Bluetooth, KDE Connect.
 5. **Quickshell desktop** (all done, see [quickshell](quickshell.md)): bar, notifications, polkit agent, launcher, lock screen, login screen (greetd + cage), cheat sheet, OSD (volume, mic, media, Caps/Num Lock), settings app ([settings](settings.md)). Possible later: notification center (history), tooltips in the bar, brightness via DDC/CI, confirmation dialog for log out.
