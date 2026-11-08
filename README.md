@@ -112,4 +112,4 @@ On the installed system the defaults live in `/usr/share/orka/` and your own fil
 
 ## License
 
-Parts adapted from Omarchy are MIT-licensed, `Copyright (c) David Heinemeier Hansson`; that notice must be kept alongside ours. The Omarchy name and logo are not used. The OrkaOS logo is my own design.
+[MIT](LICENSE). Parts adapted from Omarchy are MIT-licensed too, `Copyright (c) David Heinemeier Hansson`; that notice is kept in the [LICENSE](LICENSE) next to ours. The Omarchy name and logo are not used. The OrkaOS logo is my own design.
