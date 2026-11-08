@@ -220,10 +220,25 @@ stage_nvim() {
 # Stage: iso
 # ---------------------------------------------------------------------------
 
+# The orka package (pkg/: OrkaOS's own files), built from the working tree and
+# added to the offline repo, replacing an older build.
+add_orka_package() {
+  log "Building the orka package"
+  local pkg
+  install -d -o "$BUILD_USER" -g "$BUILD_USER" "$B/orka-pkg"
+  rm -f "$B"/orka-pkg/orka-[0-9]*.pkg.tar.zst
+  pkg="$(as_user bash "$SRC/pkg/build.sh" "$B/orka-pkg")" || die "building the orka package failed"
+  rm -f "$REPO"/orka-[0-9]*.pkg.tar.zst
+  cp "$pkg" "$REPO/"
+  repo-add -q "$REPO/$REPO_NAME.db.tar.zst" "$REPO/${pkg##*/}"
+  info "${pkg##*/}"
+}
+
 stage_iso() {
-  log "Assembling the archiso profile"
   [[ -f "$REPO/$REPO_NAME.db.tar.zst" ]] || die "run the repo stage first"
   [[ -f "$B/nvim-data.tar.zst" ]] || die "run the nvim stage first"
+  add_orka_package
+  log "Assembling the archiso profile"
 
   rm -rf "$PROFILE"
   cp -a "$RELENG" "$PROFILE"
@@ -265,7 +280,7 @@ stage_iso() {
   cp "$B/nvim-data.tar.zst" "$PROFILE/airootfs/opt/orka/"
   install -d "$PROFILE/airootfs/opt/orka/src"
   cp -r --no-preserve=mode,ownership "$SRC/installer" "$SRC/config" "$SRC/bin" "$SRC/shell" "$SRC/themes" "$SRC/apps" "$SRC/branding" \
-    "$SRC/packages.txt" "$SRC/packages-aur.txt" "$PROFILE/airootfs/opt/orka/src/"
+    "$SRC/system" "$SRC/pkg" "$SRC/LICENSE" "$SRC/packages.txt" "$SRC/packages-aur.txt" "$PROFILE/airootfs/opt/orka/src/"
   install -Dm755 "$SRC/installer/orka-install" "$PROFILE/airootfs/usr/local/bin/orka-install"
 
   log "Running mkarchiso"

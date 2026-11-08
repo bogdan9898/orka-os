@@ -2,11 +2,11 @@
 Description=OrkaOS first-boot setup
 Wants=network-online.target
 After=network-online.target
-ConditionPathExists=/usr/local/bin/orka-firstboot
+ConditionPathExists=/usr/bin/orka-firstboot
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/orka-firstboot
+ExecStart=/usr/bin/orka-firstboot
 RemainAfterExit=no
 
 [Install]

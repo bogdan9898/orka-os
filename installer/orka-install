@@ -414,12 +414,10 @@ term_palette: 1a2733;ef6461;8cc98a;e8c26b;3fa7d6;b393e0;7fd1c7;b7c5d3
 term_palette_bright: 4a5b6c;ff8a85;a8dba5;f2d48f;6cc0e8;c9b0ee;a3e3da;f1f6fa
 EOF
 
-  # Boot screen (Plymouth, branding/plymouth): the OrkaOS logo above ripples on
-  # the boot menu's background. In place before the packages, so the first
-  # initramfs already has it.
-  local theme="$TARGET/usr/share/plymouth/themes/orka"
-  install -d "$theme" "$TARGET/etc/plymouth"
-  install -m644 "$SRC"/branding/plymouth/orka/* "$theme/"
+  # Boot screen (Plymouth): the OrkaOS logo above ripples on the boot menu's
+  # background. The theme itself comes with the orka package, installed in the
+  # same transaction as the kernel; the initramfs is built at its end.
+  install -d "$TARGET/etc/plymouth"
   cat >"$TARGET/etc/plymouth/plymouthd.conf" <<'EOF'
 # OrkaOS boot screen (/usr/share/plymouth/themes/orka)
 [Daemon]
@@ -466,7 +464,9 @@ install_packages() {
   step "Installing packages (offline)"
   write_pacman_conf
   local pkgs
-  mapfile -t pkgs < <(read_list "$SRC/packages.txt"; read_list "$SRC/packages-aur.txt")
+  # orka: OrkaOS itself (shell, configs, themes, orka-* commands, services),
+  # built from this repository (pkg/), updated later from the OrkaOS repo.
+  mapfile -t pkgs < <(read_list "$SRC/packages.txt"; read_list "$SRC/packages-aur.txt"; echo orka)
   mapfile -t pkgs < <(printf '%s\n' "${pkgs[@]}" | grep -vxF -f <(printf '%s\n' "${LATE_PACKAGES[@]}"))
   info "${#pkgs[@]} packages + dependencies"
   # -K: fresh keyring in the target, -M: don't copy the live mirrorlist.
@@ -488,9 +488,9 @@ configure_system() {
   step "Configuring the system"
   genfstab -U "$TARGET" >>"$TARGET/etc/fstab"
 
-  # Files shipped with the installer (network, zram, mirrors, first-boot setup).
+  # Files written once by the installer, owned by other packages (greetd's
+  # config, the mirrorlist); everything else of OrkaOS is the orka package.
   cp -r --no-preserve=mode,ownership "$SRC/installer/target/." "$TARGET/"
-  chmod 755 "$TARGET"/usr/local/bin/orka-*
 
   echo "$ORKA_HOSTNAME" >"$TARGET/etc/hostname"
   cat >"$TARGET/etc/hosts" <<EOF
@@ -540,6 +540,16 @@ EOF
   # Snapshots before/after every pacman transaction, now that Snapper is set up.
   install_late_packages
 
+  # Updates of the orka package: the OrkaOS repository and its signing key.
+  # After the last offline package transaction: it also drops the offline
+  # repo's database, which has the same name. (Not via /tmp: arch-chroot
+  # mounts an empty tmpfs there.)
+  install -Dm644 "$SRC/pkg/join-repo.sh" "$TARGET/root/orka-join-repo.sh"
+  install -Dm644 "$SRC/pkg/orka-packages.asc" "$TARGET/root/orka-packages.asc"
+  arch-chroot "$TARGET" bash /root/orka-join-repo.sh --setup-only >>"$LOG" 2>&1 ||
+    die "could not add the OrkaOS package repository (log: $LOG)"
+  rm -f "$TARGET/root/orka-join-repo.sh" "$TARGET/root/orka-packages.asc"
+
   # A copy of the OrkaOS sources, for re-running parts of the setup later.
   install -d "$TARGET/opt/orka"
   cp -r "$SRC" "$TARGET/opt/orka/src"
@@ -547,50 +557,27 @@ EOF
   install_desktop
 }
 
-# Hyprland, bash, tmux and git defaults, orka-* commands, and the user's dotfiles.
+# The OrkaOS files themselves (Hyprland, bash, tmux and git defaults, the
+# shell, themes, apps, orka-* commands, branding) come with the orka package
+# (pkg/stage.sh). Here: what is written once, and the user's dotfiles.
 install_desktop() {
   step "Setting up the desktop (Hyprland) and shell"
-  install -d "$TARGET/usr/share/orka"
-  local d
-  for d in hypr bash tmux git; do
-    rm -rf "$TARGET/usr/share/orka/$d"
-    cp -r --no-preserve=mode,ownership "$SRC/config/$d" "$TARGET/usr/share/orka/$d"
-  done
-  # The desktop shell (Quickshell, orka-shell.service), the built-in themes,
-  # OrkaOS's own apps (apps/calculator: orka-calculator), and the folder for
-  # OrkaOS wallpapers (yours go in ~/Pictures/Wallpapers).
-  for d in shell themes apps; do
-    rm -rf "$TARGET/usr/share/orka/$d"
-    cp -r --no-preserve=mode,ownership "$SRC/$d" "$TARGET/usr/share/orka/$d"
-  done
-  install -d "$TARGET/usr/share/orka/wallpapers"
-  install -m755 "$SRC"/bin/orka-* "$TARGET/usr/local/bin/"
   install_branding
   arch-chroot "$TARGET" runuser -u "$ORKA_USER" -- env HOME="/home/$ORKA_USER" \
-    /usr/local/bin/orka-setup-user >>"$LOG" 2>&1 || die "orka-setup-user failed (log: $LOG)"
+    /usr/bin/orka-setup-user >>"$LOG" 2>&1 || die "orka-setup-user failed (log: $LOG)"
   install_nvim_bundle
   info "Login screen at boot (greetd); Hyprland starts after logging in"
 }
 
 # Neovim plugins, parsers and language servers, prepared by `build.sh nvim`,
 # so LazyVim needs no downloads on the first start.
-# The OrkaOS name and logo (branding/): os-release (kept by a pacman hook,
-# /etc/pacman.d/hooks/orka-os-release.hook), the text console banner, the
-# logo files and app icon, fastfetch's defaults.
+# The OrkaOS name in files owned by other packages: os-release (from then on
+# kept by the orka package's pacman hook, orka-os-release.hook) and the text
+# console banner. Logo, icon, fastfetch, boot screen and wallpapers are in
+# the orka package.
 install_branding() {
-  local b="$TARGET/usr/share/orka/branding"
-  install -d "$b/fastfetch"
-  install -m644 "$SRC"/branding/logo/orkaos-*.svg "$SRC/branding/os-release" "$b/"
-  install -m644 "$SRC"/branding/fastfetch/orkaos.png "$SRC"/branding/fastfetch/orkaos.txt "$b/fastfetch/"
-  install -m644 "$SRC/branding/os-release" "$TARGET/usr/lib/os-release"
+  install -m644 "$TARGET/usr/share/orka/branding/os-release" "$TARGET/usr/lib/os-release"
   printf '\e[38;2;63;167;214mOrkaOS 1.0\e[0m \\r (\\l)\n\n' >"$TARGET/etc/issue"
-  install -Dm644 "$SRC/branding/logo/orkaos-badge.svg" "$TARGET/usr/share/icons/hicolor/scalable/apps/orkaos.svg"
-  arch-chroot "$TARGET" gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor >>"$LOG" 2>&1 || true
-  install -Dm644 "$SRC/branding/fastfetch/config.jsonc" "$TARGET/etc/xdg/fastfetch/config.jsonc"
-  # Wallpapers (Settings → Wallpaper; orka-ocean.png is the default one, see
-  # config/user/orka/settings.json), plus the boot menu's light rays.
-  install -m644 "$SRC"/branding/wallpapers/*.jpg "$SRC"/branding/wallpapers/*.png "$TARGET/usr/share/orka/wallpapers/"
-  install -m644 "$SRC/branding/limine/wallpaper.jpg" "$TARGET/usr/share/orka/wallpapers/deep-water-rays.jpg"
 }
 
 install_nvim_bundle() {
@@ -626,7 +613,7 @@ finish_bootloader() {
   # Windows on other disks (also re-checked at every boot by orka-windows-entry.service,
   # for Windows disks that are disconnected during the install).
   local msg
-  msg="$(arch-chroot "$TARGET" /usr/local/bin/orka-windows-entry 2>>"$LOG")" || info "Windows scan failed (see $LOG)"
+  msg="$(arch-chroot "$TARGET" /usr/bin/orka-windows-entry 2>>"$LOG")" || info "Windows scan failed (see $LOG)"
   [[ -n "$msg" ]] && info "$msg"
 
   info "boot menu: $(grep -E '^/+' "$TARGET/boot/limine.conf" | sed 's/^ *//' | paste -sd'|' | sed 's/|/, /g')"
@@ -688,9 +675,10 @@ echo "settings: theme=$(jq -r .id "/home/$u/.config/orka/current/theme.json" 2>&
 echo "theming: qt6ct=$(as_user grep -E '^(style|icon_theme)=' "/home/$u/.config/qt6ct/qt6ct.conf" | tr '\n' ' ')kdeglobals=$(grep -c '^\[Colors:' "/home/$u/.config/kdeglobals") gtk=$(grep -c 'orka/current/gtk.css' "/home/$u/.config/gtk-3.0/gtk.css" "/home/$u/.config/gtk-4.0/gtk.css" | tr '\n' ' ')icons=$(test -f /usr/share/icons/Papirus-Dark/index.theme && echo ok) styles=$(ls /usr/lib/qt6/plugins/styles/ | tr '\n' ' ')"
 initrd="$(find /boot -name 'initramfs-linux-zen.img' 2>/dev/null | head -1)"
 echo "wallpapers: $(ls /usr/share/orka/wallpapers | tr '\n' ' ')default=$(as_user jq -r .wallpaper "/home/$u/.config/orka/settings.json")"
-echo "branding: os=[$(. /etc/os-release; echo "$NAME|$VERSION|$ID|$ID_LIKE")] plymouth=$(plymouth-set-default-theme 2>&1) initramfs-plymouth=$(lsinitcpio "$initrd" 2>/dev/null | grep -c 'plymouth/themes/orka/') hook=$(test -f /etc/pacman.d/hooks/orka-os-release.hook && echo ok) icon=$(test -f /usr/share/icons/hicolor/scalable/apps/orkaos.svg && echo ok) fastfetch=$(test -f /etc/xdg/fastfetch/config.jsonc && echo ok) cmdline=[$(grep -o 'quiet splash\|splash' /proc/cmdline | head -1)]"
+echo "branding: os=[$(. /etc/os-release; echo "$NAME|$VERSION|$ID|$ID_LIKE")] plymouth=$(plymouth-set-default-theme 2>&1) initramfs-plymouth=$(lsinitcpio "$initrd" 2>/dev/null | grep -c 'plymouth/themes/orka/') hook=$(test -f /usr/share/libalpm/hooks/orka-os-release.hook && echo ok) icon=$(test -f /usr/share/icons/hicolor/scalable/apps/orkaos.svg && echo ok) fastfetch=$(test -f /etc/xdg/fastfetch/config.jsonc && echo ok) cmdline=[$(grep -o 'quiet splash\|splash' /proc/cmdline | head -1)]"
 echo "calculator: $(python3 /usr/share/orka/apps/calculator/tests/test_calculator.py 2>&1 | tail -1) pyside6=$(python3 -c 'import PySide6.QtQuick; print("ok")' 2>&1 | tail -1) desktop=$(test -f /usr/share/applications/org.orka.Calculator.desktop && echo ok) gnome-calculator=$(pacman -Q gnome-calculator >/dev/null 2>&1 && echo installed || echo gone)"
 echo "lock: pam=$(test -f /etc/pam.d/orka-lock && echo ok || echo missing) kwallet-greetd=$(grep -c pam_kwallet5 /etc/pam.d/greetd) settings=$(as_user cat "/home/$u/.config/orka/settings.json" | tr -d ' \n')"
+echo "orka package: $(pacman -Q orka 2>&1) owned=$(pacman -Qlq orka | grep -vc '/$') unowned-orka-files=$(find /usr/share/orka /usr/bin/orka-* -type f -not -path '*/__pycache__/*' 2>/dev/null | pacman -Qo - 2>&1 | grep -c 'No package owns') usr-local-bin=$(ls /usr/local/bin | grep -c '^orka-' ) repo=$(grep -c '^\[orka\]' /etc/pacman.conf) offline-db-left=$(test -f /var/lib/pacman/sync/orka.db && echo yes || echo no) key=$(pacman-key --list-keys 3A6BF9C31940B07E97F1360C0E8E7A18FDF5DD2C >/dev/null 2>&1 && echo ok || echo missing) units=$(systemctl is-enabled orka-windows-entry.service orka-firstboot.service 2>&1 | tr '\n' ' ')"
 echo "ORKA-SELFTEST-END"
 EOF
   cat >"$TARGET/etc/systemd/system/orka-selftest.service" <<'EOF'

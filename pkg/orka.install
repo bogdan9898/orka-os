@@ -1,0 +1,47 @@
+# pacman install script of the "orka" package.
+
+# Systems installed before OrkaOS was packaged (up to 2026-11-08) got these
+# files copied by the installer. The package now ships them elsewhere:
+#   /usr/local/bin/orka-*  -> /usr/bin/orka-*  (the old copies would win in PATH)
+#   /etc/systemd/...       -> /usr/lib/systemd/... (an /etc file overrides the
+#                             packaged one, so remove the copies we put there)
+# Files in /etc are only removed when unchanged; your own edits are kept.
+_orka_migrate() {
+  local f old new unit
+  for f in /usr/bin/orka-*; do
+    rm -f "/usr/local/bin/${f##*/}"
+  done
+  for f in systemd/network/20-wired.network systemd/network/25-wireless.network \
+           systemd/resolved.conf.d/orka.conf systemd/zram-generator.conf \
+           systemd/system/greetd.service.d/plymouth.conf; do
+    old="/etc/$f" new="/usr/lib/$f"
+    [[ -f "$old" ]] && cmp -s "$old" "$new" && rm -f "$old"
+  done
+  [[ -f /etc/pacman.d/hooks/orka-os-release.hook ]] &&
+    cmp -s /etc/pacman.d/hooks/orka-os-release.hook /usr/share/libalpm/hooks/orka-os-release.hook &&
+    rm -f /etc/pacman.d/hooks/orka-os-release.hook
+  rmdir --ignore-fail-on-non-empty /etc/systemd/system/greetd.service.d 2>/dev/null || true
+  # Our old units in /etc pointed to /usr/local/bin: replace them by the
+  # packaged ones and keep them enabled as they were.
+  for unit in orka-firstboot.service orka-windows-entry.service; do
+    old="/etc/systemd/system/$unit"
+    [[ -f "$old" ]] || continue
+    local enabled=0
+    [[ -L "/etc/systemd/system/multi-user.target.wants/$unit" ]] && enabled=1
+    rm -f "$old" "/etc/systemd/system/multi-user.target.wants/$unit"
+    ((enabled)) && ln -sf "/usr/lib/systemd/system/$unit" "/etc/systemd/system/multi-user.target.wants/$unit"
+  done
+  if [[ -d /run/systemd/system ]]; then
+    systemctl daemon-reload 2>/dev/null || true
+  fi
+}
+
+post_install() {
+  _orka_migrate
+}
+
+post_upgrade() {
+  _orka_migrate
+  echo "OrkaOS updated. Hyprland and the shell reload changed files by themselves;"
+  echo "log out and back in if something looks off."
+}

@@ -5,7 +5,7 @@
 # Enabled for all users: systemctl --global enable orka-shell.service
 [Unit]
 Description=OrkaOS shell (Quickshell)
-Documentation=file:///opt/orka/src/docs/quickshell.md
+Documentation=https://github.com/bogdan9898/orka-os/blob/master/docs/quickshell.md
 PartOf=graphical-session.target
 After=graphical-session.target
 Requisite=graphical-session.target

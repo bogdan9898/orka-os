@@ -10,7 +10,7 @@ Hyprland **0.57** is configured in **Lua** (`hyprland.lua`); the old `hyprland.c
 | `~/.config/hypr/hyprland.lua` | `config/user/hypr/` | Your config: loads the defaults (`require("orka")`), then your files |
 | `~/.config/hypr/{monitors,input,looknfeel,bindings,autostart}.lua` | `config/user/hypr/` | Your overrides (loaded last, so they win) |
 | `~/.config/hypr/hypridle.conf` | `config/user/hypr/` | Only "lock before sleep"; idle lock and screen off are done by the shell (`~/.config/orka/settings.json`) |
-| `/usr/local/bin/orka-*` | `bin/` | Helper commands used by the bindings |
+| `/usr/bin/orka-*` | `bin/` | Helper commands used by the bindings |
 
 `orka-setup-user` seeds the user files and never overwrites them: if a default changed, the new version is written next to yours as `*.orka-new`.
 

@@ -19,7 +19,7 @@
 
 OrkaOS is my own Linux setup, inspired by [Omarchy](https://github.com/omacom/omarchy) but rebuilt from scratch on plain Arch: debloated, with its own name, logo, themes and desktop shell. It's made for **one machine** (see [hardware](docs/hardware-and-dual-boot.md)), dual-booted next to Windows 11, and installs **fully offline** from its own ISO.
 
-> **Status (2026-11-08):** installed and running on the real PC. Currently working on the first bugs found there and on an **update mechanism**, so changes reach the installed system without a reinstall. See the [roadmap](docs/approach.md#roadmap).
+> **Status (2026-11-08):** version 1.0, installed and running on the real PC, and **updates without reinstalling**: OrkaOS is a pacman package from this repository. Currently fixing the first bugs found on the real machine. See the [roadmap](docs/approach.md#roadmap).
 
 ## Highlights
 
@@ -52,26 +52,42 @@ OrkaOS is my own Linux setup, inspired by [Omarchy](https://github.com/omacom/om
 
 All bindings: [desktop](docs/desktop.md), or press `SUPER + K`.
 
-## Building and installing
+## Building the ISO yourself
 
-The ISO is built on Arch Linux (here: an `archlinux` WSL distro) with archiso:
+The installer ISO isn't published (it's about 3.4 GB, with every package inside so it installs offline), but you can build it yourself. Keep in mind OrkaOS is made for one machine: an AMD desktop, UEFI only, US keyboard, `Europe/Bucharest` time zone (see [hardware](docs/hardware-and-dual-boot.md)). Other hardware may need changes to `packages.txt`.
+
+**You need** an Arch Linux system (a real install, a VM, or Arch in WSL on Windows), about 15 GB of free space, internet for the first build, and these packages:
 
 ```bash
-sudo ./iso/build.sh            # all stages: aur, repo, nvim, iso
-sudo ./iso/build.sh iso        # only rebuild the ISO after config changes
+sudo pacman -S --needed archiso base-devel git python neovim tree-sitter-cli
 ```
 
-The output lands in `~/orka-build/out/`. Write it to a USB stick (or copy it onto a Ventoy stick), boot it, and `orka-install` asks for the disk, hostname, user and password. No network needed. Details, testing in QEMU and the automated install test: [ISO and installer](docs/iso.md).
+**Build:**
+
+```bash
+git clone https://github.com/bogdan9898/orka-os.git
+cd orka-os
+sudo ./iso/build.sh            # all stages: aur, repo, nvim, iso (the first time downloads ~3 GB)
+sudo ./iso/build.sh iso        # later, after changing files: only re-assemble the ISO (~5 minutes)
+```
+
+The stages: `aur` builds the AUR packages from `packages-aur.txt`, `repo` downloads every official package for the offline repository, `nvim` bundles the Neovim plugins, `iso` builds the `orka` package from your working tree and assembles the ISO. Run it with `sudo` from your normal user (AUR packages are built as that user). Everything goes to `~/orka-build/`; the ISO lands in `~/orka-build/out/orkaos-<date>-x86_64.iso`.
+
+**Install:** write the ISO to a USB stick (`dd`, Rufus in DD mode, or copy it onto a [Ventoy](https://www.ventoy.net) stick), turn **Secure Boot off**, and boot it. `orka-install` starts by itself and asks for the disk, hostname, user and password; no network needed. Then log in on the login screen.
+
+**Updates** afterwards come from this repository's package repository: `sudo pacman -Syu` updates OrkaOS together with Arch ([updates](docs/updates.md)). Details on the installer, testing in a QEMU VM and the automated install test: [ISO and installer](docs/iso.md).
 
 ## Repository layout
 
 | Path | What's in it |
 |---|---|
 | `iso/` | ISO build script, archiso profile, VM test scripts |
-| `installer/` | `orka-install` and the files it puts on the installed system |
+| `installer/` | `orka-install` and the few files it writes once (`target/`) |
+| `pkg/` | The `orka` package (OrkaOS itself): recipe, file layout, release and repository scripts |
+| `system/` | Packaged system files (services, network defaults, zram, PAM, app entries), laid out as on the system |
 | `config/` | System defaults (Hyprland in Lua, bash, tmux, git) and the user files seeded on first login (`config/user/`) |
 | `shell/` | The Quickshell desktop: bar, launcher, settings, lock and login screens, ... |
-| `bin/` | `orka-*` helper commands (settings, screenshots, night light, ...) |
+| `bin/` | `orka-*` commands (settings, screenshots, night light, ...) |
 | `apps/` | Our own apps (Orka Calculator) |
 | `themes/` | Built-in themes |
 | `branding/` | Logo, wallpapers, boot screen, boot menu, fastfetch |
@@ -91,6 +107,7 @@ On the installed system the defaults live in `/usr/share/orka/` and your own fil
 - [Neovim](docs/neovim.md): LazyVim, bundled offline
 - [Calculator](docs/calculator.md): Orka Calculator
 - [Branding](docs/branding.md): logo, name, boot screen, fastfetch, wallpapers
+- [Updates](docs/updates.md): the `orka` package, the package repository, publishing an update, the signing key
 - [Hardware and dual boot](docs/hardware-and-dual-boot.md): the target machine and the dual-boot checklist
 - [Omarchy analysis](docs/omarchy-analysis.md): what Omarchy is and what we took from it
 
@@ -104,7 +121,7 @@ On the installed system the defaults live in `/usr/share/orka/` and your own fil
 | Boot | Limine, with snapshot entries and Windows; kernel `linux-zen` with `linux` as fallback |
 | Login | Our Quickshell greeter in greetd + cage, then Hyprland via uwsm |
 | Locale | `en_US.UTF-8`, US keyboard, `Europe/Bucharest` |
-| Updates | Arch packages via `pacman -Syu`; OrkaOS's own files as pacman packages from our own repository (planned) |
+| Updates | `sudo pacman -Syu`: Arch from the Arch mirrors, OrkaOS (the `orka` package) from our own signed repository, a GitHub release ([updates](docs/updates.md)) |
 
 ### Why "Orka"?
 

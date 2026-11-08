@@ -1,11 +1,12 @@
 #!/bin/bash
 # Set up OrkaOS dotfiles for the current user. Safe to re-run: existing files
 # are never overwritten (new defaults are written next to them as *.orka-new).
-#   orka-setup-user [--src DIR]   (DIR defaults to /opt/orka/src)
+#   orka-setup-user [--src DIR]
+# The defaults come from the orka package (/usr/share/orka/user); with --src,
+# from a source checkout's config/user instead.
 set -euo pipefail
-src=/opt/orka/src
-[[ "${1:-}" == --src ]] && src="$2"
-user_cfg="$src/config/user"
+user_cfg=/usr/share/orka/user
+[[ "${1:-}" == --src ]] && user_cfg="$2/config/user"
 
 install_file() {   # install_file <from> <to> [stock file that may be replaced]
   local from="$1" to="$2" stock="${3:-}"

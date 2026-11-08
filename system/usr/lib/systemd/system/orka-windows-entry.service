@@ -5,7 +5,7 @@ RequiresMountsFor=/boot
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/orka-windows-entry
+ExecStart=/usr/bin/orka-windows-entry
 
 [Install]
 WantedBy=multi-user.target

@@ -10,7 +10,7 @@ The OrkaOS ISO is an archiso live system with the full package set baked in as a
 | `iso/live-packages.txt` | Extra packages for the live environment only (`gum`) |
 | `iso/profile/` | Overlay on archiso's `releng` profile |
 | `installer/orka-install` | The installer (runs in the live ISO) |
-| `installer/target/` | Files copied onto the installed system (network, zram, mirrors, first-boot setup) |
+| `installer/target/` | Files the installer writes once (greetd's config, the mirrorlist); everything else of OrkaOS is the `orka` package ([updates](updates.md)) |
 | `iso/test/vm.sh` | Starts the QEMU test VM |
 | `iso/test/install-test.sh` | End-to-end test: offline install + boot report |
 
@@ -42,9 +42,9 @@ Boots straight into `orka-install` on the first console. It asks for the disk, t
 1. **Partitions**: a 2 GiB ESP (FAT32) + Btrfs root, either in the largest free space (`free`, keeps Windows) or on the whole disk (`wipe`).
 2. **Btrfs subvolumes** `@`, `@home`, `@log`, `@pkg`, `zstd` compression.
 3. **Boot config before packages**: `/etc/default/limine`, a base `/boot/limine.conf`, the initramfs hooks. `limine-mkinitcpio-hook` then installs kernels into the ESP and writes the boot entries itself.
-4. **Packages** with `pacstrap` from the local repo.
+4. **Packages** with `pacstrap` from the local repo, including the **`orka` package** (OrkaOS itself, built by `build.sh iso` from the working tree; see [updates](updates.md)).
 5. **System setup**: locale, timezone, user (groups `wheel`, `docker`), services, Snapper config for `/`, KWallet PAM unlock, then `snap-pac` (pre/post snapshots for every pacman transaction).
-6. **Desktop**: Hyprland defaults to `/usr/share/orka/hypr`, `orka-*` commands to `/usr/local/bin`, the user's dotfiles via `orka-setup-user` (see [desktop](desktop.md)).
+6. **Desktop**: the OrkaOS repository and its signing key are added to `/etc/pacman.conf` (`pkg/join-repo.sh --setup-only`, for later updates), os-release and `/etc/issue` get the OrkaOS name, and `orka-setup-user` seeds the user's dotfiles from `/usr/share/orka/user` (see [desktop](desktop.md)).
 7. **Limine**: UEFI entry, fallback loader, and a Windows entry for every other disk with Windows Boot Manager. `orka-windows-entry.service` repeats the scan at every boot, so Windows disks that were disconnected during the install get their entry later.
 
 **Several disks:** the disk menu shows each disk's size, model and contents (`[empty]`, `[Windows, 4 partitions]`, ...). Only the chosen disk is touched. Erasing a disk that is not empty shows a red warning with every partition that will be deleted, and still needs the disk name typed to confirm; unattended mode refuses unless `ORKA_ERASE_NONEMPTY=1`.

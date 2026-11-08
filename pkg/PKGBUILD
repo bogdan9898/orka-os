@@ -1,0 +1,31 @@
+# OrkaOS: the "orka" package (desktop shell, configs, themes, orka-* commands,
+# services, branding). Built from this repository, not from a download:
+#   pkg/build.sh             build it (WSL / Arch, as a normal user)
+#   pkg/release.sh           build, sign and publish it to the package repo
+# The files and where they go: pkg/stage.sh.
+pkgname=orka
+pkgver=1.0.r0
+pkgrel=1
+pkgdesc="OrkaOS: Hyprland desktop, Quickshell shell, themes and tools"
+arch=(any)
+url="https://github.com/bogdan9898/orka-os"
+license=(MIT)
+backup=(
+  etc/iwd/main.conf
+  etc/pam.d/orka-lock
+  etc/xdg/fastfetch/config.jsonc
+)
+install=orka.install
+
+# pkg/build.sh runs makepkg on a copy of this file (makepkg writes the new
+# pkgver into it) and points ORKA_SRC at the repository.
+_root="${ORKA_SRC:-$startdir/..}"
+
+# 1.0.r<number of commits>: grows with every commit on master.
+pkgver() {
+  printf '1.0.r%s' "$(git -C "$_root" rev-list --count HEAD)"
+}
+
+package() {
+  bash "$_root/pkg/stage.sh" "$pkgdir"
+}

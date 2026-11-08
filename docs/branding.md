@@ -23,7 +23,7 @@ Installed to `/usr/share/orka/branding/`; the badge also as `/usr/share/icons/hi
 
 | Where | What |
 |---|---|
-| `/usr/lib/os-release` (`/etc/os-release` links to it) | `NAME="OrkaOS"`, `PRETTY_NAME="OrkaOS 1.0"`, `VERSION="1.0"`, `ID=orkaos`, `ID_LIKE=arch` (so tools that know Arch still treat it as Arch), `LOGO=orkaos`. From `branding/os-release`. The `filesystem` package ships Arch's version of this file; the pacman hook `/etc/pacman.d/hooks/orka-os-release.hook` puts ours back after each update |
+| `/usr/lib/os-release` (`/etc/os-release` links to it) | `NAME="OrkaOS"`, `PRETTY_NAME="OrkaOS 1.0"`, `VERSION="1.0"`, `ID=orkaos`, `ID_LIKE=arch` (so tools that know Arch still treat it as Arch), `LOGO=orkaos`. From `branding/os-release`. The `filesystem` package ships Arch's version of this file; the orka package's pacman hook `/usr/share/libalpm/hooks/orka-os-release.hook` puts ours back after each update |
 | `/etc/issue` | The text console banner: `OrkaOS 1.0` in the Orka blue |
 | Limine boot menu | Entries and the menu title say OrkaOS (`TARGET_OS_NAME`, `interface_branding`) |
 | ISO | `orkaos-<date>-x86_64.iso`, label `ORKAOS_<yyyymm>`, boot entry "OrkaOS installer" |
