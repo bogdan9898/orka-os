@@ -1,65 +1,115 @@
-# OrkaOS
+<p align="center">
+  <img src="branding/logo/orkaos-logo-badge.svg" alt="OrkaOS logo" width="180">
+</p>
 
-A personal, Arch-based Linux setup with its own name and branding, inspired by [Omarchy](https://github.com/omacom/omarchy). Built for one machine only (see [hardware](docs/hardware-and-dual-boot.md)), dual-booted alongside Windows 11. Not intended for public release.
+<h1 align="center">OrkaOS</h1>
 
-> Status (2026-11-08): **offline installer ISO works** (tested in QEMU, incl. Windows on another disk; **installed and running on the real PC** since 2026-11-08, from a **Ventoy** stick); **Hyprland desktop config**; **shell, terminal, git and Neovim (LazyVim, offline)**; our own **Quickshell desktop** is complete: bar, notifications, polkit agent, launcher, lock and login screens, cheat sheet, OSD, settings app with themes and wallpapers. **Orka theme "Deep water"** (+ Orka Light) colors the shell, terminal, GTK and Qt apps, with Papirus icons; the **boot menu (Limine)** is themed too. btop follows the theme, the mouse cursor (Bibata Modern Classic) can be changed in Settings, and a dark/light mode switch (SUPER + CTRL + D) changes between your dark and light theme, also for browsers. Our own **Calculator** (Standard, Expert, Programmer) replaces GNOME Calculator. **Branding**: the OrkaOS logo (bar, boot screen with ripples, fastfetch, About) and the name **OrkaOS 1.0** everywhere. Six OrkaOS wallpapers (orcas in the ocean by default). Next: fix what the real PC shows (a slow start after login is being analyzed) and an **update mechanism**, so changes reach the installed system without reinstalling (planned: OrkaOS as pacman packages in our own repository on GitHub). See the [roadmap](docs/approach.md#roadmap).
+<p align="center">
+  A personal Arch Linux desktop: Hyprland, a hand-built Quickshell interface and the orca-themed <b>Deep water</b> look.
+</p>
 
-## Naming
+<p align="center">
+  <img alt="Based on Arch Linux" src="https://img.shields.io/badge/based%20on-Arch%20Linux-1793d1?logo=archlinux&logoColor=white">
+  <img alt="Hyprland" src="https://img.shields.io/badge/compositor-Hyprland%200.57-58e1ff">
+  <img alt="Quickshell" src="https://img.shields.io/badge/shell-Quickshell-3fa9d6">
+  <img alt="Version" src="https://img.shields.io/badge/OrkaOS-1.0-0b1622">
+</p>
 
-| Use | Value |
-|---|---|
-| Display name (boot splash, login screen, about, ISO) | **OrkaOS** |
-| Command prefix | `orka` (e.g. `orka-update`, `orka-theme`) |
-| Config / state dirs | `~/.config/orka`, `~/.local/state/orka` |
-| Package / repo name | `orka` |
-| Logo idea | Orca silhouette or dorsal fin, black and white |
+![The OrkaOS desktop with the default wallpaper](docs/screenshots/desktop.png)
 
-Why "Orka" rather than "Orca": `orca` is already an Arch package (the GNOME screen reader, which installs `/usr/bin/orca`) and is crowded in the AUR (OrcaSlicer and ~25 others). `orka` is free in both the Arch repos and the AUR (checked 2026-11-05).
+OrkaOS is my own Linux setup, inspired by [Omarchy](https://github.com/omacom/omarchy) but rebuilt from scratch on plain Arch: debloated, with its own name, logo, themes and desktop shell. It's made for **one machine** (see [hardware](docs/hardware-and-dual-boot.md)), dual-booted next to Windows 11, and installs **fully offline** from its own ISO.
 
-## Goals
+> **Status (2026-11-08):** installed and running on the real PC. Currently working on the first bugs found there and on an **update mechanism**, so changes reach the installed system without a reinstall. See the [roadmap](docs/approach.md#roadmap).
 
-- Keep the spirit and structure of Omarchy (Hyprland, opinionated defaults, themes, keybindings, menus), but **debloat** it and give it **custom names and branding**.
-- Tailored to a single machine: drop everything for hardware it doesn't have.
-- Dual boot with the existing Windows 11 install.
-- A **custom OrkaOS ISO** that installs fully offline (done, see [ISO and installer](docs/iso.md)).
-- Eventually: a custom desktop shell (bar, widgets, launcher, notifications, lock screen) written in **Quickshell**.
+## Highlights
 
-## Decisions so far
+- **Own desktop shell in Quickshell**: bar, launcher, notifications, on-screen display, lock screen, login screen, polkit agent and a searchable keyboard shortcut cheat sheet. No Waybar, Mako, Walker or SDDM.
+- **Settings app**: theme, wallpaper, mouse cursor, animations, display, idle & lock, sound, night light, keyboard.
+- **Themes everywhere**: Orka "Deep water" and Orka Light, plus Catppuccin and Tokyo Night. They color the shell, Ghostty, Neovim, btop, GTK and Qt apps. A **dark / light mode** switch (SUPER + CTRL + D) also tells browsers.
+- **Offline installer**: one ISO with every package baked in (AUR included). Btrfs with **Snapper snapshots** you can boot into from the **Limine** menu, and Windows added to the boot menu automatically.
+- **Branding**: boot screen with the logo above ripples on the water, a themed boot menu, fastfetch logo, six orca wallpapers, and the name **OrkaOS 1.0** throughout the system.
+- **Orka Calculator**: our own calculator (Standard, Expert, Programmer) in Python + Qt Quick.
+- **Ready-to-use terminal**: Ghostty, tmux, starship, `eza` / `zoxide` / `fzf`, and Neovim (LazyVim) working offline on the first start.
 
-| Topic | Decision | Notes |
+## Screenshots
+
+| Launcher | Settings | Keyboard shortcuts |
 |---|---|---|
-| Audience | Personal, single machine | No package repo, mirrors, signing or release channels needed |
-| Base | Arch Linux | |
-| Approach | **Own install script on base Arch** | Rather than forking and debloating Omarchy v4. See [approach](docs/approach.md) |
-| Reference source | Omarchy **v3.8.4** (MIT) | The last release built from standard tools (Waybar, Walker, Mako, SwayOSD) |
-| ISO | **Custom OrkaOS ISO, built now** (archiso) | Installs **fully offline**: all packages, including AUR ones, baked in as a local repo |
-| Build / test machine | `archlinux` WSL distro | QEMU + KVM + VirGL test VM. See [hardware & dual boot](docs/hardware-and-dual-boot.md#test-environment) |
-| Disk layout | **Dedicated disk: 2 GB ESP + Btrfs with Snapper snapshots, no encryption** | Windows disks are disconnected during the install; their boot entry is added automatically afterwards |
-| Bootloader | **Limine** | Windows entry, snapshot boot entries |
-| Kernel | **`linux-zen`**, with stock `linux` as fallback | Omarchy's custom kernel isn't needed on this hardware |
-| Locale | `en_US.UTF-8`, US keyboard, `Europe/Bucharest` | Taken from the Windows settings |
-| Desktop shell | **Our own Quickshell shell, no stock tools** | No Waybar, Mako, SwayOSD, Hyprlock, Walker or SDDM. The login screen runs in greetd + cage. See [quickshell](docs/quickshell.md) |
-| Login screen | **Our Quickshell greeter via greetd** (in the cage compositor) | Password login, then Hyprland via uwsm |
+| ![App launcher](docs/screenshots/launcher.png) | ![Settings app, Theme page](docs/screenshots/settings.png) | ![Keyboard shortcut cheat sheet](docs/screenshots/cheatsheet.png) |
 
-## Open questions
+## Essential shortcuts
 
-- Theme and look: colors, wallpapers, logo design, fonts (current set is a placeholder; see [roadmap](docs/approach.md#roadmap)).
+| Keys | Action |
+|---|---|
+| `SUPER + RETURN` | Terminal (Ghostty) |
+| `SUPER + SPACE` | App launcher (also runs a typed command) |
+| `SUPER + K` | Every keyboard shortcut, searchable |
+| `SUPER + ALT + SPACE` | Settings |
+| `SUPER + W` | Close the window (or the open panel) |
+| `SUPER + CTRL + D` | Dark / light mode |
+| `SUPER + CTRL + L` | Lock the screen |
+| `PRINT` | Screenshot of a region |
 
-## Docs
+All bindings: [desktop](docs/desktop.md), or press `SUPER + K`.
 
-- [Omarchy analysis](docs/omarchy-analysis.md): what Omarchy is, license, structure, why it patches its kernel and packages
-- [Approach](docs/approach.md): fork vs. own script, proposed repo layout, roadmap
-- [Packages](docs/packages.md): what's in the package lists and what was dropped from Omarchy
-- [ISO and installer](docs/iso.md): building the offline ISO, what the installer does, testing in QEMU
+## Building and installing
+
+The ISO is built on Arch Linux (here: an `archlinux` WSL distro) with archiso:
+
+```bash
+sudo ./iso/build.sh            # all stages: aur, repo, nvim, iso
+sudo ./iso/build.sh iso        # only rebuild the ISO after config changes
+```
+
+The output lands in `~/orka-build/out/`. Write it to a USB stick (or copy it onto a Ventoy stick), boot it, and `orka-install` asks for the disk, hostname, user and password. No network needed. Details, testing in QEMU and the automated install test: [ISO and installer](docs/iso.md).
+
+## Repository layout
+
+| Path | What's in it |
+|---|---|
+| `iso/` | ISO build script, archiso profile, VM test scripts |
+| `installer/` | `orka-install` and the files it puts on the installed system |
+| `config/` | System defaults (Hyprland in Lua, bash, tmux, git) and the user files seeded on first login (`config/user/`) |
+| `shell/` | The Quickshell desktop: bar, launcher, settings, lock and login screens, ... |
+| `bin/` | `orka-*` helper commands (settings, screenshots, night light, ...) |
+| `apps/` | Our own apps (Orka Calculator) |
+| `themes/` | Built-in themes |
+| `branding/` | Logo, wallpapers, boot screen, boot menu, fastfetch |
+| `docs/` | Documentation, see below |
+
+On the installed system the defaults live in `/usr/share/orka/` and your own files in `~/.config/` (never overwritten). Settings are stored in `~/.config/orka/settings.json`.
+
+## Documentation
+
+- [Approach and roadmap](docs/approach.md): own script vs. forking Omarchy, roadmap, known issues
+- [ISO and installer](docs/iso.md): building the offline ISO, what the installer does, testing in QEMU, Ventoy
+- [Packages](docs/packages.md): the package lists and what was dropped from Omarchy
 - [Desktop](docs/desktop.md): Hyprland (Lua) config layout and key bindings
-- [Shell and terminal](docs/shell.md): bash, starship, Ghostty, tmux and git configs, aliases and key bindings
-- [Neovim](docs/neovim.md): LazyVim, bundled offline into the ISO
-- [Settings](docs/settings.md): the OrkaOS settings app, `orka-settings`, themes and wallpapers
-- [Calculator](docs/calculator.md): Orka Calculator (Standard, Expert, Programmer), Python + Qt Quick
-- [Branding](docs/branding.md): the logo, the OrkaOS 1.0 name, boot screen (Plymouth), fastfetch
-- [Quickshell](docs/quickshell.md): building our own bar, widgets, lock screen and more
-- [Hardware & dual boot](docs/hardware-and-dual-boot.md): target machine specs and the dual-boot checklist
+- [Quickshell](docs/quickshell.md): the bar, launcher, notifications, lock and login screens
+- [Settings](docs/settings.md): the settings app, `orka-settings`, themes, wallpapers, dark / light mode
+- [Shell and terminal](docs/shell.md): bash, starship, Ghostty, tmux and git
+- [Neovim](docs/neovim.md): LazyVim, bundled offline
+- [Calculator](docs/calculator.md): Orka Calculator
+- [Branding](docs/branding.md): logo, name, boot screen, fastfetch, wallpapers
+- [Hardware and dual boot](docs/hardware-and-dual-boot.md): the target machine and the dual-boot checklist
+- [Omarchy analysis](docs/omarchy-analysis.md): what Omarchy is and what we took from it
 
-## License note
+## Key decisions
 
-Anything copied or adapted from Omarchy is MIT-licensed. Keep its copyright notice (`Copyright (c) David Heinemeier Hansson`) in our `LICENSE` alongside our own. The "Omarchy" name and logo are not ours to use, so all of them must be replaced.
+| Topic | Decision |
+|---|---|
+| Base | Arch Linux with our own install script, not a fork of Omarchy ([why](docs/approach.md)) |
+| Reference | Omarchy **v3.8.4** (MIT), the last release built from standard tools |
+| Disk | Dedicated disk: 2 GiB ESP + Btrfs with Snapper snapshots, no encryption |
+| Boot | Limine, with snapshot entries and Windows; kernel `linux-zen` with `linux` as fallback |
+| Login | Our Quickshell greeter in greetd + cage, then Hyprland via uwsm |
+| Locale | `en_US.UTF-8`, US keyboard, `Europe/Bucharest` |
+| Updates | Arch packages via `pacman -Syu`; OrkaOS's own files as pacman packages from our own repository (planned) |
+
+### Why "Orka"?
+
+`orca` is already taken in Arch (the GNOME screen reader installs `/usr/bin/orca`) and crowded in the AUR (OrcaSlicer and about 25 others). `orka` was free in both (checked 2026-11-05). So the commands are `orka-*`, the config lives in `~/.config/orka`, and the display name is **OrkaOS**.
+
+## License
+
+Parts adapted from Omarchy are MIT-licensed, `Copyright (c) David Heinemeier Hansson`; that notice must be kept alongside ours. The Omarchy name and logo are not used. The OrkaOS logo is my own design.
