@@ -17,7 +17,9 @@ RowLayout {
 
     spacing: 0
 
-    function focus(target) {
+    // Not named "focus": every Item already has a focus property, which
+    // hides a function of that name (clicks did nothing).
+    function goTo(target) {
         Hyprland.dispatch("hl.dsp.focus({ workspace = \"" + target + "\" })");
     }
 
@@ -30,8 +32,8 @@ RowLayout {
             opacity: root.existing.includes(modelData) ? 1 : 0.5
             leftPadding: 6
             rightPadding: 6
-            onClicked: root.focus(modelData)
-            onScrolled: steps => root.focus(steps > 0 ? "e-1" : "e+1")
+            onClicked: root.goTo(modelData)
+            onScrolled: steps => root.goTo(steps > 0 ? "e-1" : "e+1")
         }
     }
 }
