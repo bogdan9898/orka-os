@@ -1,8 +1,9 @@
 // Keyboard shortcut cheat sheet (SUPER + K): every Hyprland binding (windows,
 // apps, notifications, ...) and every tmux binding, grouped by section, in
 // columns. Read fresh from `orka-keys` each time it opens, so it always shows
-// the bindings as they are now. Type to filter; Escape or a click outside
-// closes it. IPC target "cheatsheet": toggle | open | close.
+// the bindings as they are now. Type to filter; Escape, SUPER + W (see
+// hypr/orka/bindings/tiling.lua) or a click outside closes it.
+// IPC target "cheatsheet": toggle | open | close.
 import QtQuick
 import QtQuick.Layouts
 import Quickshell

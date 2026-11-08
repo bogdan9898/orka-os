@@ -4,7 +4,21 @@ local bind = section("Windows")
 local workspace = section("Workspaces")
 local group = section("Groups (tabs)")
 
-bind("SUPER + W",         hl.dsp.window.close(),                          "Close window")
+-- SUPER + W closes a full-screen OrkaOS panel (cheat sheet, launcher,
+-- settings) when one is open: they take the keyboard, so otherwise the
+-- window hidden under the panel would close instead. Else the window.
+local panels = { ["orka-cheatsheet"] = "cheatsheet", ["orka-launcher"] = "launcher", ["orka-settings"] = "settings" }
+local function close_panel_or_window()
+    for _, layer in ipairs(hl.get_layers()) do
+        local target = panels[layer.namespace]
+        if target and layer.mapped then
+            hl.exec_cmd("qs -p /usr/share/orka/shell ipc call " .. target .. " close")
+            return
+        end
+    end
+    hl.dispatch(hl.dsp.window.close())
+end
+bind("SUPER + W",         close_panel_or_window,                          "Close window (or open panel)")
 bind("SUPER + J",          hl.dsp.layout("togglesplit"),                   "Toggle window split")
 bind("SUPER + P",          hl.dsp.window.pseudo(),                         "Pseudo window")
 bind("SUPER + T",          hl.dsp.window.float({ action = "toggle" }),     "Toggle floating/tiling")
