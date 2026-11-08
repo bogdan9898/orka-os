@@ -61,7 +61,7 @@ Based on Omarchy v3.8.4. `SUPER + K` opens the cheat sheet with every shortcut (
 | `SUPER + SHIFT + RETURN`, `SUPER + SHIFT + B` | Firefox (`+ ALT`: private) |
 | `SUPER + SHIFT + F` | Dolphin |
 | `SUPER + SHIFT + Y` | Yazi |
-| `SUPER + SHIFT + N` / `SUPER + SHIFT + S` | Neovim / Sublime Text |
+| `SUPER + SHIFT + N` / `SUPER + SHIFT + E` | Neovim / Sublime Text |
 | `SUPER + SHIFT + O` | LibreOffice |
 | `SUPER + SHIFT + D` / `SUPER + SHIFT + G` | lazydocker / lazygit |
 | `SUPER + CTRL + T / A / B / W` | btop / audio (wiremix) / Bluetooth (bluetui) / Wi-Fi (impala) |
@@ -77,6 +77,7 @@ Based on Omarchy v3.8.4. `SUPER + K` opens the cheat sheet with every shortcut (
 | `SUPER + ALT + ,` / `SUPER + SHIFT + ALT + ,` | Invoke last notification / bring back the last one that disappeared |
 | `SUPER + CTRL + ,` | Do not disturb (only critical notifications pop up) |
 | `SUPER + C / V / X` | Copy / paste / cut (works in terminals too) |
+| `SUPER + SHIFT + S` | Screenshot of a region: copied to the clipboard and saved to `~/Pictures/Screenshots`; click the popup to draw on it (satty) |
 | `PRINT` / `SHIFT + PRINT` | Screenshot region / screen (edit in satty) |
 | `SUPER + CTRL + PRINT` | Copy text from a screen region (OCR) |
 | `ALT + PRINT` | Start/stop screen recording |

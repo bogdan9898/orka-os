@@ -13,6 +13,7 @@
 #   "@N <command>"    type the text + Enter, wait N seconds (default 4)
 #   "%<text>"         type the text without Enter
 #   "^x,y"            mouse click at screen pixel x,y (QMP, scaled for 1280x800)
+#   "^x1,y1-x2,y2"    drag with the left button from x1,y1 to x2,y2 (e.g. slurp)
 #   "#<monitor cmd>"  a raw QEMU monitor command
 #
 # Environment:
@@ -48,6 +49,14 @@ for line in "$@"; do
     mon "sendkey ${line#!}"; sleep "${KEYWAIT:-2}"
   elif [[ $line == \#* ]]; then   # "#<monitor command>", e.g. "#mouse_move 0 100"
     mon "${line#\#}"; sleep 1
+  elif [[ $line =~ ^\^([0-9]+),([0-9]+)-([0-9]+),([0-9]+)$ ]]; then   # "^x1,y1-x2,y2": drag with the left button
+    abs() { echo '{"execute":"input-send-event","arguments":{"events":[{"type":"abs","data":{"axis":"x","value":'$(( $1 * 32767 / 1280 ))'}},{"type":"abs","data":{"axis":"y","value":'$(( $2 * 32767 / 800 ))'}}]}}'; }
+    btn() { echo '{"execute":"input-send-event","arguments":{"events":[{"type":"btn","data":{"down":'$1',"button":"left"}}]}}'; }
+    x1=${BASH_REMATCH[1]} y1=${BASH_REMATCH[2]} x2=${BASH_REMATCH[3]} y2=${BASH_REMATCH[4]}
+    { echo '{"execute":"qmp_capabilities"}'; sleep 0.1; abs "$x1" "$y1"; sleep 0.15; abs "$x1" "$y1"; sleep 0.15; btn true; sleep 0.1
+      for s in 1 2 3 4 5 6 7 8; do abs $(( x1 + (x2 - x1) * s / 8 )) $(( y1 + (y2 - y1) * s / 8 )); sleep 0.05; done
+      sleep 0.1; btn false; sleep 0.2; } | socat - UNIX-CONNECT:/tmp/orka-qmp.sock >/dev/null 2>&1
+    sleep "${CLICKWAIT:-1.5}"
   elif [[ $line =~ ^\^([0-9]+),([0-9]+)$ ]]; then   # "^x,y": click at screen pixel x,y (1280x800)
     ax=$(( BASH_REMATCH[1] * 32767 / 1280 )); ay=$(( BASH_REMATCH[2] * 32767 / 800 ))
     move='{"execute":"input-send-event","arguments":{"events":[{"type":"abs","data":{"axis":"x","value":'$ax'}},{"type":"abs","data":{"axis":"y","value":'$ay'}}]}}'

@@ -28,6 +28,9 @@ Rectangle {
         return Quickshell.iconPath(src, true);   // an icon name
     }
     readonly property string picture: resolve(n.image) || resolve(n.appIcon)
+    // A picture worth seeing, not an icon (orka-screenshot sends the hint
+    // x-orka-preview): shown large under the text instead of the 40 px icon.
+    readonly property bool preview: picture !== "" && n.hints["x-orka-preview"] === true
 
     implicitHeight: content.implicitHeight + 24
     color: Theme.background
@@ -49,7 +52,7 @@ Rectangle {
         spacing: 12
 
         IconImage {
-            visible: card.picture !== ""
+            visible: card.picture !== "" && !card.preview
             source: card.picture
             implicitSize: 40
             Layout.alignment: Qt.AlignTop
@@ -82,6 +85,20 @@ Rectangle {
                 maximumLineCount: 6
                 elide: Text.ElideRight
                 onLinkActivated: link => Qt.openUrlExternally(link)
+            }
+            Image {
+                id: previewImage
+                visible: card.preview
+                Layout.fillWidth: true
+                Layout.topMargin: 4
+                // The picture's shape, at most 160 px high.
+                Layout.preferredHeight: visible && implicitWidth > 0 ? Math.min(160, width * implicitHeight / implicitWidth) : 0
+                source: card.preview ? card.picture : ""
+                sourceSize.width: 712
+                fillMode: Image.PreserveAspectFit
+                horizontalAlignment: Image.AlignLeft
+                asynchronous: true
+                cache: false
             }
             Flow {
                 Layout.fillWidth: true

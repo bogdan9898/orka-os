@@ -48,7 +48,8 @@ OrkaOS is my own Linux setup, inspired by [Omarchy](https://github.com/omacom/om
 | `SUPER + W` | Close the window (or the open panel) |
 | `SUPER + CTRL + D` | Dark / light mode |
 | `SUPER + CTRL + L` | Lock the screen |
-| `PRINT` | Screenshot of a region |
+| `SUPER + SHIFT + S` | Screenshot of a region, copied to the clipboard |
+| `PRINT` | Screenshot of a region, opened in the editor |
 
 All bindings: [desktop](docs/desktop.md), or press `SUPER + K`.
 

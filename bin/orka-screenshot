@@ -1,8 +1,11 @@
 #!/bin/bash
-# Screenshots: orka-screenshot region|screen|text
+# Screenshots: orka-screenshot region|snip|screen|text
 #   region  select an area, open it in satty (annotate, copy, save)
+#   snip    select an area: copied to the clipboard and saved right away; the
+#           notification shows it, clicking it opens satty to draw on it
 #   screen  the focused monitor, open it in satty
 #   text    select an area, OCR it (tesseract), copy the text
+# Escape while selecting cancels. Files go to ~/Pictures/Screenshots.
 set -euo pipefail
 dir="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")/Screenshots"
 mkdir -p "$dir"
@@ -12,11 +15,25 @@ case "${1:-region}" in
   region)
     area="$(slurp)" || exit 0
     grim -g "$area" - | satty --filename - --output-filename "$file" --copy-command wl-copy --early-exit ;;
+  snip)
+    area="$(slurp)" || exit 0
+    grim -g "$area" "$file"
+    wl-copy --type image/png < "$file"
+    # -w waits for the click; the default action is what clicking the popup
+    # does. A popup that times out is only hidden, not closed, so stop
+    # waiting after 10 minutes. x-orka-preview: the shell shows the picture
+    # large instead of as an icon.
+    action="$(timeout 600 notify-send -a Screenshot -w -t 10000 -A default=Edit \
+      -h "string:image-path:file://$file" -h "boolean:x-orka-preview:true" \
+      "Screenshot copied" "Saved to Pictures/Screenshots. Click to draw on it.")" || true
+    if [[ "$action" == default ]]; then
+      satty --filename "$file" --output-filename "$file" --copy-command wl-copy --early-exit
+    fi ;;
   screen)
     output="$(hyprctl -j monitors | jq -r '.[] | select(.focused) | .name')"
     grim -o "$output" - | satty --filename - --output-filename "$file" --copy-command wl-copy --early-exit ;;
   text)
     area="$(slurp)" || exit 0
     grim -g "$area" - | tesseract - - -l eng 2>/dev/null | wl-copy ;;
-  *) echo "usage: orka-screenshot region|screen|text" >&2; exit 1 ;;
+  *) echo "usage: orka-screenshot region|snip|screen|text" >&2; exit 1 ;;
 esac

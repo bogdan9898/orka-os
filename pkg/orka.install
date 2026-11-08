@@ -36,12 +36,31 @@ _orka_migrate() {
   fi
 }
 
+# Hyprland reloads its config as soon as a file changes, so during an upgrade
+# it can catch a file pacman is just replacing and fall into its emergency
+# mode (no bindings). Reload every running Hyprland once more, with all files
+# in place.
+_orka_reload_hyprland() {
+  local sock dir sig uid user
+  for sock in /run/user/*/hypr/*/.socket.sock; do
+    [[ -S "$sock" ]] || continue
+    dir="${sock%/.socket.sock}"
+    sig="${dir##*/}"
+    uid="${dir#/run/user/}"; uid="${uid%%/*}"
+    user="$(id -nu "$uid" 2>/dev/null)" || continue
+    runuser -u "$user" -- env XDG_RUNTIME_DIR="/run/user/$uid" HYPRLAND_INSTANCE_SIGNATURE="$sig" \
+      hyprctl reload >/dev/null 2>&1 || true
+  done
+}
+
 post_install() {
   _orka_migrate
+  _orka_reload_hyprland
 }
 
 post_upgrade() {
   _orka_migrate
+  _orka_reload_hyprland
   echo "OrkaOS updated. Hyprland and the shell reload changed files by themselves;"
   echo "log out and back in if something looks off."
 }

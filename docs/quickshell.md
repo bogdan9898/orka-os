@@ -75,7 +75,7 @@ The shell is the notification daemon (`NotificationServer` in `Notifications.qml
 - **Click:** the app's default action (e.g. open the chat), then the popup closes; without one it just closes. **Right click:** dismiss. Other actions are shown as buttons.
 - A popup that timed out isn't gone: the last 20 are kept, and `SUPER + SHIFT + ALT + ,` brings the latest back.
 - **Do not disturb** (`SUPER + CTRL + ,`, bell icon in the bar): nothing pops up except critical notifications; the rest are kept for restoring.
-- Shows the image an app sends, otherwise its icon; the body may use `<b>`, `<i>`, `<u>` and links.
+- Shows the image an app sends, otherwise its icon; the body may use `<b>`, `<i>`, `<u>` and links. With the hint `x-orka-preview` (`notify-send -h boolean:x-orka-preview:true`) the image is shown large under the text instead of as an icon: `orka-screenshot snip` (SUPER + SHIFT + S) uses it for the screenshot preview.
 
 | Keys | Command | Action |
 |---|---|---|

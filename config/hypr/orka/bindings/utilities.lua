@@ -12,6 +12,7 @@ system("SUPER + SHIFT + K",      apps.tui("orka-keybindings", "keybindings"), "S
 system("SUPER + ALT + SPACE",    "qs -p /usr/share/orka/shell ipc call settings toggle", "Settings")
 
 -- Screenshots, recording, color picker, OCR
+capture("SUPER + SHIFT + S",      "orka-screenshot snip",               "Screenshot region to clipboard (click the popup to edit)")
 capture("PRINT",                  "orka-screenshot region",             "Screenshot (region, edit)")
 capture("SHIFT + PRINT",          "orka-screenshot screen",             "Screenshot (screen, edit)")
 capture("ALT + PRINT",            "orka-screenrecord",                  "Start/stop screen recording")

@@ -20,7 +20,7 @@ No reinstall, and no ISO involved: the ISO is only for installing. If an update 
 
 Your own files are never touched by an update: the package only owns system files. Your dotfiles in `~/.config` were seeded once by `orka-setup-user`; when a default changes, run `orka-setup-user` and it writes the new version next to yours as `*.orka-new`. The three files in `/etc` that the package owns (`/etc/iwd/main.conf`, `/etc/pam.d/orka-lock`, `/etc/xdg/fastfetch/config.jsonc`) are marked as config files: if you edited one, pacman keeps yours and saves the new one as `.pacnew`.
 
-Hyprland and the Quickshell shell notice changed files and reload them by themselves; if something looks off after an update, log out and back in.
+Hyprland and the Quickshell shell notice changed files and reload them by themselves. Hyprland can catch a file while pacman is replacing it and fall into its emergency mode (seen once in the VM test), so the package's install script reloads every running Hyprland once more at the end of the update. If something still looks off after an update, log out and back in.
 
 **Not in the package** (the installer writes them once; an update doesn't change them): greetd's config (the login screen command), the mirrorlist, Plymouth's and mkinitcpio's config, the boot menu (`/boot/limine.conf` and its wallpaper on the ESP), os-release's first copy (afterwards the package's hook keeps it), `/etc/issue`, hostname, users. A change to the boot screen theme takes effect with the next initramfs build (kernel update, or `sudo limine-update`).
 
