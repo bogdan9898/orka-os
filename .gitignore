@@ -1,4 +1,7 @@
-# ISO build output (large; tracked in TEMP-FILES.md, never committed)
+# Local list of temporary files on the build PC (personal, not published)
+TEMP-FILES.md
+
+# ISO build output (large, never committed)
 iso/work/
 iso/out/
 iso/repo/

@@ -31,7 +31,7 @@ sudo ./iso/build.sh iso        # only re-assemble the ISO (installer changes)
 | `nvim` | Runs Neovim headless with the LazyVim config (`config/user/nvim`): installs the plugins at the commits in `lazy-lock.json`, the treesitter parsers and the Mason tools (`iso/nvim-bundle.lua`), and packs them as `nvim-data.tar.zst`. Fails if the lockfile would change. See [Neovim](neovim.md) |
 | `iso` | Copies archiso's `releng` profile, applies `iso/profile/`, renames it to OrkaOS (UEFI only), adds the repo and the installer, runs `mkarchiso` |
 
-Output: `~/orka-build/out/orkaos-YYYY.MM.DD-x86_64.iso` (about 3.2 GB). Build files live in `~/orka-build` (see [TEMP-FILES.md](../TEMP-FILES.md)).
+Output: `~/orka-build/out/orkaos-YYYY.MM.DD-x86_64.iso` (about 3.2 GB). Build files live in `~/orka-build` (caches, AUR builds, the offline repo; several GB, delete it when no longer needed).
 
 The package snapshot is whatever the Arch mirrors serve at build time. Rebuild the `repo` stage to refresh it; after installing, `pacman -Syu` updates from the normal mirrors.
 
