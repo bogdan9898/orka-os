@@ -9,6 +9,8 @@ The lists live in [`packages.txt`](../packages.txt) (official repos) and [`packa
 | Package | Why |
 |---|---|
 | `linux-zen` + `linux` | Desktop-tuned kernel, with stock as fallback |
+| `steam` + `lib32-mesa`, `lib32-vulkan-radeon` | Games (added 2026-11-08). Steam is in **[multilib]**: the build downloads from it, and the installer enables it in `/etc/pacman.conf` so updates keep coming. The 32-bit AMD drivers are listed explicitly, otherwise pacman could pick another vendor's driver for Steam's `lib32-vulkan-driver`. Steam downloads its own runtime (~500 MB) on the first start |
+| `discord` | Chat (added 2026-11-08), from `extra` |
 | `amd-ucode` | Ryzen microcode |
 | `linux-firmware-{amd,amdgpu,mediatek,realtek,whence}` | Only the firmware this hardware needs, instead of the full `linux-firmware` (12 sub-packages) |
 | `bluez`, `bluez-utils` | Bluetooth stack (Omarchy pulls these in elsewhere) |
@@ -55,7 +57,7 @@ Networking follows Omarchy v3: `iwd` + `impala` for Wi-Fi, no NetworkManager.
 |---|---|---|
 | Browser | `firefox` | `chromium` (Omarchy's default; its web-app launchers won't be ported) |
 | Terminal | `ghostty` | `alacritty` |
-| Apps | `claude-code` (AUR), `sublime-text-4` (AUR), `libreoffice-fresh`, `kdeconnect`, `pavucontrol`, `fastfetch`, `tmux` | `spotify`, `signal-desktop`, `1password-*`, `typora`, `localsend`, `obs-studio` |
+| Apps | `claude-code` (AUR), `sublime-text-4` (AUR), `libreoffice-fresh`, `kdeconnect`, `pavucontrol`, `fastfetch`, `tmux`; added 2026-11-08: `steam`, `discord` | `spotify`, `signal-desktop`, `1password-*`, `typora`, `localsend`, `obs-studio` |
 | Extras | OCR (`tesseract`), screen recording (`gpu-screen-recorder`) | printing (`cups*`), `noto-fonts-cjk`, `power-profiles-daemon` |
 | Development | `docker` (+ buildx, compose), `rust`, `python`, `gcc`/`g++` (via `base-devel`), `git` | `github-cli`, `mise`, `clang`, `llvm` |
 

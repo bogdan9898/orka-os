@@ -36,6 +36,10 @@ plymouth
 # --- Graphics (AMD) ------------------------------------------------------
 mesa
 vulkan-radeon
+# 32-bit drivers for Steam and its games ([multilib]). Named here so pacman
+# doesn't pick another vendor's driver for Steam's lib32-vulkan-driver.
+lib32-mesa
+lib32-vulkan-radeon
 
 # --- Networking & Bluetooth -----------------------------------------------
 iwd                       # Wi-Fi (Omarchy v3 uses iwd, no NetworkManager)
@@ -152,6 +156,8 @@ pavucontrol               # audio settings GUI
 kdeconnect                # phone integration (needs ufw ports 1714-1764 open)
 tesseract-data-eng        # OCR: copy text from screenshots (pulls tesseract)
 gpu-screen-recorder       # screen recording
+steam                     # games ([multilib]; downloads its runtime on the first start)
+discord                   # chat
 
 # --- Development -----------------------------------------------------------
 # gcc (C and C++ / g++) comes with base-devel; git is in Base system.

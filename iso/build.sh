@@ -143,7 +143,10 @@ stage_repo() {
   # that every dependency gets downloaded (as on a fresh install).
   local conf="$B/pacman-download.conf"
   # No DownloadUser: pacman would download as "alpm", which can't write here.
+  # [multilib] (Steam and its 32-bit libraries) whether or not the build host
+  # has it enabled.
   sed -e '/^\[multilib\]/,/^$/d' -e '/^DownloadUser/d' /etc/pacman.conf > "$conf"
+  printf '\n[multilib]\nInclude = /etc/pacman.d/mirrorlist\n' >> "$conf"
   sed -i -e "s|^#\?DBPath.*|DBPath = $PACDB/|" -e "s|^#\?CacheDir.*|CacheDir = $CACHE/|" "$conf"
   grep -q "^DBPath" "$conf"   || sed -i "/^\[options\]/a DBPath = $PACDB/" "$conf"
   grep -q "^CacheDir" "$conf" || sed -i "/^\[options\]/a CacheDir = $CACHE/" "$conf"

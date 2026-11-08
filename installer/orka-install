@@ -540,6 +540,12 @@ EOF
   # Snapshots before/after every pacman transaction, now that Snapper is set up.
   install_late_packages
 
+  # [multilib] for updates of Steam and its 32-bit libraries (Arch ships it
+  # commented out).
+  sed -i '/^#\[multilib\]$/,/^#Include/ s/^#//' "$TARGET/etc/pacman.conf"
+  grep -q '^\[multilib\]' "$TARGET/etc/pacman.conf" ||
+    printf '\n[multilib]\nInclude = /etc/pacman.d/mirrorlist\n' >>"$TARGET/etc/pacman.conf"
+
   # Updates of the orka package: the OrkaOS repository and its signing key.
   # After the last offline package transaction: it also drops the offline
   # repo's database, which has the same name. (Not via /tmp: arch-chroot
@@ -679,6 +685,7 @@ echo "branding: os=[$(. /etc/os-release; echo "$NAME|$VERSION|$ID|$ID_LIKE")] pl
 echo "calculator: $(python3 /usr/share/orka/apps/calculator/tests/test_calculator.py 2>&1 | tail -1) pyside6=$(python3 -c 'import PySide6.QtQuick; print("ok")' 2>&1 | tail -1) desktop=$(test -f /usr/share/applications/org.orka.Calculator.desktop && echo ok) gnome-calculator=$(pacman -Q gnome-calculator >/dev/null 2>&1 && echo installed || echo gone)"
 echo "lock: pam=$(test -f /etc/pam.d/orka-lock && echo ok || echo missing) kwallet-greetd=$(grep -c pam_kwallet5 /etc/pam.d/greetd) settings=$(as_user cat "/home/$u/.config/orka/settings.json" | tr -d ' \n')"
 echo "orka package: $(pacman -Q orka 2>&1) owned=$(pacman -Qlq orka | grep -vc '/$') unowned-orka-files=$(find /usr/share/orka /usr/bin/orka-* -type f -not -path '*/__pycache__/*' 2>/dev/null | pacman -Qo - 2>&1 | grep -c 'No package owns') usr-local-bin=$(ls /usr/local/bin | grep -c '^orka-' ) repo=$(grep -c '^\[orka\]' /etc/pacman.conf) offline-db-left=$(test -f /var/lib/pacman/sync/orka.db && echo yes || echo no) key=$(pacman-key --list-keys 3A6BF9C31940B07E97F1360C0E8E7A18FDF5DD2C >/dev/null 2>&1 && echo ok || echo missing) units=$(systemctl is-enabled orka-windows-entry.service orka-firstboot.service 2>&1 | tr '\n' ' ')"
+echo "apps: $(pacman -Q steam discord lib32-mesa lib32-vulkan-radeon 2>&1 | tr '\n' ' ')multilib=$(grep -c '^\[multilib\]' /etc/pacman.conf) lib32-vulkan-drivers=$(pacman -Qq | grep -E '^lib32-(vulkan|amdvlk|nvidia)' | tr '\n' ' ')"
 echo "ORKA-SELFTEST-END"
 EOF
   cat >"$TARGET/etc/systemd/system/orka-selftest.service" <<'EOF'
