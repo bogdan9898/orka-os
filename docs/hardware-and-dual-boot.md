@@ -41,5 +41,5 @@ Collected from Windows on 2026-11-05.
 
 ## Test environment
 
-- **Build / work VM:** Lubuntu VM in VirtualBox (`lubuntu`, LAN IP, bridged), reachable over SSH from WSL. Shared folder: `VirtualBox shared folder` ↔ `~/shared`.
+- **Build machine:** the `archlinux` WSL distro on the Windows PC (until 2026-11-05: a Lubuntu VM in VirtualBox).
 - **Test VM for OrkaOS:** QEMU/KVM with VirGL in the `archlinux` WSL distro (`iso/test/`). VirtualBox can boot the ISO (with EFI on) and install, but its graphics can't run the login screen: see [Known small issues](approach.md#known-small-issues).

@@ -19,7 +19,7 @@ The OrkaOS ISO is an archiso live system with the full package set baked in as a
 In the `archlinux` WSL distro (needs `archiso`, `base-devel`, `git`):
 
 ```sh
-cd /mnt/c/Users/bogdan/dev/orka-os
+cd /mnt/c/<path to>/orka-os
 sudo ./iso/build.sh            # all stages
 sudo ./iso/build.sh iso        # only re-assemble the ISO (installer changes)
 ```
