@@ -62,3 +62,5 @@ Restore with `gpg --import orka-signing-key.asc`. Never commit it.
 ## Tests
 
 Tested in the QEMU VM (2026-11-08): an install from the old ISO (files copied, no package) joined a local signed copy of the repository with `join-repo.sh`, got the package, kept its services enabled, then upgraded to a newer version and rebooted into a working desktop. A fresh install from the new ISO has the package from the start and the repository configured (self-test line `orka package:`).
+
+Testing a change as an update, without rebuilding the ISO: copy `pkg/PKGBUILD` and `pkg/orka.install` to a temporary directory, append `pkgver() { echo 1.0.r999; }` (a higher version than installed; `makepkg` resets `pkgrel` when `pkgver` changes, so raise `pkgver`, not `pkgrel`), build with `ORKA_SRC=<repo> makepkg -f --nodeps`, serve the file with `iso/test/vm-http.py` and in the VM (`VMOPTS=` for network) run `curl -sO 10.0.2.2:8000/<file>` and `sudo pacman -U <file>`. For a single shell file it's enough to `sudo tee` it over `/usr/share/orka/shell/...`; the shell reloads it.
