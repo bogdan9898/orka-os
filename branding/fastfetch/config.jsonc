@@ -2,15 +2,20 @@
 // your own ~/.config/fastfetch/config.jsonc replaces it).
 // The logo is an image, white (Ghostty shows it with the kitty graphics
 // protocol); elsewhere (the text consoles) OrkaOS's `fastfetch` shell
-// function switches to --logo-type chafa, the logo drawn with characters.
+// function switches to orkaos.txt, the logo drawn with characters.
 // Labels use the terminal's blue, which the OrkaOS themes set to the theme's
 // accent color.
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
   "logo": {
-    "type": "kitty-direct",
+    // Height only, and "kitty" (fastfetch scales the image itself with
+    // ImageMagick): it measures the terminal's cell size in pixels and works
+    // out the width from the image's shape, so the logo stays round with any
+    // font. Width and height together stretch it to that box of cells, which
+    // is square only if a cell is exactly twice as tall as wide (it isn't);
+    // "kitty-direct" with one size clears the screen and scrollback first.
+    "type": "kitty",
     "source": "/usr/share/orka/branding/fastfetch/orkaos.png",
-    "width": 30,
     "height": 15,
     "padding": { "top": 1, "left": 1, "right": 3 }
   },
