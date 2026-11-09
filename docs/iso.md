@@ -24,6 +24,16 @@ sudo ./iso/build.sh            # all stages
 sudo ./iso/build.sh iso        # only re-assemble the ISO (installer changes)
 ```
 
+**Without sudo, in Docker** (OrkaOS adds you to the `docker` group): nothing is installed on your system, the build dependencies, caches and archiso's work files stay in Docker.
+
+```sh
+iso/build-in-docker.sh            # all stages (same stage names as build.sh)
+iso/build-in-docker.sh nvim iso   # only some stages; the volume keeps the earlier ones
+iso/build-in-docker.sh --cleanup  # delete the images, the build volume, the ISO folder and Docker's build cache
+```
+
+It builds the image `orka-iso-builder` (`iso/docker/Dockerfile`: Arch, archiso and the build tools, a `builder` user with your UID), keeps the build files in the Docker volume `orka-build` (~4 GB after a full build, plus ~1.8 GB image and ~1.8 GB build cache) and writes the ISO to `~/orka-build-out/`. The container runs `--privileged`: mkarchiso's pacstrap mounts `/proc`, `/sys` and `/dev` in the image it builds. First tested 2026-11-09 on the OrkaOS PC (3.5 GB ISO). Note that the `docker` group is root-equivalent (Docker's own docs say so).
+
 | Stage | Does |
 |---|---|
 | `aur` | Clones the AUR packages from `packages-aur.txt`, installs their build dependencies, builds them with `makepkg` (as the normal user) |
@@ -31,7 +41,7 @@ sudo ./iso/build.sh iso        # only re-assemble the ISO (installer changes)
 | `nvim` | Runs Neovim headless with the LazyVim config (`config/user/nvim`): installs the plugins at the commits in `lazy-lock.json`, the treesitter parsers and the Mason tools (`iso/nvim-bundle.lua`), and packs them as `nvim-data.tar.zst`. Fails if the lockfile would change. See [Neovim](neovim.md) |
 | `iso` | Copies archiso's `releng` profile, applies `iso/profile/`, renames it to OrkaOS (UEFI only), adds the repo and the installer, runs `mkarchiso` |
 
-Output: `~/orka-build/out/orkaos-YYYY.MM.DD-x86_64.iso` (about 3.2 GB). Build files live in `~/orka-build` (caches, AUR builds, the offline repo; several GB, delete it when no longer needed).
+Output: `~/orka-build/out/orkaos-YYYY.MM.DD-x86_64.iso` (about 3.5 GB; `~/orka-build-out/` with Docker). Build files live in `~/orka-build` (caches, AUR builds, the offline repo; several GB, delete it when no longer needed).
 
 The package snapshot is whatever the Arch mirrors serve at build time. Rebuild the `repo` stage to refresh it; after installing, `pacman -Syu` updates from the normal mirrors.
 

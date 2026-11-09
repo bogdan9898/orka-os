@@ -6,7 +6,7 @@
 
 LazyVim normally downloads its plugins, treesitter parsers and language servers from GitHub the first time Neovim starts. On OrkaOS that already happened while the ISO was built:
 
-1. `iso/build.sh nvim` runs Neovim headless in a scratch home with our config, installs the plugins at the commits pinned in `config/user/nvim/lazy-lock.json` (`Lazy! restore`), then `iso/nvim-bundle.lua` installs LazyVim's parsers and Mason packages and checks that nothing is missing. The result (`~/.local/share/nvim`, ~170 MB) is packed as `nvim-data.tar.zst` on the ISO.
+1. `iso/build.sh nvim` runs Neovim headless in a scratch home with our config, installs the plugins at the commits pinned in `config/user/nvim/lazy-lock.json` (`Lazy! restore`; LazyVim itself is cloned at its pinned commit first, otherwise lazy.nvim installs it in a round of its own, rewrites the lockfile with only that, and takes the newest commit of every other plugin: found 2026-11-09), then `iso/nvim-bundle.lua` installs LazyVim's parsers and Mason packages and checks that nothing is missing. The result (`~/.local/share/nvim`, ~170 MB) is packed as `nvim-data.tar.zst` on the ISO.
 2. The installer unpacks it into the new user's `~/.local/share/nvim` and rewrites the build path inside Mason's wrapper scripts (`lua-language-server`) to the user's home. (Six compiled parsers still contain the build path as a source-file name in assert messages; it's never used.)
 
 Tested 2026-11-06 in the VM install test (self-test line `nvim`): 32 plugins, none missing, Tokyo Night loaded, `lua_ls` attached to a Lua file, treesitter active, no build paths left in text files.

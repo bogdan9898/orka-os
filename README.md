@@ -72,6 +72,8 @@ sudo ./iso/build.sh            # all stages: aur, repo, nvim, iso (the first tim
 sudo ./iso/build.sh iso        # later, after changing files: only re-assemble the ISO (~5 minutes)
 ```
 
+Or without sudo, in a Docker container (nothing gets installed on your system): `iso/build-in-docker.sh` (same stages; the ISO lands in `~/orka-build-out/`). See [ISO and installer](docs/iso.md#build).
+
 The stages: `aur` builds the AUR packages from `packages-aur.txt`, `repo` downloads every official package for the offline repository, `nvim` bundles the Neovim plugins, `iso` builds the `orka` package from your working tree and assembles the ISO. Run it with `sudo` from your normal user (AUR packages are built as that user). Everything goes to `~/orka-build/`; the ISO lands in `~/orka-build/out/orkaos-<date>-x86_64.iso`.
 
 **Install:** write the ISO to a USB stick (`dd`, Rufus in DD mode, or copy it onto a [Ventoy](https://www.ventoy.net) stick), turn **Secure Boot off**, and boot it. `orka-install` starts by itself and asks for the disk, hostname, user and password; no network needed. Then log in on the login screen.

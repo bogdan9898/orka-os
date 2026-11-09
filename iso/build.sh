@@ -204,6 +204,14 @@ stage_nvim() {
   rm -rf "$home"
   install -d -o "$BUILD_USER" -g "$BUILD_USER" "$home" "$home/.config"
   as_user cp -r --no-preserve=mode "$SRC/config/user/nvim" "$home/.config/nvim"
+  # LazyVim first, at its locked commit. Otherwise lazy.nvim installs it in
+  # a round of its own (our spec imports lazyvim.plugins, which needs it on
+  # disk), rewrites lazy-lock.json with only what is installed by then, and
+  # installs every other plugin at its newest commit instead of the locked one.
+  local lazyvim_commit
+  lazyvim_commit="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["LazyVim"]["commit"])' "$lock")"
+  as_user git clone -q https://github.com/LazyVim/LazyVim.git "$home/.local/share/nvim/lazy/LazyVim"
+  as_user git -C "$home/.local/share/nvim/lazy/LazyVim" checkout -q "$lazyvim_commit"
   (cd "$home" && as_user env -i HOME="$home" PATH=/usr/bin TERM=dumb \
      nvim --headless "+Lazy! restore" "+luafile $SRC/iso/nvim-bundle.lua") >"$B/nvim-bundle.log" 2>&1 ||
     { tail -20 "$B/nvim-bundle.log"; die "Neovim bundle failed, see $B/nvim-bundle.log"; }
