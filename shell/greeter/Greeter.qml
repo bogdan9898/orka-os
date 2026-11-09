@@ -19,11 +19,10 @@ FloatingWindow {
     color: Theme.background
 
     // The session greetd starts after a successful login.
-    // uwsm prints its progress on the console the session starts on (tty1),
-    // which shows for a moment between the greeter and Hyprland. Its messages
-    // also go to the journal (uwsm misc.py: print, then log), so the console
-    // copy is dropped; the console is cleared and its cursor hidden first.
-    readonly property var session: ["sh", "-c", "printf '\\033[H\\033[2J\\033[?25l'; exec uwsm start -e -D Hyprland hyprland.desktop >/dev/null 2>&1"]
+    // orka-session (bin/): clears the console and starts Hyprland through
+    // uwsm without its progress text. One word: greetd joins the command's
+    // words with spaces and runs them through a shell.
+    readonly property var session: ["orka-session"]
     readonly property var sessionEnv: ["XDG_SESSION_TYPE=wayland", "XDG_CURRENT_DESKTOP=Hyprland", "XDG_SESSION_DESKTOP=Hyprland"]
 
     property var users: []

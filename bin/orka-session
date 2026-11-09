@@ -1,0 +1,16 @@
+#!/bin/sh
+# The desktop session the login screen starts (shell/greeter/Greeter.qml),
+# through greetd. Starts Hyprland through uwsm, like Hyprland's own
+# hyprland-uwsm session.
+#
+# A script and not an inline `sh -c '...'` in the greeter: greetd joins the
+# command's words with spaces and runs them through a shell
+# (greetd/src/session/worker.rs: `exec {}`, cmd.join(" ")), which broke the
+# quoting and ended the session at once (orka r60, 2026-11-10).
+#
+# uwsm prints its progress on the console the session starts on (tty1),
+# visible for a moment before Hyprland takes the screen. Every message also
+# goes to the journal (journalctl -t uwsm), so the console copy is dropped;
+# the console is cleared and its cursor hidden first.
+printf '\033[H\033[2J\033[?25l'
+exec uwsm start -e -D Hyprland hyprland.desktop >/dev/null 2>&1
