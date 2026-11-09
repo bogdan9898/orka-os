@@ -16,10 +16,10 @@ The OrkaOS ISO is an archiso live system with the full package set baked in as a
 
 ## Build
 
-In the `archlinux` WSL distro (needs `archiso`, `base-devel`, `git`):
+On any Arch Linux system (an OrkaOS or Arch install, a VM, or Arch in WSL), as your normal user with `sudo`. Step by step, with what you need: [README: Building the ISO yourself](../README.md#building-the-iso-yourself).
 
 ```sh
-cd /mnt/c/<path to>/orka-os
+sudo pacman -S --needed archiso base-devel git python neovim tree-sitter-cli
 sudo ./iso/build.sh            # all stages
 sudo ./iso/build.sh iso        # only re-assemble the ISO (installer changes)
 ```
