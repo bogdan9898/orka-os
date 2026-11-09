@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Scripted desktop test in the installed VM: boots it (iso/test/vm.sh), logs
 # in, then runs each argument as a step and saves a screenshot after each
-# (shot1.png, shot2.png, ... in $SHOTS, default /tmp/orka-shots). Run as the
-# build user inside the archlinux WSL distro, in ONE `wsl ... bash -c` call
-# (the VM dies when the wsl call returns). Needs socat and imagemagick.
+# (shot1.png, shot2.png, ... in $SHOTS, default /tmp/orka-shots). Run as your
+# normal user on OrkaOS / Arch; from Windows, inside the archlinux WSL distro
+# in ONE `wsl ... bash -c` call (the VM dies when the wsl call returns).
+# Needs qemu-desktop, edk2-ovmf, socat and imagemagick.
 #
 #   iso/test/vm-session.sh "@20 tester" "!meta_l-ret" "@3 ls" ...
 #

@@ -47,7 +47,9 @@ if [[ ! -f seed.iso ]]; then
   [[ -f id_orka ]] || ssh-keygen -q -t ed25519 -N "" -f id_orka -C orka-test
   printf '#cloud-config\nusers:\n  - name: root\n    ssh_authorized_keys:\n      - %s\n' "$(cat id_orka.pub)" > user-data
   printf 'instance-id: orka-test\n' > meta-data
-  mkisofs -quiet -output seed.iso -volid cidata -joliet -rock user-data meta-data
+  # mkisofs (cdrtools) or xorrisofs (libisoburn, which archiso pulls in).
+  mkiso=mkisofs; command -v mkisofs >/dev/null || mkiso=xorrisofs
+  "$mkiso" -quiet -o seed.iso -V cidata -J -R user-data meta-data
 fi
 
 net="user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:2222-:22"
@@ -70,11 +72,18 @@ args+=(
   -serial file:/tmp/orka-serial.log
 )
 if ((GUI)); then
-  # WSL: Mesa may pick llvmpipe by default; force the d3d12 driver (real GPU).
-  export GALLIUM_DRIVER=d3d12
+  if [[ -d /mnt/wslg ]]; then
+    # WSL: Mesa may pick llvmpipe by default; force the d3d12 driver (real
+    # GPU). Sound through WSLg's PulseAudio server.
+    export GALLIUM_DRIVER=d3d12
+    audio=(-audiodev pa,id=snd0,server=unix:/mnt/wslg/PulseServer)
+  else
+    # A real Linux desktop (OrkaOS): the GPU directly, sound through PipeWire.
+    audio=(-audiodev pipewire,id=snd0)
+  fi
   # shellcheck disable=SC2054
   args+=(-device virtio-vga-gl -display gtk,gl=on
-         -audiodev pa,id=snd0,server=unix:/mnt/wslg/PulseServer -device ich9-intel-hda -device hda-output,audiodev=snd0)
+         "${audio[@]}" -device ich9-intel-hda -device hda-output,audiodev=snd0)
 else
   # A silent sound card, so the guest has an audio output and a microphone
   # (volume, mute and the OSD can be tested headless).

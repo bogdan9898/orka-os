@@ -4,7 +4,8 @@
 #
 #   iso/test/install-test.sh [ISO] [--mode wipe|free] [--windows-disk during|later] [--gui]
 #
-# ISO defaults to the newest one in ~/orka-build/out.
+# ISO defaults to the newest one in ~/orka-build/out (iso/build.sh) or
+# ~/orka-build-out (iso/build-in-docker.sh).
 # --mode free          first creates a fake "Windows" layout on the target
 #                      disk, to test installing next to it.
 # --windows-disk WHEN  adds a second disk with a fake Windows installation:
@@ -27,7 +28,9 @@ while (($#)); do
   esac
   shift
 done
-[[ -n "$ISO" ]] || ISO="$(ls -t "$HOME"/orka-build/out/*.iso 2>/dev/null | head -1)"
+# Newest ISO from iso/build.sh (~/orka-build/out) or iso/build-in-docker.sh (~/orka-build-out).
+# (ls fails when one of the two folders has no ISO: not an error here.)
+[[ -n "$ISO" ]] || ISO="$( { ls -t "$HOME"/orka-build/out/*.iso "$HOME"/orka-build-out/*.iso 2>/dev/null || true; } | head -1)"
 [[ -f "$ISO" ]] || { echo "no ISO found" >&2; exit 1; }
 
 log() { printf '\e[1;36m[test]\e[0m %s\n' "$*"; }
@@ -35,7 +38,7 @@ vm_ssh() {
   ssh -i "$T/id_orka" -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
       -o LogLevel=ERROR -o ConnectTimeout=3 root@127.0.0.1 "$@"
 }
-qmon() { printf '%s\n' "$1" | nc -U -q1 /tmp/orka-qmon.sock >/dev/null 2>&1 || true; }
+qmon() { printf '%s\n' "$1" | socat -t1 - UNIX-CONNECT:/tmp/orka-qmon.sock >/dev/null 2>&1 || true; }
 vm_running() { pgrep -f "qemu-system-x86_64.*orka-qmon" >/dev/null; }
 wait_vm_exit() { local _; for _ in $(seq "$1"); do vm_running || return 0; sleep 1; done; return 1; }
 
