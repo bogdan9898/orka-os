@@ -57,9 +57,9 @@ Networking follows Omarchy v3: `iwd` + `impala` for Wi-Fi, no NetworkManager.
 |---|---|---|
 | Browser | `firefox` | `chromium` (Omarchy's default; its web-app launchers won't be ported) |
 | Terminal | `ghostty` | `alacritty` |
-| Apps | `claude-code` (AUR), `sublime-text-4` (AUR), `libreoffice-fresh`, `kdeconnect`, `pavucontrol`, `fastfetch`, `tmux`; added 2026-11-08: `steam`, `discord` | `spotify`, `signal-desktop`, `1password-*`, `typora`, `localsend`, `obs-studio` |
+| Apps | `claude-code` (AUR), `sublime-text-4` (AUR), `libreoffice-fresh`, `kdeconnect`, `pavucontrol`, `fastfetch`, `tmux`; added 2026-11-08: `steam`, `discord`; added 2026-11-09: `vim` (next to `neovim`) | `spotify`, `signal-desktop`, `1password-*`, `typora`, `localsend`, `obs-studio` |
 | Extras | OCR (`tesseract`), screen recording (`gpu-screen-recorder`) | printing (`cups*`), `noto-fonts-cjk`, `power-profiles-daemon` |
-| Development | `docker` (+ buildx, compose), `rust`, `python`, `gcc`/`g++` (via `base-devel`), `git` | `github-cli`, `mise`, `clang`, `llvm` |
+| Development | `docker` (+ buildx, compose), `rust`, `python`, `gcc`/`g++` (via `base-devel`), `git`; added 2026-11-09: `github-cli` (publishing releases with `pkg/release.sh`) | `mise`, `clang`, `llvm` |
 
 ### Desktop tools removed (2026-11-05)
 
