@@ -3,7 +3,7 @@
 #
 #   pkg/build.sh [OUTDIR]     (default OUTDIR: ~/orka-build/orka-pkg)
 #
-# Run as a normal user on Arch (here: the archlinux WSL distro). Prints the
+# Run as a normal user on Arch (OrkaOS, or the archlinux WSL distro). Prints the
 # path of the built package. Needs base-devel and git.
 set -euo pipefail
 R="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

@@ -3,14 +3,14 @@
 # repository: the GitHub release "repo" of bogdan9898/orka-os, which
 # installed systems use as a pacman repository ([orka] in pacman.conf).
 #
-#   GH_TOKEN=... pkg/release.sh        (WSL / Arch, as the build user)
+#   pkg/release.sh        (on Arch / OrkaOS, as a normal user)
 #
 # Builds the package from the committed state (refuses uncommitted changes),
 # signs it and a fresh repository database with the OrkaOS key, uploads them
 # and deletes older package files from the release. The repository only ever
 # holds the newest version. Needs: base-devel, git, github-cli (gh) logged in
-# or GH_TOKEN set (from Windows: GH_TOKEN="$(gh auth token)"), and the
-# signing key in the build user's GnuPG keyring.
+# (`gh auth login`) or GH_TOKEN set, and the signing key in this user's
+# GnuPG keyring.
 set -euo pipefail
 export LC_ALL=C.UTF-8
 R="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

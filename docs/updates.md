@@ -16,7 +16,7 @@ No reinstall, and no ISO involved: the ISO is only for installing. If an update 
 | What goes where | `pkg/stage.sh`: `/usr/share/orka/*`, `/usr/bin/orka-*`, `system/` (services in `/usr/lib/systemd`, network defaults, zram, PAM, app entries), branding, boot screen |
 | The repository | The GitHub release **`repo`** of this repository: `orka.db`, `orka.files` and the newest `orka-*.pkg.tar.zst`, each with a `.sig`. Only the newest version is kept |
 | On the system | `[orka]` in `/etc/pacman.conf` (`SigLevel = Required`, `Server = https://github.com/bogdan9898/orka-os/releases/download/repo`) and the OrkaOS signing key in pacman's keyring |
-| Signing key | `OrkaOS packages`, ed25519, fingerprint `3A6BF9C31940B07E97F1360C0E8E7A18FDF5DD2C`. Public part: `pkg/orka-packages.asc`. Private part: the build user's GnuPG keyring in the `archlinux` WSL distro, no passphrase (so releases can be scripted) |
+| Signing key | `OrkaOS packages`, ed25519, fingerprint `3A6BF9C31940B07E97F1360C0E8E7A18FDF5DD2C`. Public part: `pkg/orka-packages.asc`. Private part: the GnuPG keyring of the user who publishes, on the OrkaOS PC since 2026-11-09 (before that the `archlinux` WSL distro), no passphrase (so releases can be scripted) |
 
 Your own files are never touched by an update: the package only owns system files. Your dotfiles in `~/.config` were seeded once by `orka-setup-user`; when a default changes, run `orka-setup-user` and it writes the new version next to yours as `*.orka-new`. The three files in `/etc` that the package owns (`/etc/iwd/main.conf`, `/etc/pam.d/orka-lock`, `/etc/xdg/fastfetch/config.jsonc`) are marked as config files: if you edited one, pacman keeps yours and saves the new one as `.pacnew`.
 
@@ -39,19 +39,19 @@ It downloads the public key and checks its fingerprint, trusts it in pacman's ke
 
 ## Publishing an update
 
-After committing (and pushing) a change, in the `archlinux` WSL distro as the build user:
+After committing (and pushing) a change, on the OrkaOS PC as your normal user (needs `github-cli`, logged in once with `gh auth login`, and the signing key in your GnuPG keyring):
 
 ```bash
-GH_TOKEN="$(gh auth token)" bash pkg/release.sh     # gh token from Windows, or `gh auth login` in WSL once
+bash pkg/release.sh
 ```
 
-`pkg/release.sh` refuses uncommitted changes, builds the package (`pkg/build.sh`), signs it and a fresh repository database, uploads them to the `repo` release (creating it the first time) and removes the older package files. The version comes from the number of commits, so every release needs at least one new commit. Needs `github-cli` in WSL.
+`pkg/release.sh` refuses uncommitted changes, builds the package (`pkg/build.sh`), signs it and a fresh repository database, uploads them to the `repo` release (creating it the first time) and removes the older package files. The version comes from the number of commits, so every release needs at least one new commit.
 
 To build the package without publishing: `bash pkg/build.sh [outdir]`. `iso/build.sh iso` builds it too and puts it into the ISO's offline repository, so a fresh install starts with the same files.
 
 ## The signing key
 
-Without the private key no new version can be published (and making a new key means every system has to trust it again, by re-running `join-repo.sh`). **Back it up** somewhere safe outside WSL, for example a password manager:
+Without the private key no new version can be published (and making a new key means every system has to trust it again, by re-running `join-repo.sh`). **Back it up** somewhere safe off this PC, for example a password manager:
 
 ```bash
 gpg --export-secret-keys --armor 3A6BF9C31940B07E97F1360C0E8E7A18FDF5DD2C > orka-signing-key.asc
