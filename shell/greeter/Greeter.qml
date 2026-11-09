@@ -1,9 +1,10 @@
 // The login screen: clock, user, password; Enter logs in and starts Hyprland
 // (through uwsm, like the hyprland-uwsm session). Reboot and shut down
 // buttons at the bottom.
-// If the boot hasn't finished yet when you log in, the greeter waits for it
-// with the boot screen's ripples (see bootDone below), so uwsm doesn't have to
-// wait on the bare text console with its "graphical.target is queued" text.
+// After the password the greeter shows the boot screen's ripples for at least
+// minShowMs (a smooth hand-over instead of a flash), and longer if the boot
+// hasn't finished yet (see bootDone below), so uwsm doesn't have to wait on
+// the bare text console with its "graphical.target is queued" text.
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Shapes
@@ -36,6 +37,8 @@ FloatingWindow {
     // Longest wait for the boot; after it the session starts anyway (uwsm
     // then waits out the rest itself, with its text).
     readonly property int maxWaitMs: 20000
+    // Shortest time the ripples show, even when the boot is long done.
+    readonly property int minShowMs: 3000
 
     function login() {
         if (busy || user === "")
@@ -63,9 +66,11 @@ FloatingWindow {
         onExited: exitCode => {
             if (!root.starting)
                 return;
-            if (exitCode === 0)
-                root.launchSession();
-            else if (Date.now() - root.startedAt >= root.maxWaitMs) {
+            const waited = Date.now() - root.startedAt;
+            if (exitCode === 0) {
+                if (waited >= root.minShowMs)
+                    root.launchSession();
+            } else if (waited >= root.maxWaitMs) {
                 console.warn("orka greeter: graphical.target not reached after " + root.maxWaitMs / 1000 + " s, starting the session anyway");
                 root.launchSession();
             }
