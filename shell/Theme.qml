@@ -53,6 +53,8 @@ Singleton {
         bell:        String.fromCodePoint(0xF009C),   // bell outline
         bellBadge:   String.fromCodePoint(0xF116B),   // bell with a dot: missed notifications
         close:       String.fromCodePoint(0xF0156),
+        cup:         String.fromCodePoint(0xF06CA),   // coffee outline: keep awake off
+        cupFull:     String.fromCodePoint(0xF0176),   // coffee: keep awake on
         lock:        String.fromCodePoint(0xF033E),
         mic:         String.fromCodePoint(0xF036C),
         micOff:      String.fromCodePoint(0xF036D),

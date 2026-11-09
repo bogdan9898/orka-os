@@ -148,7 +148,9 @@ The shell reads `~/.config/orka/settings.json` (`Settings.qml`) and watches it, 
 { "idle": { "lockAfter": 300, "screenOffAfter": 330 } }
 ```
 
-Seconds without keyboard or mouse input until the screen locks / the monitors turn off (`0` = never). Apps that inhibit idle (a playing video) hold both off. Invalid JSON or missing values fall back to these defaults. hypridle no longer has idle timers; it only handles "lock before sleep".
+Seconds without keyboard or mouse input until the screen locks / the monitors turn off (`0` = never). Apps that inhibit idle (a playing video) hold both off.
+
+**Keep awake** (the cup in the bar, right side): click it and idle never locks the screen or turns it off; the cup turns filled and in the accent color. Click again to go back to the times above. Not saved: every login starts with it off, so a forgotten toggle can't keep an unattended PC unlocked. Nothing suspends the PC on idle anyway (logind `IdleAction=ignore`), so it only stops locking and screen off. Also `qs -p /usr/share/orka/shell ipc call lock toggleKeepAwake`. **Tested** 2026-11-10 in the VM with `lockAfter` 10 s: on, 25 s idle, still unlocked; off, 25 s idle, locked. Invalid JSON or missing values fall back to these defaults. hypridle no longer has idle timers; it only handles "lock before sleep".
 
 ## Login screen
 

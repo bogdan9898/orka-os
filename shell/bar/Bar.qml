@@ -54,6 +54,7 @@ PanelWindow {
         BluetoothStatus {}
         NetworkStatus {}
         Volume {}
+        KeepAwake {}
         NotificationBell {}
         BarIcon {
             text: Theme.icons.cpu
