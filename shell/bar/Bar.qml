@@ -40,7 +40,6 @@ PanelWindow {
 
         Clock {}
         Recording {}
-        DndStatus {}
     }
 
     RowLayout {
@@ -55,6 +54,7 @@ PanelWindow {
         BluetoothStatus {}
         NetworkStatus {}
         Volume {}
+        NotificationBell {}
         BarIcon {
             text: Theme.icons.cpu
             onClicked: Apps.tui("btop")

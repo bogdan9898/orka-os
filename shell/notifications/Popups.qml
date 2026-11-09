@@ -1,4 +1,5 @@
 // Notification popups: top right, under the bar, on the focused monitor.
+// Hidden while the notification center is open (it lists them too).
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
@@ -9,7 +10,7 @@ PanelWindow {
     id: window
 
     screen: Quickshell.screens.find(s => Hyprland.focusedMonitor && s.name === Hyprland.focusedMonitor.name) ?? Quickshell.screens[0]
-    visible: Notifications.popups.length > 0
+    visible: Notifications.popups.length > 0 && !Notifications.centerOpen
 
     anchors {
         top: true

@@ -26,6 +26,7 @@ ShellRoot {
     }
 
     Popups {}
+    Center {}
     PolkitDialog {}
     Launcher {}
     CheatSheet {}

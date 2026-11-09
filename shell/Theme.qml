@@ -50,6 +50,9 @@ Singleton {
         cpu:         String.fromCodePoint(0xF035B),
         recording:   String.fromCodePoint(0xF0EC2),
         dnd:         String.fromCodePoint(0xF009B),   // bell with a slash
+        bell:        String.fromCodePoint(0xF009C),   // bell outline
+        bellBadge:   String.fromCodePoint(0xF116B),   // bell with a dot: missed notifications
+        close:       String.fromCodePoint(0xF0156),
         lock:        String.fromCodePoint(0xF033E),
         mic:         String.fromCodePoint(0xF036C),
         micOff:      String.fromCodePoint(0xF036D),

@@ -73,8 +73,9 @@ The shell is the notification daemon (`NotificationServer` in `Notifications.qml
 - **Popups** top right under the bar, on the focused monitor, newest on top, at most 5 (older ones are hidden, not lost). Blue border, red for critical.
 - **Timeout:** 5 seconds, or what the app asks for (`notify-send -t`). Critical notifications stay until dismissed. The mouse over a popup pauses all timeouts.
 - **Click:** the app's default action (e.g. open the chat), then the popup closes; without one it just closes. **Right click:** dismiss. Other actions are shown as buttons.
-- A popup that timed out isn't gone: the last 20 are kept, and `SUPER + SHIFT + ALT + ,` brings the latest back.
-- **Do not disturb** (`SUPER + CTRL + ,`, bell icon in the bar): nothing pops up except critical notifications; the rest are kept for restoring.
+- A popup that timed out isn't gone: the last 50 are kept (in memory, until the shell restarts), and `SUPER + SHIFT + ALT + ,` brings the latest back.
+- **Notification center** (`notifications/Center.qml`): the bell at the right of the bar (or `SUPER + N`) opens a list of every kept notification, newest first, with when it arrived ("5 min ago") and a close button; clicking one runs its default action, other actions are buttons as on popups. Header: **Do not disturb** and **Clear all**. Escape or a click outside closes it; popups are hidden while it's open. The bell shows a dot (accent color) when notifications went by unseen, a slash while do not disturb is on; right click toggles do not disturb.
+- **Do not disturb** (`SUPER + CTRL + ,`, right click on the bell, or the center's button; the bell gets a slash): nothing pops up except critical notifications; the rest are kept for restoring.
 - Shows the image an app sends, otherwise its icon; the body may use `<b>`, `<i>`, `<u>` and links. With the hint `x-orka-preview` (`notify-send -h boolean:x-orka-preview:true`) the image is shown large under the text instead of as an icon: `orka-screenshot snip` (SUPER + SHIFT + S) uses it for the screenshot preview.
 
 | Keys | Command | Action |
@@ -84,11 +85,14 @@ The shell is the notification daemon (`NotificationServer` in `Notifications.qml
 | `SUPER + ALT + ,` | `orka-notifications invoke` | Run the newest one's default action |
 | `SUPER + SHIFT + ALT + ,` | `orka-notifications restore` | Bring back the last one that disappeared |
 | `SUPER + CTRL + ,` | `orka-notifications dnd` | Toggle do not disturb |
+| `SUPER + N` | `orka-notifications center` | Open/close the notification center |
 | | `orka-notifications status` | Prints `dnd=off shown=1 hidden=3` |
 
 **Tested** 2026-11-06 in the VM with `notify-send`: popups stack newest first, critical (red) stays, action buttons, bold/italic body, app timeout (`-t 3000`) and the 5 s default, images and theme icons (a missing icon is left out), restore, do not disturb (bell in the bar, notification kept), `SUPER + ,` and `SUPER + SHIFT + ,`. Not yet tried: mouse clicks on popups (default action, right-click dismiss, hover pause), `SUPER + ALT + ,`, real apps (Firefox, KDE Connect).
 
-`orka-notifications` calls the shell over IPC (`qs -p /usr/share/orka/shell ipc call notifications <function>`). Try it with `notify-send "Hello" "World"` (`libnotify`, now in the package list). Not yet: a notification center (history panel), sounds, inline replies.
+**Notification center tested** 2026-11-09 on the real PC (repo shell in place of the installed one): three `notify-send` notifications timed out and the bell got its dot; the center listed them newest first with time, close button, icons, bold text and an action button; opening it cleared the dot; open/close and do not disturb (bell with a slash) through IPC; by the user, with the mouse: close buttons, clicking a card (its action), the action button, do not disturb (button and right click on the bell), Clear all, closing with Escape, a click outside and the bell. Not yet tried: `SUPER + N` (needs the package update), more than fits on screen (scrolling).
+
+`orka-notifications` calls the shell over IPC (`qs -p /usr/share/orka/shell ipc call notifications <function>`). Try it with `notify-send "Hello" "World"` (`libnotify`, now in the package list). Not yet: sounds, inline replies.
 
 ## Polkit agent
 

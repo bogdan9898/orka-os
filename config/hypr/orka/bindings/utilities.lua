@@ -25,6 +25,7 @@ notify("SUPER + SHIFT + comma",       "orka-notifications dismiss-all", "Dismiss
 notify("SUPER + ALT + comma",         "orka-notifications invoke",      "Invoke last notification")
 notify("SUPER + SHIFT + ALT + comma", "orka-notifications restore",     "Restore last notification")
 notify("SUPER + CTRL + comma",        "orka-notifications dnd",         "Toggle do not disturb")
+notify("SUPER + N",                   "orka-notifications center",      "Notification center")
 
 -- Caps Lock / Num Lock state on the OSD. Passed through (the keys still do
 -- their job), with any modifiers, and without a description so they stay

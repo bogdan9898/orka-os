@@ -3,8 +3,10 @@ pragma Singleton
 // notifications and decides which are shown as popups (notifications/Popups.qml).
 //
 // A popup disappears after its timeout but the notification is kept (up to
-// `keep`), so `restore` can bring the latest one back. Do not disturb keeps
-// everything except critical notifications from popping up.
+// `keep`), so `restore` can bring the latest one back, and the notification
+// center (notifications/Center.qml, the bell in the bar, SUPER + N) lists
+// them all. Kept in memory only: gone when the shell restarts. Do not disturb
+// keeps everything except critical notifications from popping up.
 //
 // Controlled from Hyprland key bindings through `orka-notifications <command>`
 // (IPC target "notifications", see the IpcHandler below).
@@ -23,9 +25,20 @@ Singleton {
 
     readonly property int defaultTimeout: 5000   // ms
     readonly property int maxPopups: 5
-    readonly property int keep: 20
+    readonly property int keep: 50
 
     property var deadlines: ({})   // notification id -> time (ms) its popup closes
+    property var receivedAt: ({})  // notification id -> time (ms) it arrived
+
+    // The notification center: open or not, and when it was last looked at.
+    property bool centerOpen: false
+    property real seenAt: 0
+    onCenterOpenChanged: seenAt = Date.now()   // opening and closing: all seen
+
+    // Everything kept, shown or not, newest first (the center's list).
+    readonly property var history: popups.concat(hidden).sort((a, b) => (receivedAt[b.id] ?? 0) - (receivedAt[a.id] ?? 0))
+    // Gone from the screen without being seen in the center: the bell's dot.
+    readonly property int missed: hidden.filter(n => (receivedAt[n.id] ?? 0) > seenAt).length
 
     NotificationServer {
         keepOnReload: true
@@ -37,6 +50,7 @@ Singleton {
 
         onNotification: n => {
             n.tracked = true;
+            root.receivedAt[n.id] = Date.now();
             n.closed.connect(() => root.forget(n));
             if (root.dnd && n.urgency !== NotificationUrgency.Critical)
                 root.hidden = root.hidden.concat([n]);
@@ -68,6 +82,13 @@ Singleton {
         popups = popups.filter(x => x !== n);
         hidden = hidden.filter(x => x !== n);
         delete deadlines[n.id];
+        delete receivedAt[n.id];
+    }
+
+    // Close every notification, shown or kept.
+    function clearAll() {
+        for (const n of popups.concat(hidden))
+            n.dismiss();
     }
 
     // Keep only the latest `keep` hidden notifications.
@@ -125,6 +146,9 @@ Singleton {
             if (root.hidden.length)
                 root.show(root.hidden[root.hidden.length - 1]);
             root.hidden = root.hidden.filter(x => !root.popups.includes(x));
+        }
+        function toggleCenter(): void {
+            root.centerOpen = !root.centerOpen;
         }
         function toggleDnd(): string {
             root.dnd = !root.dnd;

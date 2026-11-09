@@ -1,5 +1,6 @@
 // One notification popup. Click: default action (or close), right click:
-// close, buttons: the app's other actions.
+// close, buttons: the app's other actions. In the notification center
+// (inCenter) it also shows when it arrived and a close button.
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -13,6 +14,21 @@ Rectangle {
     readonly property Notification n: modelData
     readonly property bool critical: n.urgency === NotificationUrgency.Critical
     readonly property var buttons: n.actions.filter(a => a.identifier !== "default")
+
+    property bool inCenter: false
+    property real now: Date.now()   // the center ticks this, for "5 min ago"
+
+    function age(t) {
+        if (!t)
+            return "";
+        const min = Math.floor((now - t) / 60000);
+        if (min < 1)
+            return "just now";
+        if (min < 60)
+            return min + " min ago";
+        const h = Math.floor(min / 60);
+        return h < 24 ? h + " h ago" : Qt.formatDateTime(new Date(t), "d MMM HH:mm");
+    }
 
     // An image sent with the notification, else the app's icon; nothing if
     // neither exists (instead of Qt's checkerboard for a missing icon).
@@ -63,14 +79,42 @@ Rectangle {
             Layout.alignment: Qt.AlignTop
             spacing: 4
 
-            Text {
+            RowLayout {
                 Layout.fillWidth: true
-                text: card.n.summary || card.n.appName
-                color: Theme.foreground
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSize + 1
-                font.bold: true
-                elide: Text.ElideRight
+                spacing: 8
+
+                Text {
+                    Layout.fillWidth: true
+                    text: card.n.summary || card.n.appName
+                    color: Theme.foreground
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSize + 1
+                    font.bold: true
+                    elide: Text.ElideRight
+                }
+                Text {
+                    visible: card.inCenter
+                    text: card.age(Notifications.receivedAt[card.n.id])
+                    color: Theme.foreground
+                    opacity: 0.6
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSize - 1
+                }
+                Text {
+                    visible: card.inCenter
+                    text: Theme.icons.close
+                    color: closeArea.containsMouse ? Theme.urgent : Theme.foreground
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSize + 2
+                    MouseArea {
+                        id: closeArea
+                        anchors.fill: parent
+                        anchors.margins: -4
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: card.n.dismiss()
+                    }
+                }
             }
             Text {
                 Layout.fillWidth: true
