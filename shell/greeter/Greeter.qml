@@ -1,8 +1,12 @@
 // The login screen: clock, user, password; Enter logs in and starts Hyprland
 // (through uwsm, like the hyprland-uwsm session). Reboot and shut down
 // buttons at the bottom.
+// If the boot hasn't finished yet when you log in, the greeter waits for it
+// with the boot screen's ripples (see bootDone below), so uwsm doesn't have to
+// wait on the bare text console with its "graphical.target is queued" text.
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Shapes
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Greetd
@@ -24,6 +28,14 @@ FloatingWindow {
     property bool busy: false
     property string status: ""
     property bool statusIsError: false
+    // Logged in, waiting for the boot to finish before starting the session.
+    property bool starting: false
+    property real startedAt: 0
+    // 0..1, the ripples' 2 s cycle (as on the boot screen).
+    property real ripplePhase: 0
+    // Longest wait for the boot; after it the session starts anyway (uwsm
+    // then waits out the rest itself, with its text).
+    readonly property int maxWaitMs: 20000
 
     function login() {
         if (busy || user === "")
@@ -40,6 +52,50 @@ FloatingWindow {
         status = message;
         statusIsError = true;
         passwordInput.forceActiveFocus();
+    }
+
+    // uwsm (start) waits while graphical.target has a start job queued, and
+    // prints that on the text console. Wait for the same here: done when the
+    // target is active or no longer queued.
+    Process {
+        id: bootDone
+        command: ["sh", "-c", "systemctl is-active -q graphical.target || ! systemctl list-jobs --no-legend graphical.target | grep -q ."]
+        onExited: exitCode => {
+            if (!root.starting)
+                return;
+            if (exitCode === 0)
+                root.launchSession();
+            else if (Date.now() - root.startedAt >= root.maxWaitMs) {
+                console.warn("orka greeter: graphical.target not reached after " + root.maxWaitMs / 1000 + " s, starting the session anyway");
+                root.launchSession();
+            }
+        }
+    }
+
+    Timer {
+        id: bootPoll
+        interval: 500
+        repeat: true
+        triggeredOnStart: true
+        running: root.starting
+        onTriggered: {
+            if (!bootDone.running)
+                bootDone.running = true;
+        }
+    }
+
+    NumberAnimation on ripplePhase {
+        from: 0
+        to: 1
+        duration: 2000
+        loops: Animation.Infinite
+        running: root.starting
+    }
+
+    function launchSession() {
+        starting = false;
+        console.info("orka greeter: starting the session");
+        Greetd.launch(session, sessionEnv, true);
     }
 
     // Normal users: UID 1000-59999 with a real login shell.
@@ -68,10 +124,11 @@ FloatingWindow {
             root.failed("Wrong password");
         }
         function onReadyToLaunch() {
-            console.info("orka greeter: logged in, starting the session");
+            console.info("orka greeter: logged in, waiting for the boot to finish");
             root.status = "Starting the desktop...";
             root.statusIsError = false;
-            Greetd.launch(root.session, root.sessionEnv, true);
+            root.startedAt = Date.now();
+            root.starting = true;
         }
         function onError(error) {
             console.warn("orka greeter: greetd error: " + error);
@@ -120,6 +177,7 @@ FloatingWindow {
         // User: TAB / the arrows switch when there is more than one.
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
+            visible: !root.starting
             spacing: 10
             Text {
                 visible: root.users.length > 1
@@ -154,6 +212,7 @@ FloatingWindow {
 
         Rectangle {
             Layout.alignment: Qt.AlignHCenter
+            visible: !root.starting
             implicitWidth: 320
             implicitHeight: 40
             color: "transparent"
@@ -190,6 +249,58 @@ FloatingWindow {
                     color: Theme.foreground
                     opacity: 0.4
                     font: passwordInput.font
+                }
+            }
+        }
+
+        // While waiting for the boot: the OrkaOS badge with ripples spreading
+        // below it, like the boot screen (branding/plymouth/orka/orka.script):
+        // three flat rings, each growing while it fades, a third of a cycle
+        // apart. The badge, not the white logo: it shows in light mode too.
+        Item {
+            id: ripples
+            Layout.alignment: Qt.AlignHCenter
+            visible: root.starting
+            implicitWidth: 200
+            implicitHeight: 190
+
+            readonly property real fullWidth: 130
+            readonly property real centerY: 160
+
+            Image {
+                anchors.horizontalCenter: parent.horizontalCenter
+                y: 0
+                width: 110
+                height: 110
+                source: Theme.logoBadge
+                sourceSize: Qt.size(330, 330)
+                smooth: true
+                mipmap: true
+            }
+
+            Repeater {
+                model: 3
+                Shape {
+                    id: ring
+                    required property int index
+                    readonly property real p: (root.ripplePhase + index / 3) % 1
+                    readonly property real w: ripples.fullWidth * (0.2 + p)
+                    anchors.fill: parent
+                    opacity: 0.9 * (1 - p)
+                    preferredRendererType: Shape.CurveRenderer
+                    ShapePath {
+                        strokeColor: Theme.accent
+                        strokeWidth: 2
+                        fillColor: "transparent"
+                        PathAngleArc {
+                            centerX: ripples.width / 2
+                            centerY: ripples.centerY
+                            radiusX: ring.w / 2
+                            radiusY: ring.w / 2 * 0.24
+                            startAngle: 0
+                            sweepAngle: 360
+                        }
+                    }
                 }
             }
         }
