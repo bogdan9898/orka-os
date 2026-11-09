@@ -160,7 +160,7 @@ At boot greetd shows our login screen on tty1: `greeter.qml` (a second entry poi
 
 - Clock, date, the user (the only normal user, UID 1000+; with several, TAB or the arrows switch), password field. Enter logs in; a wrong password shows red and asks again.
 - After a login it starts `uwsm start -e -D Hyprland hyprland.desktop` (what Hyprland's own `hyprland-uwsm` session runs) and quits; cage exits with it and greetd starts the session.
-- After the password it shows the OrkaOS badge with the boot screen's ripples (in the accent color) and "Starting the desktop..." for at least 3 s, so the hand-over doesn't flash by; longer if the boot hasn't finished yet (`graphical.target` still queued, which uwsm waits for before starting Hyprland), at most 20 s. Otherwise uwsm would wait on the bare text console with its "queued for start" text.
+- After the password it shows "Welcome, <name>" (the account's full name from `/etc/passwd`, else the login name capitalized) with the boot screen's ripples (in the accent color) and "Starting the desktop..." for at least 3 s, so the hand-over doesn't flash by; longer if the boot hasn't finished yet (`graphical.target` still queued, which uwsm waits for before starting Hyprland), at most 20 s. Otherwise uwsm would wait on the bare text console with its "queued for start" text.
 - **Reboot** / **Shut down** buttons (`systemctl`, allowed for the active seat).
 - KWallet is unlocked with the login password here too (`pam_kwallet5` in `/etc/pam.d/greetd`).
 - `cage -s` keeps console switching on: `CTRL + ALT + F2` still gives a text login if the login screen breaks.

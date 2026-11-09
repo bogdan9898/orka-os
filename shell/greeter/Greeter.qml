@@ -23,6 +23,11 @@ FloatingWindow {
     readonly property var sessionEnv: ["XDG_SESSION_TYPE=wayland", "XDG_CURRENT_DESKTOP=Hyprland", "XDG_SESSION_DESKTOP=Hyprland"]
 
     property var users: []
+    property var fullNames: ({})   // user -> full name from /etc/passwd ("" if not set)
+    // For "Welcome, ...": the full name, else the login name capitalized.
+    function displayName(u) {
+        return fullNames[u] || (u ? u.charAt(0).toUpperCase() + u.substring(1) : "");
+    }
     property int userIndex: 0
     readonly property string user: users.length ? users[userIndex] : ""
     property string password: ""
@@ -106,9 +111,22 @@ FloatingWindow {
     // Normal users: UID 1000-59999 with a real login shell.
     Process {
         running: true
-        command: ["awk", "-F:", "$3 >= 1000 && $3 < 60000 && $7 !~ /(nologin|false)$/ { print $1 }", "/etc/passwd"]
+        // name:full name (the comment field up to its first comma).
+        command: ["awk", "-F:", "$3 >= 1000 && $3 < 60000 && $7 !~ /(nologin|false)$/ { split($5, f, \",\"); print $1 \":\" f[1] }", "/etc/passwd"]
         stdout: StdioCollector {
-            onStreamFinished: root.users = text.split("\n").filter(u => u !== "")
+            onStreamFinished: {
+                const names = {};
+                const users = [];
+                for (const line of text.split("\n")) {
+                    if (line === "")
+                        continue;
+                    const i = line.indexOf(":");
+                    users.push(line.substring(0, i));
+                    names[line.substring(0, i)] = line.substring(i + 1).trim();
+                }
+                root.fullNames = names;
+                root.users = users;
+            }
         }
     }
 
@@ -258,29 +276,29 @@ FloatingWindow {
             }
         }
 
-        // While waiting for the boot: the OrkaOS badge with ripples spreading
+        // While waiting for the boot: "Welcome, <name>" with ripples spreading
         // below it, like the boot screen (branding/plymouth/orka/orka.script):
         // three flat rings, each growing while it fades, a third of a cycle
-        // apart. The badge, not the white logo: it shows in light mode too.
+        // apart.
         Item {
             id: ripples
             Layout.alignment: Qt.AlignHCenter
             visible: root.starting
-            implicitWidth: 200
-            implicitHeight: 190
+            implicitWidth: Math.max(200, welcome.implicitWidth)
+            implicitHeight: 130
 
             readonly property real fullWidth: 130
-            readonly property real centerY: 160
+            readonly property real centerY: 100
 
-            Image {
+            Text {
+                id: welcome
                 anchors.horizontalCenter: parent.horizontalCenter
-                y: 0
-                width: 110
-                height: 110
-                source: Theme.logoBadge
-                sourceSize: Qt.size(330, 330)
-                smooth: true
-                mipmap: true
+                y: 10
+                text: "Welcome, " + root.displayName(root.user)
+                color: Theme.foreground
+                font.family: Theme.font
+                font.pixelSize: Theme.fontSize + 14
+                font.bold: true
             }
 
             Repeater {
