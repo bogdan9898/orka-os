@@ -53,6 +53,6 @@ fi
 
 gh release upload "$TAG" --clobber "$pkg" "$pkg.sig" "$W/orka.db" "$W/orka.db.sig" "$W/orka.files" "$W/orka.files.sig"
 gh release view "$TAG" --json assets -q '.assets[].name' |
-  grep -E '^orka-[0-9].*\.pkg\.tar\.zst(\.sig)?$' | grep -vxF -e "$name" -e "$name.sig" |
+  { grep -E '^orka-[0-9].*\.pkg\.tar\.zst(\.sig)?$' | grep -vxF -e "$name" -e "$name.sig" || true; } |
   while read -r old; do gh release delete-asset "$TAG" "$old" --yes; echo "Removed $old"; done
 echo "Published $name"
