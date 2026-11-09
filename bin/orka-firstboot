@@ -11,8 +11,8 @@ ufw allow 1714:1764/udp comment 'KDE Connect'
 ufw --force enable
 systemctl enable --now ufw.service
 
-# Package lists: the install was offline, so the sync databases are missing
-# (pacman warns about it). Fetch them if there is network; harmless if not.
-pacman -Sy --noconfirm || true
+# No `pacman -Sy` here: refreshing the package lists without upgrading sets
+# up a partial upgrade on the next `pacman -S`. orka-update-reminder asks the
+# user to run the first `pacman -Syu` instead.
 
 systemctl disable orka-firstboot.service

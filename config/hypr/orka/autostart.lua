@@ -13,4 +13,6 @@ hl.on("hyprland.start", function()
     -- GTK/Qt theme and icons: gsettings needs the session's D-Bus, which the
     -- installer doesn't have, so set them again at each login.
     hl.exec_cmd("orka-settings apply apps")
+    -- Until the first full upgrade: a notification that offers to run it.
+    hl.exec_cmd(apps.run("orka-update-reminder"))
 end)

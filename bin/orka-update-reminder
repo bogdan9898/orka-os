@@ -1,0 +1,37 @@
+#!/bin/bash
+# OrkaOS: until the system has had its first full upgrade, remind at every
+# login with a notification; clicking it opens a terminal that runs
+# `sudo pacman -Syu`, where you see pacman's questions and notices.
+#
+# Why: a fresh install has the packages of the ISO, which can be weeks old.
+# Refreshing the package lists without upgrading (pacman -Sy, which
+# orka-firstboot used to do) sets up a partial upgrade on the next
+# `pacman -S`; Arch: "never run pacman -Sy; instead, always use pacman -Syu".
+# Upgrading unattended in the background would hide pacman's notices and
+# replace files under the running desktop, so the user starts it.
+#
+# Started at each login by Hyprland (orka/autostart.lua).
+set -u
+
+# Done once pacman has logged a full upgrade (-Syu, also through yay). The
+# installer's pacman runs never use -u, so they don't count.
+if grep -q 'starting full system upgrade' /var/log/pacman.log 2>/dev/null; then
+  exit 0
+fi
+
+# Wait for the notification server (the OrkaOS shell starts with the session).
+for _ in $(seq 60); do
+  busctl --user status org.freedesktop.Notifications >/dev/null 2>&1 && break
+  sleep 1
+done
+
+# Critical: stays on screen until clicked or dismissed (a normal popup hides
+# after 5 s, easy to miss right after login). -w waits for the click.
+action="$(notify-send -a OrkaOS -u critical -i system-software-update -w -A default="Update now" \
+  "Update OrkaOS" "This system hasn't been fully updated since it was installed. Click to run the update (sudo pacman -Syu).")" || exit 0
+
+if [[ "$action" == default ]]; then
+  # org.orka.<id>: floating and centered (orka/windows.lua).
+  exec uwsm app -- ghostty --class=org.orka.update -e bash -c \
+    'sudo pacman -Syu; echo; read -rsn1 -p "Press any key to close."'
+fi
