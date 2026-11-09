@@ -19,7 +19,7 @@
 
 OrkaOS is my own Linux setup, inspired by [Omarchy](https://github.com/omacom/omarchy) but rebuilt from scratch on plain Arch: debloated, with its own name, logo, themes and desktop shell. It's made for **one machine** (see [hardware](docs/hardware-and-dual-boot.md)), dual-booted next to Windows 11, and installs **fully offline** from its own ISO.
 
-> **Status (2026-11-08):** version 1.0, installed and running on the real PC, and **updates without reinstalling**: OrkaOS is a pacman package from this repository. Currently fixing the first bugs found on the real machine. See the [roadmap](docs/approach.md#roadmap).
+> **Status (2026-11-10):** version 1.0, installed and running on the real PC, and **updates without reinstalling**: OrkaOS is a pacman package from this repository (latest `orka 1.0.r61`). Bugs found on the real machine are being fixed and released from the PC itself. See the [roadmap](docs/approach.md#roadmap).
 
 ## Highlights
 
