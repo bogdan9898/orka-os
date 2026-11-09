@@ -420,10 +420,15 @@ EOF
   install -d "$TARGET/etc/plymouth"
   cat >"$TARGET/etc/plymouth/plymouthd.conf" <<'EOF'
 # OrkaOS boot screen (/usr/share/plymouth/themes/orka)
+# UseSimpledrm: draw on the firmware framebuffer right away. Without it
+# Plymouth waits for the real GPU driver, which on the real PC never reached
+# it inside the initramfs: after DeviceTimeout it fell back to the grey text
+# theme (three dots) and stayed there until the login screen.
 [Daemon]
 Theme=orka
 ShowDelay=0
 DeviceTimeout=8
+UseSimpledrm=1
 EOF
 
   # Initramfs: systemd-based, the boot screen, plus the overlay hook that
