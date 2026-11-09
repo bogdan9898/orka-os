@@ -58,7 +58,9 @@ Layout taken from Omarchy v3.8.4's Waybar; the code is our own (Omarchy v4's Qui
 | Right | CPU | btop | |
 | Center | Bell with a slash while do not disturb is on | Turn it off | |
 
-Not in it (on purpose): battery (desktop), Omarchy's weather, update, dictation and idle indicators (no such features yet), tooltips (later).
+**Hover labels** (right side): resting the pointer 400 ms on an icon makes it grow to the left and slide out a short label before the glyph: `Volume 45%` / `Volume: muted`, `Ethernet` / `Wi-Fi, signal 80%` / `Offline`, `Bluetooth on, 1 connected`, `Keep awake: on/off`, `Notifications: 2 missed` / `do not disturb`, `System monitor`; tray apps show their own tooltip (else their name). The icon stays under the pointer and the items on its left move aside (animated, 160 ms); it collapses as soon as the pointer leaves, and a click before the 400 ms cancels it, so a quick point-and-click never expands. `tooltip` property of `bar/BarIcon.qml` (it grows its left padding). Picked 2026-11-10 after trying floating labels (a popup per label lagged: every pointer move repositions a window) and 200 ms to 1 s delays.
+
+Not in it (on purpose): battery (desktop), Omarchy's weather, update, dictation and idle indicators (no such features yet).
 
 Files (`shell/`): `shell.qml` (one bar per monitor, the notification popups), `Notifications.qml` (the notification daemon), `notifications/` (popups), `polkit/` (the admin password dialog), `LauncherState.qml` + `launcher/` (the app launcher), `LockState.qml` + `lock/` (lock screen, idle), `Settings.qml` (`~/.config/orka/settings.json`), `greeter.qml` + `greeter/` (the login screen), `cheatsheet/` (keyboard shortcuts, SUPER + K), `osd/` (on-screen display), `SettingsState.qml` + `settings/` (the settings app, see [settings](settings.md)), `Theme.qml` (colors, font, glyphs; placeholder until the Orka theme), `Apps.qml` (start programs via uwsm, like `orka/apps.lua`), `bar/*.qml` (one file per widget). Network state comes from `orka-netstatus`, because Quickshell's Networking module only supports NetworkManager and OrkaOS uses iwd + systemd-networkd.
 

@@ -12,5 +12,7 @@ BarIcon {
 
     visible: adapter !== null
     text: !on ? Theme.icons.btOff : connected ? Theme.icons.btConnected : Theme.icons.btOn
+    readonly property int connectedCount: Bluetooth.devices.values.filter(d => d.connected).length
+    tooltip: !on ? "Bluetooth off" : connectedCount > 0 ? "Bluetooth on, " + connectedCount + " connected" : "Bluetooth on"
     onClicked: Apps.tui("bluetui")
 }

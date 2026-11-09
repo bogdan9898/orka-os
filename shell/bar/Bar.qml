@@ -58,6 +58,7 @@ PanelWindow {
         NotificationBell {}
         BarIcon {
             text: Theme.icons.cpu
+            tooltip: "System monitor"
             onClicked: Apps.tui("btop")
         }
     }

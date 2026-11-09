@@ -18,6 +18,7 @@ BarIcon {
     }
 
     text: muted ? Theme.icons.muted : Theme.icons.volume[volume < 0.34 ? 0 : volume < 0.67 ? 1 : 2]
+    tooltip: muted ? "Volume: muted" : "Volume " + Math.round(volume * 100) + "%"
     onClicked: Apps.tui("wiremix")
     onRightClicked: if (ready) sink.audio.muted = !sink.audio.muted
     onScrolled: steps => {

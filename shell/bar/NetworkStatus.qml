@@ -13,6 +13,9 @@ BarIcon {
     text: status[0] === "wifi" ? Theme.icons.wifi[Math.min(4, Math.floor(Number(status[1]) / 20))]
         : status[0] === "ethernet" ? Theme.icons.ethernet
         : Theme.icons.offline
+    tooltip: status[0] === "wifi" ? "Wi-Fi, signal " + status[1] + "%"
+        : status[0] === "ethernet" ? "Ethernet"
+        : "Offline"
     onClicked: Apps.tui("impala")
 
     Process {

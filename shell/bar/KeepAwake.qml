@@ -7,5 +7,6 @@ import qs
 BarIcon {
     text: LockState.keepAwake ? Theme.icons.cupFull : Theme.icons.cup
     color: LockState.keepAwake ? Theme.accent : Theme.foreground
+    tooltip: "Keep awake: " + (LockState.keepAwake ? "on" : "off")
     onClicked: LockState.keepAwake = !LockState.keepAwake
 }

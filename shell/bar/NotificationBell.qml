@@ -7,6 +7,7 @@ import qs
 BarIcon {
     text: Notifications.dnd ? Theme.icons.dnd : Notifications.missed > 0 ? Theme.icons.bellBadge : Theme.icons.bell
     color: Notifications.missed > 0 && !Notifications.dnd ? Theme.accent : Theme.foreground
+    tooltip: Notifications.dnd ? "Notifications: do not disturb" : Notifications.missed > 0 ? "Notifications: " + Notifications.missed + " missed" : "Notifications"
     onClicked: Notifications.centerOpen = !Notifications.centerOpen
     onRightClicked: Notifications.dnd = !Notifications.dnd
 }
