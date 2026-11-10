@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Start the OrkaOS test VM (QEMU + KVM, UEFI). State lives in ~/orka-test.
+# Start the OrkaOS test VM (QEMU + KVM, UEFI). State lives in ~/dev/orka-test
+# ($ORKA_TEST_DIR; not directly in the home folder, which stays clean).
 #
 #   iso/test/vm.sh [options]
 #     --iso PATH     boot this ISO (default: boot the installed disk)
@@ -10,13 +11,13 @@
 #     --extra-disk F attach F (raw image) as a second disk (/dev/vdb)
 #
 # The live ISO gets the test SSH key through a cloud-init seed:
-#   ssh -i ~/orka-test/id_orka -p 2222 root@127.0.0.1
+#   ssh -i ~/dev/orka-test/id_orka -p 2222 root@127.0.0.1
 # Serial console output: /tmp/orka-serial.log, QEMU monitor: /tmp/orka-qmon.sock,
 # QMP (e.g. input-send-event for mouse clicks in tests): /tmp/orka-qmp.sock
 
 set -euo pipefail
 
-T="$HOME/orka-test"
+T="${ORKA_TEST_DIR:-$HOME/dev/orka-test}"
 OVMF=/usr/share/edk2/x64
 ISO="" OFFLINE=0 GUI=0 FRESH=0 DISK_GIB=40 EXTRA=""
 

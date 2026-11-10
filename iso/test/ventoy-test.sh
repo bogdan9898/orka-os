@@ -3,7 +3,7 @@
 # it boots from a real Ventoy stick. Run as root inside the archlinux WSL
 # distro:
 #
-#   iso/test/ventoy-test.sh [ISO]     default: newest ISO in ~bogdan/orka-build/out
+#   iso/test/ventoy-test.sh [ISO]     default: newest ISO in ~bogdan/dev/orka-build/out
 #
 # Downloads Ventoy (Linux release) into ~bogdan/ventoy-test once, creates a
 # 6 GiB stick image there, installs Ventoy on it, reformats the data partition
@@ -18,7 +18,7 @@ U=bogdan
 T=/home/$U/ventoy-test
 S="${SHOTS:-/tmp/orka-ventoy}"
 SECS="${SECS:-240}"
-ISO="${1:-$(ls -t /home/$U/orka-build/out/*.iso | head -1)}"
+ISO="${1:-$(ls -t /home/$U/dev/orka-build/out/*.iso | head -1)}"
 OVMF=/usr/share/edk2/x64
 die() { echo "ventoy-test: $*" >&2; exit 1; }
 [[ $EUID -eq 0 ]] || die "run as root"

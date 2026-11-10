@@ -66,7 +66,7 @@ Status on 2026-11-10 (day 6, Claude Code working directly on the OrkaOS PC; late
 - **Grey boot screen with three dots fixed:** Plymouth's text fallback; `UseSimpledrm=1` in `/etc/plymouth/plymouthd.conf` (installer; added by hand on the PC). Details in [branding](branding.md#boot-screen-plymouth).
 - **Updates:** no more `pacman -Sy` at first boot (partial-upgrade trap); `orka-update-reminder` asks for the first `pacman -Syu` at every login until it has run.
 - **Bar:** notification center (bell, SUPER + N, 50 kept), keep-awake cup, hover labels (icons expand after 400 ms). fastfetch logo no longer squished.
-- **ISO and tests on the PC:** `iso/build-in-docker.sh` builds the ISO without sudo (and fixed a real bug: Neovim plugins were not at their pinned commits); `iso/test/*` run here as well as on WSL; the install test passes. The Docker build cache was cleaned up afterwards; the test VM disk `~/orka-test` is kept on purpose.
+- **ISO and tests on the PC:** `iso/build-in-docker.sh` builds the ISO without sudo (and fixed a real bug: Neovim plugins were not at their pinned commits); `iso/test/*` run here as well as on WSL; the install test passes. The Docker build cache was cleaned up afterwards; the test VM disk is kept on purpose (moved to `~/dev/orka-test` on 2026-11-10: nothing of the tests or builds goes directly into the home folder).
 
 **Next up:**
 1. **Not published yet: no boot-screen frame after the login screen** (`greetd.service.d/clear-console.conf` wipes `/dev/fb0`; Hyprland's background black; [quickshell](quickshell.md#login-screen)). r65 on the PC: fonts and transitions confirmed by the user, but the boot screen's logo and ripples flashed between "Welcome" and the desktop.

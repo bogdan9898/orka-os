@@ -15,7 +15,8 @@
 #
 # Must run as root on Arch Linux (archiso, pacman). makepkg runs as the
 # unprivileged build user: $SUDO_USER, or $ORKA_BUILD_USER if set.
-# Everything is written below $ORKA_BUILD_DIR (default: ~build_user/orka-build).
+# Everything is written below $ORKA_BUILD_DIR (default: ~build_user/dev/orka-build,
+# not directly in the home folder).
 
 set -euo pipefail
 export LC_ALL=C.UTF-8   # built into glibc; the build host may have no locales generated
@@ -44,7 +45,7 @@ preflight() {
   [[ -d "$RELENG" ]] || die "archiso releng profile not found at $RELENG"
 
   BUILD_HOME="$(getent passwd "$BUILD_USER" | cut -d: -f6)"
-  B="${ORKA_BUILD_DIR:-$BUILD_HOME/orka-build}"
+  B="${ORKA_BUILD_DIR:-$BUILD_HOME/dev/orka-build}"
   AUR_SRC="$B/aur-src"       # AUR git checkouts (build user)
   AUR_PKGS="$B/aur-pkgs"     # built AUR packages (build user)
   CACHE="$B/pkg-cache"       # downloaded official packages (reused between builds)

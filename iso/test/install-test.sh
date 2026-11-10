@@ -4,8 +4,8 @@
 #
 #   iso/test/install-test.sh [ISO] [--mode wipe|free] [--windows-disk during|later] [--gui]
 #
-# ISO defaults to the newest one in ~/orka-build/out (iso/build.sh) or
-# ~/orka-build-out (iso/build-in-docker.sh).
+# ISO defaults to the newest one in ~/dev/orka-build/out (iso/build.sh) or
+# ~/dev/orka-build-out (iso/build-in-docker.sh).
 # --mode free          first creates a fake "Windows" layout on the target
 #                      disk, to test installing next to it.
 # --windows-disk WHEN  adds a second disk with a fake Windows installation:
@@ -17,7 +17,7 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-T="$HOME/orka-test"
+T="${ORKA_TEST_DIR:-$HOME/dev/orka-test}"
 ISO="" MODE=wipe GUI=() WINDISK=""
 while (($#)); do
   case "$1" in
@@ -28,9 +28,9 @@ while (($#)); do
   esac
   shift
 done
-# Newest ISO from iso/build.sh (~/orka-build/out) or iso/build-in-docker.sh (~/orka-build-out).
+# Newest ISO from iso/build.sh (~/dev/orka-build/out) or iso/build-in-docker.sh (~/dev/orka-build-out).
 # (ls fails when one of the two folders has no ISO: not an error here.)
-[[ -n "$ISO" ]] || ISO="$( { ls -t "$HOME"/orka-build/out/*.iso "$HOME"/orka-build-out/*.iso 2>/dev/null || true; } | head -1)"
+[[ -n "$ISO" ]] || ISO="$( { ls -t "$HOME"/dev/orka-build/out/*.iso "$HOME"/dev/orka-build-out/*.iso 2>/dev/null || true; } | head -1)"
 [[ -f "$ISO" ]] || { echo "no ISO found" >&2; exit 1; }
 
 log() { printf '\e[1;36m[test]\e[0m %s\n' "$*"; }

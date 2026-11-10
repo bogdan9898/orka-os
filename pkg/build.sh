@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Build the "orka" package from this repository (working tree as it is).
 #
-#   pkg/build.sh [OUTDIR]     (default OUTDIR: ~/orka-build/orka-pkg)
+#   pkg/build.sh [OUTDIR]     (default OUTDIR: ~/dev/orka-build/orka-pkg)
 #
 # Run as a normal user on Arch (OrkaOS, or the archlinux WSL distro). Prints the
 # path of the built package. Needs base-devel and git.
 set -euo pipefail
 R="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-OUT="${1:-$HOME/orka-build/orka-pkg}"
+OUT="${1:-$HOME/dev/orka-build/orka-pkg}"
 [[ $EUID -ne 0 ]] || { echo "pkg/build.sh: run as a normal user, not root" >&2; exit 1; }
 
 W="$(mktemp -d /tmp/orka-pkg-XXXX)"

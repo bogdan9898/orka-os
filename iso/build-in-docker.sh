@@ -14,13 +14,13 @@
 #
 #   image   orka-iso-builder            Arch + archiso etc. (iso/docker/Dockerfile)
 #   volume  orka-build                  build files, caches between builds (~15 GB)
-#   output  ~/orka-build-out/           the finished ISO (owned by you)
+#   output  ~/dev/orka-build-out/       the finished ISO (owned by you)
 set -euo pipefail
 
 R="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 IMAGE=orka-iso-builder
 VOLUME=orka-build
-OUT="${ORKA_ISO_OUT:-$HOME/orka-build-out}"
+OUT="${ORKA_ISO_OUT:-$HOME/dev/orka-build-out}"
 
 if [[ "${1:-}" == --cleanup ]]; then
   docker volume rm -f "$VOLUME" >/dev/null && echo "removed volume $VOLUME"
