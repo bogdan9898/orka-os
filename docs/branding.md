@@ -62,3 +62,14 @@ In `/usr/share/orka/wallpapers/` (Settings → Wallpaper lists them), all 2560×
 | `orka-fins.png` | Orca fins cutting through the waves, the water seen above and below the surface (the user's picture) |
 
 `branding/wallpapers/make.sh` makes the bubbles one (python3, librsvg, imagemagick). "Theme default" in Settings → Wallpaper still means the theme's own wallpaper or its background color.
+
+### Blurry wallpapers, and getting more (open, not decided)
+
+Reported by the user 2026-11-10: some wallpapers look soft on the 2560×1440 monitor. The user's AI-generated pictures came out of the generator smaller than that and were scaled up. A rough check (how much detail a picture loses when shrunk to 50 % and enlarged again; an enlarged picture loses little) gave: `orka-ice.png` 0.0033 (lowest by far), `orka-ocean.png` 0.0066, `orka-moon.png` 0.0079, `orka-fins.png` 0.0071, `deep-water-bubbles.jpg` 0.019. The light rays are a smooth gradient, so their low score means nothing. Only a hint: the user has to say which ones look blurry. We also want more wallpapers.
+
+Options (looked up 2026-11-10; the generators' sizes come from comparison blogs, not the vendors' docs, so check them before paying):
+
+1. **Generate again at full size, then shrink** (recommended): shrinking stays sharp, enlarging blurs. Flux 1.1 Pro Ultra (Black Forest Labs) is said to do 16:9 up to ~4 megapixels (2560×1440 is 3.7); Midjourney's HD mode is said to give 2912×1632 at 16:9. Ideogram (~2048 px, its upscaler crops to its own ratios) fits worse.
+2. **AI-upscale the originals** if the user still has them: Real-ESRGAN runs locally on the AMD GPU through Vulkan (AUR `realesrgan-ncnn-vulkan`, upstream stale; `upscayl-ncnn-git` is a newer fork). Better than plain scaling, worse than generating at full size. Installing it needs the user's OK.
+3. **Real orca photos** under a clear license, since the repository is public: NOAA (mostly public domain as US government work; some are other people's photos under CC BY-SA, check each one and credit the photographer) and Wikimedia Commons (license per file). The Unsplash License is disputed for distributions (not on Fedora's list of good content licenses, Parabola blacklisted wallpapers under it). Wallpaper sites like Wallhaven: rights mostly unclear, avoid.
+4. **Made by code**, like `bubbles.py`: sharp at any resolution, no license question. Ideas in the Deep water style: light rays, caustics, ripples, a silhouette built from the logo.
