@@ -80,7 +80,7 @@ Status on 2026-11-10 (late evening, end of the session; latest release **`orka 1
 
 **Next up:**
 1. Nothing waiting for confirmation on the PC (r75 confirmed). For the next session (the user said "tomorrow", 2026-11-11):
-   - SUPER + W with the notification center open closes the window under it instead of the center (same problem the calendar had). Fix offered: add `orka-notification-center` to the `panels` table in `config/hypr/orka/bindings/tiling.lua` with an IPC `close` on the `notifications` target (it only has `toggleCenter` today). Not started, wait for the user's OK.
+   - **Not about the calendar** (SUPER + W closes the calendar correctly, confirmed in r75). Only the **notification center** (bell / SUPER + N) may still have the old SUPER + W problem: it is not in the `panels` table in `config/hypr/orka/bindings/tiling.lua`, so going by the code SUPER + W would close the focused window under it, not the center. **Not tested**, only read from the code; check it first (with a spare terminal focused). If confirmed, the fix: add `orka-notification-center` to that table and an IPC `close` on the `notifications` target (it only has `toggleCenter`). Wait for the user's OK.
    - The wallpaper options above wait for the user's pick.
 2. The user keeps reporting bugs and small features from the PC: fix in the repo, test (VM end to end for boot/login), commit, and publish only when the user says so.
 3. Open questions, not started, each needs the user's decision first:
