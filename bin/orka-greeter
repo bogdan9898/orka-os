@@ -1,0 +1,18 @@
+#!/bin/sh
+# The login screen greetd starts on tty1 as the "greeter" user
+# (/etc/greetd/config.toml: command = "orka-greeter"): the Quickshell greeter
+# (shell/greeter.qml) inside the cage kiosk compositor.
+#   -s  allow switching to other consoles (CTRL + ALT + F2...)
+#   -d  no window decorations (and Qt's own title bar is turned off too)
+# XCURSOR_*: the OrkaOS mouse cursor, as in the desktop (orka/envs.lua).
+#
+# greetd gives the greeter tty1 as its output. cage, Mesa and Quickshell log
+# a lot there; the text stayed on the console behind the login screen and
+# showed for a moment after a login, when cage exits and the console is back
+# in text mode (orka r61, 2026-11-10). Their output goes to the journal
+# instead (journalctl -t orka-greeter), and the console is cleared with its
+# cursor hidden first, which also drops any text left from the boot.
+printf '\033[H\033[2J\033[?25l'
+export XCURSOR_THEME=Bibata-Modern-Classic XCURSOR_SIZE=24
+export QT_WAYLAND_DISABLE_WINDOWDECORATION=1 QS_DISABLE_CRASH_HANDLER=1
+exec systemd-cat -t orka-greeter cage -s -d -- qs -p /usr/share/orka/shell/greeter.qml

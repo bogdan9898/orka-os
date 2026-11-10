@@ -69,15 +69,15 @@ Status on 2026-11-10 (day 6, Claude Code working directly on the OrkaOS PC; late
 - **ISO and tests on the PC:** `iso/build-in-docker.sh` builds the ISO without sudo (and fixed a real bug: Neovim plugins were not at their pinned commits); `iso/test/*` run here as well as on WSL; the install test passes. The Docker build cache was cleaned up afterwards; the test VM disk `~/orka-test` is kept on purpose.
 
 **Next up:**
-1. **Confirm r61 on the PC:** after `sudo pacman -Syu` and a logout/login the user should see "Welcome, Bogdan", then black (no text) before the desktop. If login breaks: `CTRL + ALT + F2`, then `sudo pacman -U /var/cache/pacman/pkg/orka-1.0.r58-1-any.pkg.tar.zst` and `sudo systemctl restart greetd`.
+1. **Login text flash, fixed in the repo, not published yet:** r61 works on the PC, but cage's log still flashed for a moment after a login (the greeter's output was on tty1). `bin/orka-greeter` sends it to the journal (`journalctl -t orka-greeter`); tested in the VM ([quickshell](quickshell.md#login-screen)). After publishing, on the PC: `sudo pacman -Syu`, then once `sudo sed -i 's|^command = .*|command = "orka-greeter"|' /etc/greetd/config.toml`, then log out and in: login screen, black, desktop, no text. If the login screen doesn't come up: `CTRL + ALT + F2` and put the old command back (`env XCURSOR_THEME=Bibata-Modern-Classic XCURSOR_SIZE=24 QT_WAYLAND_DISABLE_WINDOWDECORATION=1 QS_DISABLE_CRASH_HANDLER=1 cage -s -d -- qs -p /usr/share/orka/shell/greeter.qml`), then `sudo systemctl restart greetd`.
 2. The user keeps reporting bugs and small features from the PC: fix in the repo, test (VM end to end for boot/login), commit, and publish only when the user says so.
 3. Open questions, not started, each needs the user's decision first:
    - Old installs don't get installer-written settings (e.g. `UseSimpledrm=1`, greetd config): should the package's install script bring them up to date?
    - The `docker` group the installer adds users to is root-equivalent (Docker's own docs): keep, rootless Docker, or `sudo docker`?
-   - The PC's firmware (UEFI) phase takes ~72 s of the ~98 s boot; outside OrkaOS, not investigated.
+   - The PC's firmware (UEFI) phase (43 s cold boot, 72 s on reboots) is before Limine starts (Limine itself takes ~3 s, its timeout). Investigated 2026-11-10: most likely DDR5 memory training on AM5 (MSI B650 Tomahawk, BIOS 1.70 of 08/2023, EXPO on). BIOS options: Memory Context Restore + Power Down Mode, or a BIOS update. The user chose to leave it as it is.
    - Why the amdgpu devices never reach Plymouth inside the initramfs (worked around, cause unknown).
    - Publishing the ISO as split release assets (GitHub's limit is 2 GiB per file, the ISO is 3.5 GB): undecided.
-   - ~2.5 s of black between the boot screen and the login screen (seen in the VM; cage/greeter start).
+   - ~2.5 s of black between the boot screen and the login screen (seen in the VM). Not the greeter itself: in the VM greetd to "Configuration Loaded" takes ~0.45 s, on the PC the greeter draws its first frame ~0.1 s after start; a shader cache would save ~3 ms (measured 2026-11-10).
 4. AI review of AUR packages before they are built (planned, see 6. below), then the open TODOs (fonts, clicking through the interactive installer) and the real-machine checks below.
 
 1. **Foundation**

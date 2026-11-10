@@ -1,12 +1,10 @@
-# OrkaOS login screen: greetd runs the Quickshell greeter (shell/greeter.qml)
-# as the "greeter" user, inside the cage kiosk compositor. After a login the
-# greeter starts Hyprland through uwsm.
-#   -s  allow switching to other consoles (CTRL + ALT + F2...)
-#   -d  no window decorations (and Qt's own title bar is turned off too)
-# XCURSOR_*: the OrkaOS mouse cursor, as in the desktop (orka/envs.lua).
+# OrkaOS login screen: greetd runs orka-greeter (the Quickshell greeter,
+# shell/greeter.qml, inside the cage kiosk compositor; its log goes to the
+# journal: journalctl -t orka-greeter) as the "greeter" user. After a login
+# the greeter starts Hyprland through orka-session (uwsm).
 [terminal]
 vt = 1
 
 [default_session]
-command = "env XCURSOR_THEME=Bibata-Modern-Classic XCURSOR_SIZE=24 QT_WAYLAND_DISABLE_WINDOWDECORATION=1 QS_DISABLE_CRASH_HANDLER=1 cage -s -d -- qs -p /usr/share/orka/shell/greeter.qml"
+command = "orka-greeter"
 user = "greeter"
