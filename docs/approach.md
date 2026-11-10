@@ -73,7 +73,7 @@ Status on 2026-11-10 (evening, end of day 6; latest release **`orka 1.0.r68`**, 
 - If the login screen ever fails to come up on an old install: `CTRL + ALT + F2`, put the old greetd command back (`env XCURSOR_THEME=Bibata-Modern-Classic XCURSOR_SIZE=24 QT_WAYLAND_DISABLE_WINDOWDECORATION=1 QS_DISABLE_CRASH_HANDLER=1 cage -s -d -- qs -p /usr/share/orka/shell/greeter.qml`), then `sudo systemctl restart greetd`.
 
 **Next up:**
-1. Nothing waiting for confirmation on the PC.
+1. Committed, **not published yet**: the calendar under the bar's clock and the new clock text (`e3beaee`, see [quickshell](quickshell.md#the-bar)). Before publishing: try it in the real shell (keyboard, clicks, SUPER + W, the notification center closing it).
 2. The user keeps reporting bugs and small features from the PC: fix in the repo, test (VM end to end for boot/login), commit, and publish only when the user says so.
 3. Open questions, not started, each needs the user's decision first:
    - Old installs don't get installer-written settings (e.g. `UseSimpledrm=1`, greetd config): should the package's install script bring them up to date?
