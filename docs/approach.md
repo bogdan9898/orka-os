@@ -73,7 +73,7 @@ Status on 2026-11-10 (evening, end of day 6; latest release **`orka 1.0.r68`**, 
 - If the login screen ever fails to come up on an old install: `CTRL + ALT + F2`, put the old greetd command back (`env XCURSOR_THEME=Bibata-Modern-Classic XCURSOR_SIZE=24 QT_WAYLAND_DISABLE_WINDOWDECORATION=1 QS_DISABLE_CRASH_HANDLER=1 cage -s -d -- qs -p /usr/share/orka/shell/greeter.qml`), then `sudo systemctl restart greetd`.
 
 **Next up:**
-1. Committed, **not published yet**: the calendar under the bar's clock and the new clock text (`e3beaee`, see [quickshell](quickshell.md#the-bar)). With a month/year picker; tried by the user in the real shell run from the repo ("looks good"). After publishing: check SUPER + W closes it.
+1. Nothing waiting for confirmation on the PC. Latest release **`orka 1.0.r75`** (2026-11-10, late evening), installed and confirmed on the PC: the clock reads `10 Nov 2026 Tuesday 10:05 PM` and opens a calendar with a month/year picker ([quickshell](quickshell.md#the-bar)); SUPER + W closes it (the user tested it with a spare terminal: the calendar closed, the terminal stayed). Open: SUPER + W still closes the window under the notification center instead of the center (not asked to fix yet). Wallpaper options wait for the user's pick ([branding](branding.md#blurry-wallpapers-and-getting-more-open-not-decided)).
 2. The user keeps reporting bugs and small features from the PC: fix in the repo, test (VM end to end for boot/login), commit, and publish only when the user says so.
 3. Open questions, not started, each needs the user's decision first:
    - Old installs don't get installer-written settings (e.g. `UseSimpledrm=1`, greetd config): should the package's install script bring them up to date?
