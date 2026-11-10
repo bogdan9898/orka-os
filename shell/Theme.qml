@@ -40,8 +40,14 @@ Singleton {
         onLoadFailed: root.theme = {}
     }
 
-    readonly property string font: "JetBrainsMono Nerd Font"
-    readonly property int fontSize: 12
+    // The interface font (Settings → Fonts), else JetBrainsMono Nerd Font.
+    // Its size is in points for apps; the shell scales from its 12 px at the
+    // GTK default of 11 pt. The icons below are Nerd Font glyphs: with
+    // another font they come from JetBrainsMono Nerd Font through font
+    // fallback.
+    readonly property string defaultFont: "JetBrainsMono Nerd Font"
+    readonly property string font: Settings.interfaceFont || defaultFont
+    readonly property int fontSize: Settings.interfaceFontSize > 0 ? Math.round(Settings.interfaceFontSize * 12 / 11) : 12
     readonly property int barHeight: 26
 
     // Nerd Font glyphs (Material Design range), same as Omarchy's bar.
@@ -75,6 +81,7 @@ Singleton {
         timer:       String.fromCodePoint(0xF051B),
         check:       String.fromCodePoint(0xF012C),
         folder:      String.fromCodePoint(0xF024B),
+        font:        String.fromCodePoint(0xF0284),   // format-font
         btOn:        String.fromCodePoint(0xF293),
         btOff:       String.fromCodePoint(0xF00B2),
         btConnected: String.fromCodePoint(0xF00B1),

@@ -22,6 +22,7 @@ orka-settings about                        # system information (JSON)
 | Wallpaper | Theme default (its wallpaper or background color), or an image from your folder | `.wallpaper` (path, `""` = theme default) | `orka-wallpaper` (swaybg) |
 | Animations | On/off; speed (Relaxed ×1.5, Normal, Quick ×0.7, Snappy ×0.45); opening and closing windows (Pop in, Slide, Grow, Fade only); switching workspaces (Off, Slide, Slide up/down, Fade, Slide + fade); moving and resizing windows on/off | `.animations.enabled`, `.speed`, `.windows` (`popin` `slide` `gnomed` `fade`), `.workspaces` (`off` `slide` `slidevert` `fade` `slidefade`), `.moves` | `current/hyprland.lua` → `orka/looknfeel.lua` (`hl.animation`), `hyprctl reload` |
 | Mouse cursor | Size (24, 32, 40, 48) and a cursor theme, each shown with its arrow, hand, text and busy cursor | `.cursor.theme`, `.cursor.size` | see [Mouse cursor](#mouse-cursor) |
+| Fonts | Interface font and monospace font, each from the installed fonts (shown in themselves; a search finds all of them) with a size, or Default | `.fonts.interface`, `.fonts.monospace` (`{ family, size }`, points) | see [Fonts](#fonts) |
 | Display | Resolution + refresh rate (from the modes the monitor reports), scale (100–200 %), per monitor. **Goes back after 15 s** unless you press Keep | `.monitors["DP-1"] = { mode, scale }` | `current/hyprland.lua` → `hl.monitor`, `hyprctl reload` |
 | Idle & lock | Lock after / screen off after: 1, 2, 5, 10, 15, 30 min, 1 h, never; "Lock now" | `.idle.lockAfter`, `.idle.screenOffAfter` (seconds) | The shell (`lock/Idle.qml`) |
 | Sound | Default output and input device, volume, mute | Pipewire itself (remembered by WirePlumber) | Pipewire |
@@ -98,7 +99,30 @@ Most apps let Hyprland draw the cursor (Wayland cursor-shape protocol), so it ch
 | GTK | `gsettings` `cursor-theme`, `cursor-size` |
 | Qt / KDE apps | `[Mouse]` in `~/.config/kcminputrc` |
 | X11 apps (XWayland) | `~/.local/share/icons/default/index.theme` (`Inherits=`) |
-| Login screen | `XCURSOR_THEME` in `/etc/greetd/config.toml` (fixed, not from your settings) |
+| Login screen | `XCURSOR_THEME` in `orka-greeter` (`bin/`; fixed, not from your settings) |
+
+## Fonts
+
+Two fonts, like GNOME and KDE: the **interface font** and the **monospace font**, each with a size in points. Unset (Default), every place keeps its own default: the shell JetBrainsMono Nerd Font (12 px), GTK apps Adwaita Sans / Adwaita Mono 11, the terminal JetBrainsMono Nerd Font 9, everything else Noto Sans / Noto Sans Mono through fontconfig. "Default" and "Default size" go back to that.
+
+Settings → Fonts shows the fonts with Latin letters (for monospace, the fixed-width ones), each button in its own font; the search looks through all installed fonts (about 250, most of them Noto fonts for other scripts). Ghostscript's two symbol fonts (D050000L, Standard Symbols PS) are left out of the short list, and Nerd Fonts' proportional "Propo" variants out of the monospace one. From a terminal:
+
+```sh
+orka-settings fonts                                                       # installed families (JSON)
+orka-settings set .fonts.interface '{"family":"Noto Sans","size":11}'
+orka-settings set .fonts.monospace.family '"JetBrainsMono Nerd Font"'
+orka-settings set .fonts null                                             # everything back to the defaults
+```
+
+| Where | Interface font | Monospace font |
+|---|---|---|
+| The shell (bar, launcher, notifications, Settings, lock screen) | `Theme.font` / `Theme.fontSize` from `settings.json`, live; the size scales from 12 px at 11 pt | – |
+| GTK apps | `gsettings` `font-name` | `monospace-font-name` |
+| Qt / KDE apps | `[Fonts] general` in `qt6ct.conf` | `[Fonts] fixed` |
+| Everything else (browsers, Hyprland's group bar...) | fontconfig `sans-serif` | fontconfig `monospace` |
+| Terminal (Ghostty) and Neovim in it | – | `font-family` / `font-size` at the end of `current/ghostty.conf`, reloaded at once (SIGUSR2) |
+
+fontconfig gets `~/.config/fontconfig/conf.d/50-orka-fonts.conf` (removed again when both are Default). The shell's icons are Nerd Font glyphs: with another interface font they still come from JetBrainsMono Nerd Font through Qt's font fallback. GTK and Qt apps pick up a change when they start (some GTK apps right away). The login screen keeps its own font (it runs before you log in, as another user).
 
 ## How Hyprland gets the values
 
@@ -107,6 +131,8 @@ Most apps let Hyprland draw the cursor (Wayland cursor-shape protocol), so it ch
 The login screen doesn't use these settings (it runs before you log in, as another user).
 
 ## Tested
+
+2026-11-10 (fonts) in the VM, by clicking: Settings → Fonts lists 21 fonts for the interface and 7 monospace ones, a search for "arabic" finds the Noto Arabic fonts; picking Noto Sans switches the bar, Settings and notifications at once with the icons intact; Noto Sans Mono 12 lands in gsettings, `qt6ct.conf` and Ghostty; with URW Gothic pavucontrol (GTK) and Dolphin (Qt) open in it; 14 pt still fits the bar; changing the monospace font while a terminal is open changes it at once. In a test config folder: a theme change keeps the terminal font, `set .fonts null` removes everything again (Ghostty back to JetBrainsMono 9, fontconfig file gone), `fc-match` follows the fontconfig file. Not tried: Firefox and Chromium following fontconfig's sans-serif, Neovim's look in other monospace fonts.
 
 2026-11-07 (animations) in the VM from a fresh install: the Animations page shows the defaults; `orka-settings set .animations '{"speed":0.7,"windows":"slide","workspaces":"slidefade","moves":false}'` changes Hyprland's live table (`hyprctl animations`: windowsIn 2.87 `slide`, workspaces 2.45 `slidefade 20%`, windowsMove off) and the page follows; turning animations off sets `animations:enabled` false. All 20 window × workspace style combinations pass `Hyprland --verify-config`; unknown values fall back to the defaults. Not judged yet: how the animations look and feel (screenshots can't show motion; check on the real machine).
 

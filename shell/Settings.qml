@@ -17,6 +17,9 @@ pragma Singleton
 //                    speed multiplies durations (0.45–1.5); windows: popin slide
 //                    gnomed fade; workspaces: off slide slidevert fade slidefade
 //   monitors         { "DP-1": { mode: "2560x1440@165", scale: 1 } }
+//   fonts            { interface: { family: "Noto Sans", size: 11 }, monospace: { family, size } }
+//                    sizes in points; unset = each place's own default
+//                    (orka-settings fonts lists the installed families)
 import QtQuick
 import Quickshell
 import Quickshell.Io
@@ -54,6 +57,11 @@ Singleton {
     readonly property string workspaceAnimation: animations.workspaces || "off"
     readonly property bool moveAnimation: animations.moves !== false
     readonly property var monitors: data.monitors || {}
+    readonly property var fonts: data.fonts || {}
+    readonly property string interfaceFont: (fonts.interface || {}).family || ""   // "" = default
+    readonly property int interfaceFontSize: number((fonts.interface || {}).size, 0)   // 0 = default
+    readonly property string monospaceFont: (fonts.monospace || {}).family || ""
+    readonly property int monospaceFontSize: number((fonts.monospace || {}).size, 0)
 
     function number(value, fallback) {
         return typeof value === "number" && value >= 0 ? Math.round(value) : fallback;

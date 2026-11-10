@@ -6,6 +6,7 @@ Rectangle {
     id: root
     property alias text: label.text
     property bool selected: false
+    property string fontFamily: Theme.font   // e.g. a font shown in itself
     signal clicked
 
     implicitWidth: label.implicitWidth + 24
@@ -18,7 +19,7 @@ Rectangle {
         id: label
         anchors.centerIn: parent
         color: root.selected ? Theme.background : Theme.foreground
-        font.family: Theme.font
+        font.family: root.fontFamily
         font.pixelSize: Theme.fontSize
         font.bold: root.selected
     }
