@@ -34,7 +34,7 @@ Based on Omarchy v3.8.4. `SUPER + K` opens the cheat sheet with every shortcut (
 
 | Keys | Action |
 |---|---|
-| `SUPER + W` | Close window (or the open cheat sheet, launcher or Settings panel) |
+| `SUPER + W` | Close window (or the open cheat sheet, launcher, Settings or calendar) |
 | `SUPER + T` | Toggle floating/tiling |
 | `SUPER + F` / `SUPER + ALT + F` | Full screen / full width |
 | `SUPER + J` / `SUPER + P` | Toggle split / pseudo-tile |

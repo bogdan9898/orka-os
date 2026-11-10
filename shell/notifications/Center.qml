@@ -42,8 +42,10 @@ PanelWindow {
     }
 
     onVisibleChanged: {
-        if (visible)
-            Qt.callLater(() => box.forceActiveFocus());
+        if (!visible)
+            return;
+        CalendarState.open = false;   // both drop down under the bar
+        Qt.callLater(() => box.forceActiveFocus());
     }
 
     // A click outside the box closes it.

@@ -4,10 +4,10 @@ local bind = section("Windows")
 local workspace = section("Workspaces")
 local group = section("Groups (tabs)")
 
--- SUPER + W closes a full-screen OrkaOS panel (cheat sheet, launcher,
--- settings) when one is open: they take the keyboard, so otherwise the
+-- SUPER + W closes an OrkaOS panel (cheat sheet, launcher, settings,
+-- calendar) when one is open: they take the keyboard, so otherwise the
 -- window hidden under the panel would close instead. Else the window.
-local panels = { ["orka-cheatsheet"] = "cheatsheet", ["orka-launcher"] = "launcher", ["orka-settings"] = "settings" }
+local panels = { ["orka-cheatsheet"] = "cheatsheet", ["orka-launcher"] = "launcher", ["orka-settings"] = "settings", ["orka-calendar"] = "calendar" }
 local function close_panel_or_window()
     for _, layer in ipairs(hl.get_layers()) do
         local target = panels[layer.namespace]
