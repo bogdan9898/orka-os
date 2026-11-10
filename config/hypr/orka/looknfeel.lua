@@ -58,6 +58,10 @@ hl.config({
     misc = {
         disable_hyprland_logo      = true,
         disable_splash_rendering   = true,
+        -- Black, not Hyprland's grey (#111111), behind the wallpaper: it
+        -- shows for a moment at login before the wallpaper fades in, right
+        -- after the login screen's fade to black.
+        background_color           = 0xff000000,
         disable_scale_notification = true,
         focus_on_activate          = true,
         anr_missed_pings           = 3,
